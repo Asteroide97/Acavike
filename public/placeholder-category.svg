@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0B3561" />
+      <stop offset="100%" stop-color="#245886" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="#EDE6D9" />
+  <rect x="48" y="48" width="704" height="504" rx="36" fill="url(#g)" />
+  <g fill="#F4EEE2">
+    <path d="M165 387V213h96c70 0 111 34 111 87s-41 87-111 87h-96Zm66-54h24c32 0 50-13 50-33s-18-33-50-33h-24v66Z" />
+    <path d="M425 387V213h66v120h104v54H425Z" opacity=".9" />
+  </g>
+  <text x="76" y="516" fill="#F4EEE2" font-family="Arial, sans-serif" font-size="28" font-weight="700">Catálogo Industrial Acavike</text>
+</svg>

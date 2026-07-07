@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#F6F1E7" />
+  <rect x="56" y="56" width="688" height="488" rx="34" fill="#FFFFFF" stroke="#D4DBE4" stroke-width="8" />
+  <rect x="116" y="144" width="250" height="250" rx="28" fill="#0B3561" opacity=".08" />
+  <path d="M218 214h80l46 110h-60l-11-24h-68l-11 24h-60l84-110Zm10 53-16 33h38l-16-33h-6Z" fill="#0B3561" />
+  <rect x="412" y="172" width="218" height="28" rx="14" fill="#0B3561" opacity=".88" />
+  <rect x="412" y="226" width="164" height="18" rx="9" fill="#6A7685" opacity=".76" />
+  <rect x="412" y="266" width="214" height="18" rx="9" fill="#6A7685" opacity=".55" />
+  <rect x="412" y="328" width="132" height="56" rx="18" fill="#DCE6F3" />
+  <text x="116" y="472" fill="#0F172A" font-family="Arial, sans-serif" font-size="34" font-weight="700">Acavike Demo</text>
+</svg>
