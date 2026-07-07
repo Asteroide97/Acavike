@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { unstable_noStore as noStore } from "next/cache";
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/public/product-card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -13,6 +14,7 @@ export default async function CategoryCatalogPage({
 }: {
   params: Params;
 }) {
+  noStore();
   const { slug } = await params;
   const { category, products } = await getCategoryCatalogDataRepository(slug);
 

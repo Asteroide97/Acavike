@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { unstable_noStore as noStore } from "next/cache";
 import { logoutAction } from "@/lib/actions/auth";
 import { requireUser } from "@/lib/auth";
 import { Alert } from "@/components/ui/alert";
@@ -15,6 +16,7 @@ export default async function AdminLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  noStore();
   const user = await requireUser(BACKOFFICE_ROLES);
 
   return (
@@ -57,7 +59,7 @@ export default async function AdminLayout({
             </div>
           </div>
 
-          {RUNTIME_NOTICE && !DEMO_MODE ? <Alert tone={RUNTIME_NOTICE.tone}>{RUNTIME_NOTICE.message}</Alert> : null}
+          {RUNTIME_NOTICE ? <Alert tone={RUNTIME_NOTICE.tone}>{RUNTIME_NOTICE.message}</Alert> : null}
 
           {children}
         </div>

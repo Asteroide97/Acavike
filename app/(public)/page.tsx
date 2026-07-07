@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { unstable_noStore as noStore } from "next/cache";
 import { ArrowRight, Building2, ClipboardCheck, Search } from "lucide-react";
 import { CategoryCard } from "@/components/public/category-card";
 import { ProductCard } from "@/components/public/product-card";
@@ -10,6 +11,7 @@ import { getHomepageData } from "@/lib/site";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
+  noStore();
   const { sections, categories, featuredProducts } = await getHomepageData();
   const hero = sections.find((section) => section.key === "hero_home");
   const quickQuote = sections.find((section) => section.key === "quick_quote");

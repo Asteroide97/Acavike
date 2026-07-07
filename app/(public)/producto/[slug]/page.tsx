@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { unstable_noStore as noStore } from "next/cache";
 import { notFound } from "next/navigation";
 import { addToCartAction } from "@/lib/actions/commerce";
 import { formatCurrency } from "@/lib/utils";
@@ -18,6 +19,7 @@ export default async function ProductDetailPage({
 }: {
   params: Params;
 }) {
+  noStore();
   const { slug } = await params;
   const { product, relatedProducts } = await getProductDetailDataRepository(slug);
 

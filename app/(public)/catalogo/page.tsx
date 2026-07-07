@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { unstable_noStore as noStore } from "next/cache";
 import { PUBLIC_SORT_OPTIONS } from "@/lib/constants";
 import { ProductCard } from "@/components/public/product-card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -18,6 +19,7 @@ export default async function CatalogPage({
 }: {
   searchParams: SearchParams;
 }) {
+  noStore();
   const resolved = await searchParams;
   const query = getSingleValue(resolved.q) || "";
   const categorySlug = getSingleValue(resolved.categoria) || "";

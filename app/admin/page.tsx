@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { unstable_noStore as noStore } from "next/cache";
 import { AlertCircle, Boxes, CreditCard, DollarSign, FileText, PackageSearch, ShoppingCart, Users } from "lucide-react";
 import { AdminFlash } from "@/components/admin/admin-flash";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
@@ -21,6 +22,7 @@ export default async function AdminHomePage({
 }: {
   searchParams: SearchParams;
 }) {
+  noStore();
   await requireUser(BACKOFFICE_ROLES);
   const resolvedSearchParams = await searchParams;
   const {
