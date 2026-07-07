@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { UserRole } from "@prisma/client";
 import { SESSION_COOKIE } from "@/lib/constants";
+import { AUTH_SECRET, DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
+import { demoBackofficeUser, demoCustomerUser, findDemoViewerById, getDemoRuntimeUser } from "@/lib/demo-data";
 import { prisma } from "@/lib/prisma";
 
 type SessionPayload = {
@@ -12,7 +14,7 @@ type SessionPayload = {
 };
 
 function getSessionSecret() {
-  return process.env.SESSION_SECRET || "acavike-dev-secret";
+  return AUTH_SECRET;
 }
 
 function encode(payload: SessionPayload) {
@@ -84,6 +86,14 @@ export async function getCurrentUser() {
     return null;
   }
 
+  if (DEMO_MODE) {
+    return findDemoViewerById(session.userId);
+  }
+
+  if (!DATABASE_ENABLED) {
+    return null;
+  }
+
   return prisma.user.findUnique({
     where: { id: session.userId },
     include: { customer: true },
@@ -91,6 +101,18 @@ export async function getCurrentUser() {
 }
 
 export async function requireUser(roles?: UserRole[]) {
+  if (DEMO_MODE) {
+    if (roles?.includes("CUSTOMER")) {
+      return demoCustomerUser;
+    }
+
+    return getDemoRuntimeUser(roles?.[0] ?? demoBackofficeUser.role);
+  }
+
+  if (!DATABASE_ENABLED) {
+    return getDemoRuntimeUser(roles?.[0] ?? "ADMIN");
+  }
+
   const user = await getCurrentUser();
 
   if (!user) {

@@ -11,18 +11,40 @@ La plataforma incluye:
 ## Requisitos
 
 - `Node.js 20+`
-- `PostgreSQL`
 - `npm`
+- `PostgreSQL` solo para instalaciones reales con base de datos
 
 ## Variables de entorno
 
-Copia `.env.example` a `.env` y ajusta los valores:
+La aplicacion soporta dos modos.
+
+### Modo demo sin base de datos
 
 ```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/acavike?schema=public"
-SESSION_SECRET="cambia-esta-clave-por-una-cadena-larga-y-segura"
+DEMO_MODE="true"
+AUTH_SECRET="cambia-esta-clave-por-una-cadena-larga-y-segura"
 NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 ```
+
+Notas:
+
+- `DATABASE_URL` no es obligatoria.
+- La home, el catalogo, los productos, las categorias, el carrito visual, el checkout visual y el admin cargan con datos demo internos.
+- Las acciones del admin se muestran en modo simulado.
+
+### Modo real con PostgreSQL
+
+```env
+DEMO_MODE="false"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/acavike?schema=public"
+AUTH_SECRET="cambia-esta-clave-por-una-cadena-larga-y-segura"
+NEXT_PUBLIC_SITE_URL="http://localhost:3000"
+```
+
+Notas:
+
+- Si `DEMO_MODE=false` y falta `DATABASE_URL`, la aplicacion muestra errores controlados y no rompe los Server Components.
+- `AUTH_SECRET` es la variable recomendada. Tambien se aceptan `JWT_SECRET` o `SESSION_SECRET` por compatibilidad.
 
 ## Instalacion
 
@@ -31,12 +53,26 @@ npm install
 npx prisma generate
 ```
 
-## Migraciones
+## Desarrollo
 
-Para crear y aplicar la migracion inicial:
+### Correr en modo demo
 
 ```bash
+npm run dev
+```
+
+Con `DEMO_MODE=true`, el sitio funciona sin base de datos.
+
+### Correr en modo real
+
+1. Configura `DEMO_MODE=false`.
+2. Define `DATABASE_URL`.
+3. Genera Prisma y aplica migraciones.
+
+```bash
+npx prisma generate
 npm run db:migrate -- --name init
+npm run dev
 ```
 
 Si solo quieres sincronizar el esquema local rapidamente:
@@ -45,21 +81,28 @@ Si solo quieres sincronizar el esquema local rapidamente:
 npm run db:push
 ```
 
-## Seed
-
-Carga datos demo, categorias, productos y usuarios iniciales:
+Si necesitas datos iniciales para entorno real:
 
 ```bash
 npm run db:seed
 ```
 
-## Desarrollo
+## Variables de Vercel
 
-```bash
-npm run dev
+### Demo
+
+```env
+DEMO_MODE="true"
+AUTH_SECRET="..."
 ```
 
-Abre [http://localhost:3000](http://localhost:3000).
+### Produccion real
+
+```env
+DEMO_MODE="false"
+DATABASE_URL="..."
+AUTH_SECRET="..."
+```
 
 ## Build y validacion
 
@@ -69,12 +112,11 @@ npm run build
 npx prisma generate
 ```
 
-## Acceso inicial
+## Acceso demo
 
 Superadmin:
 
-- `email`: `admin@acavike.com`
-- `password`: `Admin123!`
+- `admin@acavike.com` / `Admin123!`
 
 Usuarios demo adicionales:
 
@@ -100,6 +142,6 @@ npm run db:seed
 - El checkout genera pedidos con estado `PENDING_TRANSFER`.
 - El comprobante se carga en `public/uploads/receipts`.
 - Solo `SUPERADMIN` y `ADMIN` pueden editar catalogo, contenido, precios y usuarios.
-- `WAREHOUSE` opera pedidos y estados logísticos.
+- `WAREHOUSE` opera pedidos y estados logisticos.
 - `SALES` administra cotizaciones y clientes.
 - `CUSTOMER` consulta cuenta y pedidos desde el frente publico.

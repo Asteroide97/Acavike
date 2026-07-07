@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
 import { PUBLIC_SORT_OPTIONS } from "@/lib/constants";
 import { ProductCard } from "@/components/public/product-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Select } from "@/components/ui/select";
+import { getCatalogPageDataRepository } from "@/lib/repositories/catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -23,44 +23,10 @@ export default async function CatalogPage({
   const categorySlug = getSingleValue(resolved.categoria) || "";
   const sort = getSingleValue(resolved.orden) || "featured";
 
-  const categories = await prisma.category.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-  });
-
-  const orderBy =
-    sort === "price_asc"
-      ? { price: "asc" as const }
-      : sort === "price_desc"
-        ? { price: "desc" as const }
-        : sort === "newest"
-          ? { createdAt: "desc" as const }
-          : { isFeatured: "desc" as const };
-
-  const products = await prisma.product.findMany({
-    where: {
-      isActive: true,
-      OR: query
-        ? [
-            { name: { contains: query, mode: "insensitive" } },
-            { sku: { contains: query, mode: "insensitive" } },
-            { brand: { contains: query, mode: "insensitive" } },
-            { category: { name: { contains: query, mode: "insensitive" } } },
-          ]
-        : undefined,
-      category: categorySlug ? { slug: categorySlug } : undefined,
-    },
-    include: {
-      images: {
-        orderBy: { sortOrder: "asc" },
-        take: 1,
-      },
-      category: true,
-      priceTiers: {
-        orderBy: { minQuantity: "asc" },
-      },
-    },
-    orderBy,
+  const { categories, products } = await getCatalogPageDataRepository({
+    query,
+    categorySlug,
+    sort: sort as "featured" | "price_asc" | "price_desc" | "newest",
   });
 
   return (

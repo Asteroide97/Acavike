@@ -2,12 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { addToCartAction } from "@/lib/actions/commerce";
-import { prisma } from "@/lib/prisma";
 import { formatCurrency } from "@/lib/utils";
 import { ProductCard } from "@/components/public/product-card";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/ui/table";
+import { getProductDetailDataRepository } from "@/lib/repositories/catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -19,41 +19,11 @@ export default async function ProductDetailPage({
   params: Params;
 }) {
   const { slug } = await params;
-  const product = await prisma.product.findUnique({
-    where: { slug },
-    include: {
-      category: true,
-      images: {
-        orderBy: { sortOrder: "asc" },
-      },
-      priceTiers: {
-        orderBy: { minQuantity: "asc" },
-      },
-    },
-  });
+  const { product, relatedProducts } = await getProductDetailDataRepository(slug);
 
   if (!product || !product.isActive) {
     notFound();
   }
-
-  const relatedProducts = await prisma.product.findMany({
-    where: {
-      categoryId: product.categoryId,
-      isActive: true,
-      NOT: { id: product.id },
-    },
-    include: {
-      images: {
-        orderBy: { sortOrder: "asc" },
-        take: 1,
-      },
-      category: true,
-      priceTiers: {
-        orderBy: { minQuantity: "asc" },
-      },
-    },
-    take: 4,
-  });
 
   return (
     <div className="section-shell py-10">

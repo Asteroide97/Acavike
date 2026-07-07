@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } fro
 import { updateOrderStatusAction } from "@/lib/actions/admin";
 import { requireUser } from "@/lib/auth";
 import { ORDER_ROLES, ORDER_STATUS_LABELS } from "@/lib/constants";
-import { prisma } from "@/lib/prisma";
+import { getAdminOrderByIdRepository } from "@/lib/repositories/orders";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -27,18 +27,7 @@ export default async function OrderDetailAdminPage({
   const { id } = await params;
   const resolvedSearchParams = await searchParams;
 
-  const order = await prisma.order.findUnique({
-    where: { id },
-    include: {
-      customer: true,
-      items: true,
-      payment: {
-        include: {
-          reviewedBy: true,
-        },
-      },
-    },
-  });
+  const order = await getAdminOrderByIdRepository(id);
 
   if (!order) {
     notFound();
@@ -48,13 +37,18 @@ export default async function OrderDetailAdminPage({
     user.role === "WAREHOUSE"
       ? ["TO_PICK", "WAITING_STOCK", "SHIPPED", "DELIVERED"]
       : Object.keys(ORDER_STATUS_LABELS);
+  const reviewedBy =
+    order.payment && "reviewedBy" in order.payment
+      ? (order.payment.reviewedBy as { name?: string } | null | undefined)
+      : null;
+  const reviewedByName = reviewedBy?.name || "Admin";
 
   return (
     <div className="space-y-6">
       <AdminPageHeader
         eyebrow="Pedido"
         title={order.orderNumber}
-        description={`Cliente: ${order.customer.companyName} · Creado ${formatDate(order.createdAt)}`}
+        description={`Cliente: ${order.customer.companyName} - Creado ${formatDate(order.createdAt)}`}
       />
 
       <AdminFlash searchParams={resolvedSearchParams} />
@@ -159,7 +153,7 @@ export default async function OrderDetailAdminPage({
                 </p>
                 <p>
                   <span className="font-semibold">Revision:</span>{" "}
-                  {order.payment.reviewedAt ? `${order.payment.reviewedBy?.name || "Admin"} · ${formatDate(order.payment.reviewedAt)}` : "Pendiente"}
+                  {order.payment.reviewedAt ? `${reviewedByName} - ${formatDate(order.payment.reviewedAt)}` : "Pendiente"}
                 </p>
               </CardContent>
             </Card>

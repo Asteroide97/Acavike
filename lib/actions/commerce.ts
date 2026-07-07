@@ -8,6 +8,8 @@ import { redirect } from "next/navigation";
 import { createSession, getCurrentUser } from "@/lib/auth";
 import { logAuditEntry } from "@/lib/audit";
 import { getCartTotals, getOrCreateCart } from "@/lib/cart";
+import { DATABASE_CONFIG_ERROR, DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
+import { demoOrders, demoQuotes } from "@/lib/demo-data";
 import { prisma } from "@/lib/prisma";
 import { calculateTaxes, getBankSettings, makeOrderNumber, makeQuoteNumber } from "@/lib/site";
 import { parseLines } from "@/lib/utils";
@@ -41,7 +43,20 @@ function resolveTieredPrice(product: ProductWithTiers, quantity: number) {
   return Number((eligibleTiers[0]?.price ?? product.price).toString());
 }
 
+function appendSearchParam(pathname: string, params: Record<string, string>) {
+  const searchParams = new URLSearchParams(params);
+  return `${pathname}${pathname.includes("?") ? "&" : "?"}${searchParams.toString()}`;
+}
+
 export async function addToCartAction(formData: FormData) {
+  if (DEMO_MODE) {
+    redirect("/carrito?added=1&demo=1");
+  }
+
+  if (!DATABASE_ENABLED) {
+    redirect("/carrito?error=configuracion");
+  }
+
   const productId = String(formData.get("productId") ?? "");
   const quantity = Math.max(1, Number(formData.get("quantity") ?? 1));
 
@@ -87,6 +102,14 @@ export async function addToCartAction(formData: FormData) {
 }
 
 export async function updateCartItemAction(formData: FormData) {
+  if (DEMO_MODE) {
+    redirect("/carrito?demo=1");
+  }
+
+  if (!DATABASE_ENABLED) {
+    redirect("/carrito?error=configuracion");
+  }
+
   const itemId = String(formData.get("itemId") ?? "");
   const quantity = Math.max(0, Number(formData.get("quantity") ?? 0));
 
@@ -118,6 +141,14 @@ export async function updateCartItemAction(formData: FormData) {
 }
 
 export async function removeCartItemAction(formData: FormData) {
+  if (DEMO_MODE) {
+    redirect("/carrito?demo=1");
+  }
+
+  if (!DATABASE_ENABLED) {
+    redirect("/carrito?error=configuracion");
+  }
+
   const itemId = String(formData.get("itemId") ?? "");
   await prisma.cartItem.delete({ where: { id: itemId } }).catch(() => null);
   revalidatePath("/carrito");
@@ -126,6 +157,14 @@ export async function removeCartItemAction(formData: FormData) {
 }
 
 export async function clearCartAction() {
+  if (DEMO_MODE) {
+    redirect("/carrito?demo=1");
+  }
+
+  if (!DATABASE_ENABLED) {
+    redirect("/carrito?error=configuracion");
+  }
+
   const user = await getCurrentUser();
   const cart = await getOrCreateCart(user?.id);
   await prisma.cartItem.deleteMany({
@@ -143,6 +182,17 @@ export async function submitContactMessageAction(input: unknown): Promise<Contac
     return { success: false, error: parsed.error.issues[0]?.message ?? "No fue posible enviar el mensaje." };
   }
 
+  if (DEMO_MODE) {
+    return { success: true };
+  }
+
+  if (!DATABASE_ENABLED) {
+    return {
+      success: false,
+      error: DATABASE_CONFIG_ERROR ?? "La base de datos no esta configurada.",
+    };
+  }
+
   await prisma.contactMessage.create({
     data: parsed.data,
   });
@@ -155,6 +205,17 @@ export async function submitQuickQuoteAction(input: unknown): Promise<QuickQuote
 
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "No fue posible registrar la solicitud." };
+  }
+
+  if (DEMO_MODE) {
+    return { success: true, quoteNumber: demoQuotes[0]?.quoteNumber ?? "COT-DEMO" };
+  }
+
+  if (!DATABASE_ENABLED) {
+    return {
+      success: false,
+      error: DATABASE_CONFIG_ERROR ?? "La base de datos no esta configurada.",
+    };
   }
 
   const email = parsed.data.email.toLowerCase();
@@ -216,6 +277,17 @@ export async function submitCheckoutAction(input: unknown): Promise<CheckoutActi
 
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "No fue posible procesar el checkout." };
+  }
+
+  if (DEMO_MODE) {
+    return { success: true, orderNumber: demoOrders[0]?.orderNumber ?? "PED-DEMO" };
+  }
+
+  if (!DATABASE_ENABLED) {
+    return {
+      success: false,
+      error: DATABASE_CONFIG_ERROR ?? "La base de datos no esta configurada.",
+    };
   }
 
   const currentUser = await getCurrentUser();
@@ -371,6 +443,14 @@ export async function uploadTransferReceiptAction(formData: FormData) {
   const reference = String(formData.get("reference") ?? "");
   const redirectTo = String(formData.get("redirectTo") ?? `/checkout?orden=${orderNumber}`);
   const receipt = formData.get("receipt");
+
+  if (DEMO_MODE) {
+    redirect(appendSearchParam(redirectTo, { receipt: "1", demo: "1" }));
+  }
+
+  if (!DATABASE_ENABLED) {
+    redirect(appendSearchParam(redirectTo, { receiptError: "1" }));
+  }
 
   if (!(receipt instanceof File) || receipt.size === 0) {
     redirect(`${redirectTo}&receiptError=1`);

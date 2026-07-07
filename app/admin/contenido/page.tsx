@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { updateSiteSectionAction } from "@/lib/actions/admin";
 import { requireUser } from "@/lib/auth";
 import { ADMIN_ROLES } from "@/lib/constants";
-import { prisma } from "@/lib/prisma";
+import { listAllSiteSectionsRepository } from "@/lib/repositories/settings";
 
 export const dynamic = "force-dynamic";
 
@@ -21,9 +21,7 @@ export default async function ContentPage({
   await requireUser(ADMIN_ROLES);
   const resolvedSearchParams = await searchParams;
 
-  const sections = await prisma.siteSection.findMany({
-    orderBy: { sortOrder: "asc" },
-  });
+  const sections = await listAllSiteSectionsRepository();
 
   return (
     <div className="space-y-6">

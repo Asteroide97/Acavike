@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+import { DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
 import { prisma } from "@/lib/prisma";
 
 export async function logAuditEntry(input: {
@@ -8,6 +9,10 @@ export async function logAuditEntry(input: {
   entityId?: string | null;
   metadata?: Prisma.InputJsonValue;
 }) {
+  if (DEMO_MODE || !DATABASE_ENABLED) {
+    return;
+  }
+
   try {
     await prisma.auditLog.create({
       data: {

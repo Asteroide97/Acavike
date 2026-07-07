@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { logoutAction } from "@/lib/actions/auth";
 import { requireUser } from "@/lib/auth";
+import { Alert } from "@/components/ui/alert";
 import { BACKOFFICE_ROLES, USER_ROLE_LABELS } from "@/lib/constants";
+import { DEMO_MODE, RUNTIME_NOTICE } from "@/lib/config";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -33,6 +35,11 @@ export default async function AdminLayout({
             </div>
 
             <div className="flex flex-wrap gap-3">
+              {DEMO_MODE ? (
+                <span className="inline-flex h-11 items-center rounded-2xl border border-sky-200 bg-sky-50 px-4 text-sm font-semibold text-sky-900">
+                  Modo demo
+                </span>
+              ) : null}
               <Link href="/" className={cn(buttonVariants({ variant: "outline" }))}>
                 Ver sitio publico
               </Link>
@@ -49,6 +56,8 @@ export default async function AdminLayout({
               </form>
             </div>
           </div>
+
+          {RUNTIME_NOTICE && !DEMO_MODE ? <Alert tone={RUNTIME_NOTICE.tone}>{RUNTIME_NOTICE.message}</Alert> : null}
 
           {children}
         </div>

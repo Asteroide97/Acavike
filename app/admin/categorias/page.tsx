@@ -3,9 +3,10 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/ui/table";
 import { buttonVariants } from "@/components/ui/button";
+import { DEMO_MODE } from "@/lib/config";
 import { ADMIN_ROLES } from "@/lib/constants";
 import { requireUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { listAdminCategoriesRepository } from "@/lib/repositories/catalog";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -13,18 +14,7 @@ export const dynamic = "force-dynamic";
 export default async function CategoriesPage() {
   await requireUser(ADMIN_ROLES);
 
-  const categories = await prisma.category.findMany({
-    include: {
-      parent: true,
-      _count: {
-        select: {
-          products: true,
-          children: true,
-        },
-      },
-    },
-    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-  });
+  const categories = await listAdminCategoriesRepository();
 
   return (
     <div className="space-y-6">
@@ -33,9 +23,15 @@ export default async function CategoriesPage() {
         title="Estructura del catalogo"
         description="Define jerarquia, orden visual, visibilidad publica y contexto de navegacion."
         actions={
-          <Link href="/admin/categorias/nuevo" className={cn(buttonVariants())}>
-            Nueva categoria
-          </Link>
+          DEMO_MODE ? (
+            <span className={cn(buttonVariants({ variant: "outline" }), "pointer-events-none opacity-60")}>
+              Nueva categoria
+            </span>
+          ) : (
+            <Link href="/admin/categorias/nuevo" className={cn(buttonVariants())}>
+              Nueva categoria
+            </Link>
+          )
         }
       />
 
@@ -69,9 +65,15 @@ export default async function CategoriesPage() {
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Link href={`/admin/categorias/${category.id}`} className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
-                    Editar
-                  </Link>
+                  {DEMO_MODE ? (
+                    <span className={cn(buttonVariants({ variant: "outline", size: "sm" }), "pointer-events-none opacity-60")}>
+                      Solo vista
+                    </span>
+                  ) : (
+                    <Link href={`/admin/categorias/${category.id}`} className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
+                      Editar
+                    </Link>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

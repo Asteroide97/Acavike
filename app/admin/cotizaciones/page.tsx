@@ -4,9 +4,10 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/ui/table";
 import { buttonVariants } from "@/components/ui/button";
+import { DEMO_MODE } from "@/lib/config";
 import { QUOTE_ROLES } from "@/lib/constants";
 import { requireUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { listAdminQuotesRepository } from "@/lib/repositories/orders";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -21,13 +22,7 @@ export default async function QuotesAdminPage({
   await requireUser(QUOTE_ROLES);
   const resolvedSearchParams = await searchParams;
 
-  const quotes = await prisma.quote.findMany({
-    include: {
-      customer: true,
-      items: true,
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const quotes = await listAdminQuotesRepository();
 
   return (
     <div className="space-y-6">
@@ -36,9 +31,15 @@ export default async function QuotesAdminPage({
         title="Pipeline comercial"
         description="Crea propuestas, ajusta partidas y convierte cotizaciones aceptadas en pedidos."
         actions={
-          <Link href="/admin/cotizaciones/nuevo" className={cn(buttonVariants())}>
-            Nueva cotizacion
-          </Link>
+          DEMO_MODE ? (
+            <span className={cn(buttonVariants({ variant: "outline" }), "pointer-events-none opacity-60")}>
+              Nueva cotizacion
+            </span>
+          ) : (
+            <Link href="/admin/cotizaciones/nuevo" className={cn(buttonVariants())}>
+              Nueva cotizacion
+            </Link>
+          )
         }
       />
 
@@ -75,9 +76,15 @@ export default async function QuotesAdminPage({
                 <TableCell>{formatCurrency(quote.total)}</TableCell>
                 <TableCell>{formatDate(quote.validUntil)}</TableCell>
                 <TableCell>
-                  <Link href={`/admin/cotizaciones/${quote.id}`} className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
-                    Abrir
-                  </Link>
+                  {DEMO_MODE ? (
+                    <span className={cn(buttonVariants({ variant: "outline", size: "sm" }), "pointer-events-none opacity-60")}>
+                      Solo vista
+                    </span>
+                  ) : (
+                    <Link href={`/admin/cotizaciones/${quote.id}`} className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
+                      Abrir
+                    </Link>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

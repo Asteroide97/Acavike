@@ -9,6 +9,7 @@ export function AdminFlash({ searchParams }: { searchParams: SearchParamsRecord 
   const saved = getStatusParam(searchParams, "saved");
   const deleted = getStatusParam(searchParams, "deleted");
   const converted = getStatusParam(searchParams, "converted");
+  const demo = getStatusParam(searchParams, "demo");
 
   if (error) {
     return <Alert tone="danger">{error}</Alert>;
@@ -27,7 +28,7 @@ export function AdminFlash({ searchParams }: { searchParams: SearchParamsRecord 
   }
 
   if (saved) {
-    return <Alert tone="success">Los cambios se guardaron correctamente.</Alert>;
+    return <Alert tone="success">{demo ? "Accion simulada correctamente en modo demo." : "Los cambios se guardaron correctamente."}</Alert>;
   }
 
   return null;

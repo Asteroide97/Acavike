@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/ui/table";
 import { ORDER_STATUS_LABELS, QUOTE_STATUS_LABELS } from "@/lib/constants";
 import { requireUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getAdminAnalyticsRepository } from "@/lib/repositories/admin-dashboard";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -11,38 +11,8 @@ export const dynamic = "force-dynamic";
 export default async function AnalyticsPage() {
   await requireUser(["SUPERADMIN", "ADMIN"]);
 
-  const [ordersByStatus, quotesByStatus, orderItems, categories, auditLogs] = await Promise.all([
-    prisma.order.groupBy({
-      by: ["status"],
-      _count: { _all: true },
-      _sum: { total: true },
-    }),
-    prisma.quote.groupBy({
-      by: ["status"],
-      _count: { _all: true },
-      _sum: { total: true },
-    }),
-    prisma.orderItem.groupBy({
-      by: ["productId", "sku", "name"],
-      _sum: { quantity: true, total: true },
-      orderBy: { _sum: { total: "desc" } },
-      take: 8,
-    }),
-    prisma.category.findMany({
-      include: {
-        _count: {
-          select: {
-            products: true,
-          },
-        },
-      },
-    }),
-    prisma.auditLog.findMany({
-      include: { user: true },
-      orderBy: { createdAt: "desc" },
-      take: 8,
-    }),
-  ]);
+  const { ordersByStatus, quotesByStatus, orderItems, categories, auditLogs } =
+    await getAdminAnalyticsRepository();
 
   const sortedCategories = [...categories].sort((a, b) => b._count.products - a._count.products).slice(0, 8);
 
@@ -69,7 +39,7 @@ export default async function AnalyticsPage() {
               <TableBody>
                 {ordersByStatus.map((row) => (
                   <TableRow key={row.status}>
-                    <TableCell>{ORDER_STATUS_LABELS[row.status]}</TableCell>
+                    <TableCell>{ORDER_STATUS_LABELS[row.status as keyof typeof ORDER_STATUS_LABELS]}</TableCell>
                     <TableCell>{row._count._all}</TableCell>
                     <TableCell>{formatCurrency(row._sum.total ?? 0)}</TableCell>
                   </TableRow>
@@ -93,7 +63,7 @@ export default async function AnalyticsPage() {
               <TableBody>
                 {quotesByStatus.map((row) => (
                   <TableRow key={row.status}>
-                    <TableCell>{QUOTE_STATUS_LABELS[row.status]}</TableCell>
+                    <TableCell>{QUOTE_STATUS_LABELS[row.status as keyof typeof QUOTE_STATUS_LABELS]}</TableCell>
                     <TableCell>{row._count._all}</TableCell>
                     <TableCell>{formatCurrency(row._sum.total ?? 0)}</TableCell>
                   </TableRow>

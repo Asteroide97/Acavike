@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
 import { CART_COOKIE } from "@/lib/constants";
+import { DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
+import { demoCart } from "@/lib/demo-data";
 import { prisma } from "@/lib/prisma";
 
 export async function getOrCreateCartSessionId() {
@@ -22,6 +24,21 @@ export async function getOrCreateCartSessionId() {
 }
 
 export async function getOrCreateCart(userId?: string) {
+  if (DEMO_MODE) {
+    return {
+      ...demoCart,
+      userId: userId ?? demoCart.userId,
+    };
+  }
+
+  if (!DATABASE_ENABLED) {
+    return {
+      ...demoCart,
+      userId: userId ?? null,
+      items: [],
+    };
+  }
+
   const sessionId = await getOrCreateCartSessionId();
 
   let cart = await prisma.cart.findUnique({

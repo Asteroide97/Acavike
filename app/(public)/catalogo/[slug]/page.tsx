@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/public/product-card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { prisma } from "@/lib/prisma";
+import { getCategoryCatalogDataRepository } from "@/lib/repositories/catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -14,31 +14,11 @@ export default async function CategoryCatalogPage({
   params: Params;
 }) {
   const { slug } = await params;
-  const category = await prisma.category.findUnique({
-    where: { slug },
-  });
+  const { category, products } = await getCategoryCatalogDataRepository(slug);
 
   if (!category) {
     notFound();
   }
-
-  const products = await prisma.product.findMany({
-    where: {
-      categoryId: category.id,
-      isActive: true,
-    },
-    include: {
-      images: {
-        orderBy: { sortOrder: "asc" },
-        take: 1,
-      },
-      category: true,
-      priceTiers: {
-        orderBy: { minQuantity: "asc" },
-      },
-    },
-    orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
-  });
 
   return (
     <div className="section-shell py-10">

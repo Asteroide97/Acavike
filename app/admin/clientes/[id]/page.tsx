@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/ui/table";
 import { QUOTE_ROLES } from "@/lib/constants";
 import { requireUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getCustomerByIdRepository } from "@/lib/repositories/customers";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -20,19 +20,7 @@ export default async function CustomerDetailPage({
   await requireUser(QUOTE_ROLES);
   const { id } = await params;
 
-  const customer = await prisma.customer.findUnique({
-    where: { id },
-    include: {
-      user: true,
-      orders: {
-        include: { payment: true },
-        orderBy: { createdAt: "desc" },
-      },
-      quotes: {
-        orderBy: { createdAt: "desc" },
-      },
-    },
-  });
+  const customer = await getCustomerByIdRepository(id);
 
   if (!customer) {
     notFound();

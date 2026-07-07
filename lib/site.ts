@@ -1,5 +1,7 @@
-import { prisma } from "@/lib/prisma";
-import { BANK_SETTING_KEYS, TAX_RATE } from "@/lib/constants";
+import { TAX_RATE } from "@/lib/constants";
+import { getHomepageDataRepository, getPublicNavigationDataRepository } from "@/lib/repositories/catalog";
+import { getOrderDetailsRepository } from "@/lib/repositories/orders";
+import { getBankSettingsRepository, getSiteSettingsMapRepository } from "@/lib/repositories/settings";
 
 export function calculateTaxes(subtotal: number, discount = 0) {
   const taxableBase = Math.max(subtotal - discount, 0);
@@ -10,78 +12,23 @@ export function calculateTaxes(subtotal: number, discount = 0) {
 }
 
 export async function getSiteSettingsMap() {
-  const settings = await prisma.siteSetting.findMany();
-  return settings.reduce<Record<string, string>>((acc, setting) => {
-    acc[setting.key] = setting.value;
-    return acc;
-  }, {});
+  return getSiteSettingsMapRepository();
 }
 
 export async function getBankSettings() {
-  const settings = await getSiteSettingsMap();
-  return {
-    bankName: settings[BANK_SETTING_KEYS.bankName] ?? "BANCO DEMO",
-    beneficiary: settings[BANK_SETTING_KEYS.beneficiary] ?? "ACAVIKE S.A. DE C.V.",
-    clabe: settings[BANK_SETTING_KEYS.clabe] ?? "000000000000000000",
-    referenceHelp:
-      settings[BANK_SETTING_KEYS.referenceHelp] ??
-      "Usa tu número de pedido como referencia bancaria.",
-  };
+  return getBankSettingsRepository();
 }
 
 export async function getPublicNavigationData() {
-  const [categories, settings] = await Promise.all([
-    prisma.category.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-      take: 10,
-    }),
-    getSiteSettingsMap(),
-  ]);
-
-  return { categories, settings };
+  return getPublicNavigationDataRepository();
 }
 
 export async function getHomepageData() {
-  const [sections, categories, featuredProducts] = await Promise.all([
-    prisma.siteSection.findMany({
-      where: { isActive: true },
-      orderBy: { sortOrder: "asc" },
-    }),
-    prisma.category.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-      take: 6,
-    }),
-    prisma.product.findMany({
-      where: { isActive: true, isFeatured: true },
-      include: {
-        images: {
-          orderBy: { sortOrder: "asc" },
-          take: 1,
-        },
-        category: true,
-        priceTiers: {
-          orderBy: { minQuantity: "asc" },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-      take: 8,
-    }),
-  ]);
-
-  return { sections, categories, featuredProducts };
+  return getHomepageDataRepository();
 }
 
 export async function getOrderDetails(orderNumber: string) {
-  return prisma.order.findUnique({
-    where: { orderNumber },
-    include: {
-      items: true,
-      customer: true,
-      payment: true,
-    },
-  });
+  return getOrderDetailsRepository(orderNumber);
 }
 
 export function makeOrderNumber() {

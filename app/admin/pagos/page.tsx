@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { reviewTransferPaymentAction } from "@/lib/actions/admin";
 import { requireUser } from "@/lib/auth";
 import { ADMIN_ROLES, TRANSFER_STATUS_LABELS } from "@/lib/constants";
-import { prisma } from "@/lib/prisma";
+import { listAdminPaymentsRepository } from "@/lib/repositories/orders";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -22,17 +22,7 @@ export default async function PaymentsPage({
   await requireUser(ADMIN_ROLES);
   const resolvedSearchParams = await searchParams;
 
-  const payments = await prisma.transferPayment.findMany({
-    include: {
-      reviewedBy: true,
-      order: {
-        include: {
-          customer: true,
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const payments = await listAdminPaymentsRepository();
 
   return (
     <div className="space-y-6">

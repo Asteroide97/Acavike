@@ -3,7 +3,7 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/ui/table";
 import { QUOTE_ROLES } from "@/lib/constants";
 import { requireUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { listCustomersRepository } from "@/lib/repositories/customers";
 import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -11,18 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function CustomersPage() {
   await requireUser(QUOTE_ROLES);
 
-  const customers = await prisma.customer.findMany({
-    include: {
-      user: true,
-      _count: {
-        select: {
-          orders: true,
-          quotes: true,
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const customers = await listCustomersRepository();
 
   return (
     <div className="space-y-6">

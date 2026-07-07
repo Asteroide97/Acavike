@@ -3,6 +3,8 @@
 import { compare, hash } from "bcrypt";
 import { createSession, destroySession } from "@/lib/auth";
 import { logAuditEntry } from "@/lib/audit";
+import { DATABASE_CONFIG_ERROR, DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
+import { demoCredentials, demoCustomerUser, findDemoUserByEmail } from "@/lib/demo-data";
 import { prisma } from "@/lib/prisma";
 import { loginSchema, registerSchema } from "@/lib/validators";
 
@@ -25,6 +27,29 @@ export async function loginAction(input: unknown): Promise<LoginActionResult> {
   }
 
   const email = parsed.data.email.toLowerCase();
+
+  if (DEMO_MODE) {
+    const user = findDemoUserByEmail(email);
+    const credentials = demoCredentials[email as keyof typeof demoCredentials];
+
+    if (!user || !credentials || credentials.password !== parsed.data.password) {
+      return { success: false, error: "Usa una credencial demo valida para iniciar sesion." };
+    }
+
+    await createSession({ id: user.id, role: user.role });
+    return {
+      success: true,
+      redirectTo: user.role === "CUSTOMER" ? "/mi-cuenta" : "/admin",
+    };
+  }
+
+  if (!DATABASE_ENABLED) {
+    return {
+      success: false,
+      error: DATABASE_CONFIG_ERROR ?? "La base de datos no esta configurada.",
+    };
+  }
+
   const user = await prisma.user.findUnique({
     where: { email },
   });
@@ -35,7 +60,7 @@ export async function loginAction(input: unknown): Promise<LoginActionResult> {
 
   const matches = await compare(parsed.data.password, user.passwordHash);
   if (!matches) {
-    return { success: false, error: "La contraseña es incorrecta." };
+    return { success: false, error: "La contrasena es incorrecta." };
   }
 
   await createSession({ id: user.id, role: user.role });
@@ -62,12 +87,27 @@ export async function registerAction(input: unknown): Promise<RegisterActionResu
     };
   }
 
+  if (DEMO_MODE) {
+    await createSession({ id: demoCustomerUser.id, role: demoCustomerUser.role });
+    return {
+      success: true,
+      redirectTo: "/mi-cuenta",
+    };
+  }
+
+  if (!DATABASE_ENABLED) {
+    return {
+      success: false,
+      error: DATABASE_CONFIG_ERROR ?? "La base de datos no esta configurada.",
+    };
+  }
+
   const email = parsed.data.email.toLowerCase();
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
     return {
       success: false,
-      error: "Ya existe una cuenta con ese correo. Inicia sesión para continuar.",
+      error: "Ya existe una cuenta con ese correo. Inicia sesion para continuar.",
     };
   }
 

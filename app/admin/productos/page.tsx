@@ -3,9 +3,10 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/ui/table";
 import { buttonVariants } from "@/components/ui/button";
+import { DEMO_MODE } from "@/lib/config";
 import { ADMIN_ROLES } from "@/lib/constants";
 import { requireUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { listAdminProductsRepository } from "@/lib/repositories/catalog";
 import { cn, formatCurrency } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -13,10 +14,7 @@ export const dynamic = "force-dynamic";
 export default async function ProductsAdminPage() {
   await requireUser(ADMIN_ROLES);
 
-  const products = await prisma.product.findMany({
-    include: { category: true },
-    orderBy: { createdAt: "desc" },
-  });
+  const products = await listAdminProductsRepository();
 
   return (
     <div className="space-y-6">
@@ -25,9 +23,15 @@ export default async function ProductsAdminPage() {
         title="Catalogo de productos"
         description="Administra nombres, SKU, categoria, stock, precios y escalas por mayoreo."
         actions={
-          <Link href="/admin/productos/nuevo" className={cn(buttonVariants())}>
-            Nuevo producto
-          </Link>
+          DEMO_MODE ? (
+            <span className={cn(buttonVariants({ variant: "outline" }), "pointer-events-none opacity-60")}>
+              Nuevo producto
+            </span>
+          ) : (
+            <Link href="/admin/productos/nuevo" className={cn(buttonVariants())}>
+              Nuevo producto
+            </Link>
+          )
         }
       />
 
@@ -64,9 +68,15 @@ export default async function ProductsAdminPage() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Link href={`/admin/productos/${product.id}`} className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
-                    Editar
-                  </Link>
+                  {DEMO_MODE ? (
+                    <span className={cn(buttonVariants({ variant: "outline", size: "sm" }), "pointer-events-none opacity-60")}>
+                      Solo vista
+                    </span>
+                  ) : (
+                    <Link href={`/admin/productos/${product.id}`} className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
+                      Editar
+                    </Link>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

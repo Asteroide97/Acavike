@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } fro
 import { updateUserRoleAction } from "@/lib/actions/admin";
 import { requireUser } from "@/lib/auth";
 import { ADMIN_ROLES, USER_ROLE_LABELS } from "@/lib/constants";
-import { prisma } from "@/lib/prisma";
+import { listAdminUsersRepository } from "@/lib/repositories/admin-dashboard";
 import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -20,10 +20,7 @@ export default async function UsersPage({
   await requireUser(ADMIN_ROLES);
   const resolvedSearchParams = await searchParams;
 
-  const users = await prisma.user.findMany({
-    include: { customer: true },
-    orderBy: { createdAt: "desc" },
-  });
+  const users = await listAdminUsersRepository();
 
   return (
     <div className="space-y-6">

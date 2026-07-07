@@ -5,7 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/ui/table";
 import { ORDER_ROLES } from "@/lib/constants";
 import { requireUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { listAdminProductsRepository } from "@/lib/repositories/catalog";
+import { listAdminOrdersRepository } from "@/lib/repositories/orders";
 import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -14,19 +15,14 @@ export default async function WarehousePage() {
   await requireUser(ORDER_ROLES);
 
   const [products, orders] = await Promise.all([
-    prisma.product.findMany({
-      where: { isActive: true },
-      include: { category: true },
-      orderBy: { stock: "asc" },
-    }),
-    prisma.order.findMany({
-      where: { status: { in: ["PAYMENT_APPROVED", "TO_PICK", "WAITING_STOCK", "SHIPPED"] } },
-      include: { customer: true },
-      orderBy: { createdAt: "desc" },
-    }),
+    listAdminProductsRepository(),
+    listAdminOrdersRepository(),
   ]);
 
   const lowStockProducts = products.filter((product) => product.stock <= product.lowStockThreshold);
+  const queueOrders = orders.filter((order) =>
+    ["PAYMENT_APPROVED", "TO_PICK", "WAITING_STOCK", "SHIPPED"].includes(order.status),
+  );
 
   return (
     <div className="space-y-6">
@@ -80,7 +76,7 @@ export default async function WarehousePage() {
                 </tr>
               </TableHead>
               <TableBody>
-                {orders.map((order) => (
+                {queueOrders.map((order) => (
                   <TableRow key={order.id}>
                     <TableCell>
                       <Link href={`/admin/pedidos/${order.id}`} className="font-semibold text-primary">

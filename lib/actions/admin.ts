@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { logAuditEntry } from "@/lib/audit";
+import { DATABASE_CONFIG_ERROR, DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
 import { ADMIN_ROLES, ORDER_ROLES, QUOTE_ROLES } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { getBankSettings, makeOrderNumber, makeQuoteNumber } from "@/lib/site";
@@ -12,6 +13,18 @@ import { parseCheckbox, parseLines, slugify, toNumber, toStringValue } from "@/l
 function redirectWithMessage(path: string, params: Record<string, string>) {
   const searchParams = new URLSearchParams(params);
   redirect(`${path}?${searchParams.toString()}`);
+}
+
+function ensureWritableAction(path: string, mode: "saved" | "deleted" | "converted" = "saved") {
+  if (DEMO_MODE) {
+    redirectWithMessage(path, { [mode]: "1", demo: "1" });
+  }
+
+  if (!DATABASE_ENABLED) {
+    redirectWithMessage(path, {
+      error: DATABASE_CONFIG_ERROR ?? "La base de datos no esta configurada.",
+    });
+  }
 }
 
 function parseImageLines(value: string) {
@@ -75,6 +88,7 @@ function parseQuoteItems(value: string) {
 }
 
 export async function saveCategoryAction(formData: FormData) {
+  ensureWritableAction("/admin/categorias");
   const user = await requireUser(ADMIN_ROLES);
   const categoryId = toStringValue(formData.get("categoryId"));
   const name = toStringValue(formData.get("name"));
@@ -124,6 +138,7 @@ export async function saveCategoryAction(formData: FormData) {
 }
 
 export async function deleteCategoryAction(formData: FormData) {
+  ensureWritableAction("/admin/categorias", "deleted");
   const user = await requireUser(ADMIN_ROLES);
   const categoryId = toStringValue(formData.get("categoryId"));
 
@@ -155,6 +170,7 @@ export async function deleteCategoryAction(formData: FormData) {
 }
 
 export async function saveProductAction(formData: FormData) {
+  ensureWritableAction("/admin/productos");
   const user = await requireUser(ADMIN_ROLES);
   const productId = toStringValue(formData.get("productId"));
   const name = toStringValue(formData.get("name"));
@@ -229,6 +245,7 @@ export async function saveProductAction(formData: FormData) {
 }
 
 export async function deleteProductAction(formData: FormData) {
+  ensureWritableAction("/admin/productos", "deleted");
   const user = await requireUser(ADMIN_ROLES);
   const productId = toStringValue(formData.get("productId"));
 
@@ -250,8 +267,9 @@ export async function deleteProductAction(formData: FormData) {
 }
 
 export async function updateOrderStatusAction(formData: FormData) {
-  const user = await requireUser(ORDER_ROLES);
   const orderId = toStringValue(formData.get("orderId"));
+  ensureWritableAction(`/admin/pedidos/${orderId}`);
+  const user = await requireUser(ORDER_ROLES);
   const status = toStringValue(formData.get("status"));
 
   const allowedForWarehouse = ["TO_PICK", "WAITING_STOCK", "SHIPPED", "DELIVERED"];
@@ -279,6 +297,7 @@ export async function updateOrderStatusAction(formData: FormData) {
 }
 
 export async function reviewTransferPaymentAction(formData: FormData) {
+  ensureWritableAction("/admin/pagos");
   const user = await requireUser(ADMIN_ROLES);
   const paymentId = toStringValue(formData.get("paymentId"));
   const status = toStringValue(formData.get("status"));
@@ -324,6 +343,7 @@ export async function reviewTransferPaymentAction(formData: FormData) {
 }
 
 export async function saveQuoteAction(formData: FormData) {
+  ensureWritableAction("/admin/cotizaciones");
   const user = await requireUser(QUOTE_ROLES);
   const quoteId = toStringValue(formData.get("quoteId"));
   const customerId = toStringValue(formData.get("customerId"));
@@ -383,6 +403,7 @@ export async function saveQuoteAction(formData: FormData) {
 }
 
 export async function updateQuoteStatusAction(formData: FormData) {
+  ensureWritableAction("/admin/cotizaciones");
   const user = await requireUser(QUOTE_ROLES);
   const quoteId = toStringValue(formData.get("quoteId"));
   const status = toStringValue(formData.get("status"));
@@ -404,6 +425,7 @@ export async function updateQuoteStatusAction(formData: FormData) {
 }
 
 export async function convertQuoteToOrderAction(formData: FormData) {
+  ensureWritableAction("/admin/pedidos", "converted");
   const user = await requireUser(QUOTE_ROLES);
   const quoteId = toStringValue(formData.get("quoteId"));
   const quote = await prisma.quote.findUnique({
@@ -484,6 +506,7 @@ export async function convertQuoteToOrderAction(formData: FormData) {
 }
 
 export async function saveCouponAction(formData: FormData) {
+  ensureWritableAction("/admin/cupones");
   const user = await requireUser(ADMIN_ROLES);
   const couponId = toStringValue(formData.get("couponId"));
   const data = {
@@ -518,6 +541,7 @@ export async function saveCouponAction(formData: FormData) {
 }
 
 export async function deleteCouponAction(formData: FormData) {
+  ensureWritableAction("/admin/cupones", "deleted");
   const user = await requireUser(ADMIN_ROLES);
   const couponId = toStringValue(formData.get("couponId"));
   await prisma.coupon.delete({ where: { id: couponId } }).catch(() => null);
@@ -532,6 +556,7 @@ export async function deleteCouponAction(formData: FormData) {
 }
 
 export async function saveEmailTemplateAction(formData: FormData) {
+  ensureWritableAction("/admin/email-templates");
   const user = await requireUser(ADMIN_ROLES);
   const templateId = toStringValue(formData.get("templateId"));
   const key = toStringValue(formData.get("key"));
@@ -565,6 +590,7 @@ export async function saveEmailTemplateAction(formData: FormData) {
 }
 
 export async function updateSiteSectionAction(formData: FormData) {
+  ensureWritableAction("/admin/contenido");
   const user = await requireUser(ADMIN_ROLES);
   const sectionId = toStringValue(formData.get("sectionId"));
 
@@ -594,6 +620,7 @@ export async function updateSiteSectionAction(formData: FormData) {
 }
 
 export async function updateSiteSettingAction(formData: FormData) {
+  ensureWritableAction("/admin/settings");
   const user = await requireUser(ADMIN_ROLES);
   const key = toStringValue(formData.get("key"));
   const value = toStringValue(formData.get("value"));
@@ -617,6 +644,7 @@ export async function updateSiteSettingAction(formData: FormData) {
 }
 
 export async function updateUserRoleAction(formData: FormData) {
+  ensureWritableAction("/admin/usuarios");
   const user = await requireUser(ADMIN_ROLES);
   const userId = toStringValue(formData.get("userId"));
   const role = toStringValue(formData.get("role"));
@@ -638,6 +666,7 @@ export async function updateUserRoleAction(formData: FormData) {
 }
 
 export async function updateMessageStatusAction(formData: FormData) {
+  ensureWritableAction("/admin/mensajes");
   const user = await requireUser(ADMIN_ROLES);
   const messageId = toStringValue(formData.get("messageId"));
   const status = toStringValue(formData.get("status"));

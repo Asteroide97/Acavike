@@ -6,9 +6,10 @@ import { DashboardStatCard } from "@/components/admin/dashboard-stat-card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
+import { DEMO_MODE } from "@/lib/config";
 import { requireUser } from "@/lib/auth";
 import { BACKOFFICE_ROLES } from "@/lib/constants";
-import { prisma } from "@/lib/prisma";
+import { getAdminDashboardRepository } from "@/lib/repositories/admin-dashboard";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -22,42 +23,16 @@ export default async function AdminHomePage({
 }) {
   await requireUser(BACKOFFICE_ROLES);
   const resolvedSearchParams = await searchParams;
-
-  const [orderMetrics, customersCount, openQuotesCount, pendingOrdersCount, pendingTransfersCount, products, recentOrders, recentQuotes] =
-    await Promise.all([
-      prisma.order.aggregate({
-        _sum: { total: true },
-        _count: { _all: true },
-        _avg: { total: true },
-      }),
-      prisma.customer.count(),
-      prisma.quote.count({
-        where: { status: { in: ["DRAFT", "SENT"] } },
-      }),
-      prisma.order.count({
-        where: { status: { in: ["PENDING_TRANSFER", "RECEIPT_UPLOADED", "PAYMENT_APPROVED", "TO_PICK", "WAITING_STOCK"] } },
-      }),
-      prisma.transferPayment.count({
-        where: { status: { in: ["PENDING", "IN_REVIEW"] } },
-      }),
-      prisma.product.findMany({
-        where: { isActive: true },
-        include: { category: true },
-        orderBy: { stock: "asc" },
-      }),
-      prisma.order.findMany({
-        include: { customer: true, payment: true },
-        orderBy: { createdAt: "desc" },
-        take: 5,
-      }),
-      prisma.quote.findMany({
-        include: { customer: true },
-        orderBy: { createdAt: "desc" },
-        take: 5,
-      }),
-    ]);
-
-  const lowStockProducts = products.filter((product) => product.stock <= product.lowStockThreshold);
+  const {
+    orderMetrics,
+    customersCount,
+    openQuotesCount,
+    pendingOrdersCount,
+    pendingTransfersCount,
+    recentOrders,
+    recentQuotes,
+    lowStockProducts,
+  } = await getAdminDashboardRepository();
 
   return (
     <div className="space-y-6">
@@ -76,6 +51,12 @@ export default async function AdminHomePage({
           </>
         }
       />
+
+      {DEMO_MODE ? (
+        <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-sky-900">
+          Modo demo
+        </div>
+      ) : null}
 
       <AdminFlash searchParams={resolvedSearchParams} />
 

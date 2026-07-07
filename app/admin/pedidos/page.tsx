@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } fro
 import { buttonVariants } from "@/components/ui/button";
 import { ORDER_ROLES } from "@/lib/constants";
 import { requireUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { listAdminOrdersRepository } from "@/lib/repositories/orders";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -21,13 +21,7 @@ export default async function OrdersAdminPage({
   await requireUser(ORDER_ROLES);
   const resolvedSearchParams = await searchParams;
 
-  const orders = await prisma.order.findMany({
-    include: {
-      customer: true,
-      payment: true,
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const orders = await listAdminOrdersRepository();
 
   return (
     <div className="space-y-6">
