@@ -1,4 +1,17 @@
-export const DEMO_MODE = process.env.DEMO_MODE === "true";
+const rawDemoMode = process.env.DEMO_MODE;
+
+function normalizeEnvBoolean(value?: string) {
+  if (!value) return false;
+
+  const normalized = value
+    .trim()
+    .replace(/^["']|["']$/g, "")
+    .toLowerCase();
+
+  return normalized === "true" || normalized === "1" || normalized === "yes";
+}
+
+export const DEMO_MODE = normalizeEnvBoolean(rawDemoMode);
 export const HAS_DATABASE_URL = Boolean(process.env.DATABASE_URL);
 export const DATABASE_URL = process.env.DATABASE_URL?.trim() || "";
 export const DATABASE_ENABLED = !DEMO_MODE && HAS_DATABASE_URL;

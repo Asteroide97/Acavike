@@ -9,5 +9,9 @@ export async function GET() {
     demoMode: DEMO_MODE,
     hasDatabaseUrl: HAS_DATABASE_URL,
     mode: APP_MODE,
+    demoModeVariableExists: Boolean(process.env.DEMO_MODE),
+    demoModeRawLength: process.env.DEMO_MODE?.length ?? 0,
+    nodeEnv: process.env.NODE_ENV,
+    vercelEnv: process.env.VERCEL_ENV,
   });
 }
