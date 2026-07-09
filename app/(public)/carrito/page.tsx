@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { clearCartAction, removeCartItemAction, updateCartItemAction } from "@/lib/actions/commerce";
+import { clearCartAction, removeCartItemAction, updateCartItemAction } from "@/lib/actions/cart";
 import { getCartTotals, getOrCreateCart } from "@/lib/cart";
 import { formatCurrency } from "@/lib/utils";
 import { EmptyState } from "@/components/ui/empty-state";

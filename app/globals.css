@@ -4,23 +4,23 @@
 
 @layer base {
   :root {
-    --background: 40 25% 97%;
-    --foreground: 215 34% 16%;
+    --background: 0 0% 94%;
+    --foreground: 220 20% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 215 34% 16%;
-    --primary: 214 70% 20%;
+    --card-foreground: 220 20% 11%;
+    --primary: 210 100% 22%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 42 32% 92%;
-    --secondary-foreground: 215 34% 20%;
-    --muted: 39 18% 93%;
-    --muted-foreground: 215 16% 40%;
-    --accent: 40 42% 88%;
-    --accent-foreground: 215 34% 16%;
-    --destructive: 0 71% 45%;
+    --secondary: 210 16% 92%;
+    --secondary-foreground: 214 28% 18%;
+    --muted: 210 20% 95%;
+    --muted-foreground: 215 12% 38%;
+    --accent: 210 35% 91%;
+    --accent-foreground: 220 20% 11%;
+    --destructive: 0 66% 43%;
     --destructive-foreground: 0 0% 100%;
-    --border: 214 18% 85%;
-    --input: 214 18% 88%;
-    --ring: 214 70% 20%;
+    --border: 0 0% 84%;
+    --input: 0 0% 84%;
+    --ring: 210 100% 22%;
   }
 
   * {
@@ -33,12 +33,7 @@
 
   body {
     @apply min-h-screen bg-background font-body text-foreground antialiased;
-    background-image:
-      radial-gradient(circle at top, rgba(11, 53, 97, 0.08), transparent 32%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 243, 236, 0.92)),
-      linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
-    background-size: auto, auto, 30px 30px, 30px 30px;
+    background-image: none;
   }
 
   h1,
@@ -57,7 +52,10 @@
 
 @layer components {
   .surface {
-    @apply rounded-3xl border border-white/80 bg-white/90 shadow-panel backdrop-blur-sm;
+    border: 1px solid #d6d6d6;
+    border-radius: 4px;
+    background: #ffffff;
+    box-shadow: none;
   }
 
   .admin-surface {
@@ -65,6 +63,93 @@
   }
 
   .section-shell {
-    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-[1180px] px-3 sm:px-4 lg:px-5;
+  }
+
+  .public-app h1,
+  .public-app h2,
+  .public-app h3,
+  .public-app h4,
+  .public-app h5,
+  .public-app h6 {
+    font-family: var(--font-body);
+    letter-spacing: -0.02em;
+  }
+
+  .public-panel {
+    border: 1px solid #d6d6d6;
+    border-radius: 4px;
+    background: #ffffff;
+  }
+
+  .public-kicker {
+    color: #003a70;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .public-link {
+    color: #004b8d;
+    font-weight: 700;
+  }
+
+  .public-link:hover {
+    text-decoration: underline;
+  }
+
+  .public-btn,
+  .public-btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 38px;
+    padding: 0.55rem 0.95rem;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .public-btn {
+    border: 1px solid #002b52;
+    background: #003a70;
+    color: #ffffff;
+  }
+
+  .public-btn:hover {
+    background: #002b52;
+  }
+
+  .public-btn-outline {
+    border: 1px solid #c2ccd8;
+    background: #ffffff;
+    color: #113a63;
+  }
+
+  .public-btn-outline:hover {
+    border-color: #003a70;
+    color: #003a70;
+  }
+
+  .public-input,
+  .public-select {
+    width: 100%;
+    min-height: 40px;
+    border: 1px solid #bcc7d3;
+    border-radius: 4px;
+    background: #ffffff;
+    padding: 0.55rem 0.75rem;
+    color: #111827;
+    font-size: 13px;
+    outline: none;
+  }
+
+  .public-input:focus,
+  .public-select:focus {
+    border-color: #003a70;
+    box-shadow: 0 0 0 2px rgba(0, 58, 112, 0.12);
   }
 }

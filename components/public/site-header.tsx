@@ -1,93 +1,100 @@
 import Link from "next/link";
-import { Boxes, ClipboardList, LayoutGrid, ShoppingCart, UserRound } from "lucide-react";
+import { Boxes, ShoppingCart } from "lucide-react";
 import type { Category, User } from "@prisma/client";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { PUBLIC_NAV_TABS } from "@/lib/public-catalog";
+import { formatCurrency } from "@/lib/utils";
 
 type Viewer = (User & { customer?: { id: string } | null }) | null;
 
 export function SiteHeader({
-  categories,
   cartCount,
+  cartTotal,
   user,
+  supportPhone,
 }: {
   categories: Category[];
   cartCount: number;
+  cartTotal: number;
   user: Viewer;
+  supportPhone?: string;
 }) {
+  const authHref = user ? (user.role !== "CUSTOMER" ? "/admin" : "/mi-cuenta") : "/mi-cuenta";
+  const authLabel = user ? (user.role !== "CUSTOMER" ? "Panel admin" : "Sesion activa") : "Iniciar Sesion";
+  const phoneLabel = supportPhone || "81 0000 0000";
+
   return (
-    <header className="border-b border-white/70 bg-white/90 backdrop-blur-md">
-      <div className="section-shell py-4">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-4">
+    <header className="border-b-2 border-[#002B52] bg-[#003A70] text-white">
+      <div className="section-shell py-3">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-6">
             <Link href="/" className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+              <div className="flex h-12 w-12 items-center justify-center border border-white/30 bg-white/10">
                 <Boxes className="h-6 w-6" />
               </div>
               <div>
-                <div className="font-heading text-xl font-semibold">Acavike</div>
-                <div className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                <div className="text-[28px] font-bold uppercase leading-none tracking-[0.03em]">Acavike</div>
+                <div className="mt-1 text-[11px] uppercase tracking-[0.28em] text-blue-100">
                   Industrial Supply
                 </div>
               </div>
             </Link>
-            <div className="hidden rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600 md:block">
-              Compra B2B por transferencia
+
+            <div className="text-[13px] leading-tight text-blue-50">
+              <div className="font-semibold">Suministros Industriales</div>
+              <div>{phoneLabel}</div>
             </div>
           </div>
 
-          <div className="flex flex-1 items-center gap-3">
-            <form action="/catalogo" className="flex w-full max-w-2xl items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2">
-              <input
-                name="q"
-                placeholder="Buscar SKU, producto o categoría"
-                className="h-10 flex-1 rounded-xl bg-transparent px-3 text-sm outline-none placeholder:text-slate-400"
-              />
-              <button className={cn(buttonVariants({ size: "sm" }))} type="submit">
-                Buscar
-              </button>
-            </form>
-            <nav className="hidden items-center gap-2 lg:flex">
-              <Link href="/mi-cuenta" className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
-                <UserRound className="mr-2 h-4 w-4" />
-                {user ? "Mi cuenta" : "Ingresar"}
-              </Link>
-              <Link href="/carrito" className={cn(buttonVariants({ size: "sm" }))}>
-                <ShoppingCart className="mr-2 h-4 w-4" />
-                Carrito ({cartCount})
-              </Link>
-            </nav>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[13px] font-medium lg:flex lg:flex-wrap lg:items-center lg:justify-end">
+            <Link href="/mi-cuenta" className="hover:text-blue-100">
+              Mi Cuenta
+            </Link>
+            <Link href="/contacto" className="hover:text-blue-100">
+              Contacto
+            </Link>
+            <Link href={authHref} className="hover:text-blue-100">
+              {authLabel}
+            </Link>
+            <Link href="/carrito" className="flex items-center gap-2 text-[12px] hover:text-blue-100">
+              <ShoppingCart className="h-4 w-4" />
+              <span>
+                Carrito MXN {formatCurrency(cartTotal)}{cartCount ? ` (${cartCount})` : ""}
+              </span>
+            </Link>
           </div>
         </div>
 
-        <div className="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-4 lg:flex-row lg:items-center lg:justify-between">
-          <nav className="flex flex-wrap items-center gap-2 text-sm">
-            <Link href="/catalogo" className="rounded-full bg-slate-900 px-4 py-2 text-white">
-              Ver todo
-            </Link>
-            {categories.map((category) => (
+        <div className="mt-4 flex flex-col gap-3 lg:flex-row lg:items-center">
+          <form action="/catalogo" className="flex flex-1 items-center gap-2 border border-[#002B52] bg-white p-2">
+            <input
+              name="q"
+              placeholder="Buscar SKU, producto o categoria"
+              className="h-10 flex-1 border border-slate-300 px-3 text-[13px] text-slate-900 outline-none"
+            />
+            <button className="public-btn min-w-[88px]" type="submit">
+              Buscar
+            </button>
+          </form>
+
+          <div className="border border-white/20 bg-[#002B52] px-3 py-2 text-[12px] text-blue-50">
+            Compra por transferencia bancaria y cotizacion para volumen.
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-white/20 bg-[#002B52]">
+        <div className="section-shell">
+          <nav className="grid grid-cols-2 sm:grid-cols-3 lg:flex" aria-label="Navegacion principal">
+            {PUBLIC_NAV_TABS.map((item) => (
               <Link
-                key={category.id}
-                href={`/catalogo/${category.slug}`}
-                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-slate-700 hover:border-primary hover:text-primary"
+                key={item.label}
+                href={item.href}
+                className="border-b border-r border-white/10 px-3 py-3 text-[13px] font-semibold text-white hover:bg-white/10 lg:border-b-0"
               >
-                {category.name}
+                {item.label}
               </Link>
             ))}
           </nav>
-
-          <div className="flex items-center gap-2 text-sm">
-            <Link href="/cotizacion-rapida" className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-slate-700 hover:bg-slate-100">
-              <ClipboardList className="h-4 w-4" />
-              Cotización rápida
-            </Link>
-            {user && user.role !== "CUSTOMER" ? (
-              <Link href="/admin" className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-slate-700 hover:bg-slate-100">
-                <LayoutGrid className="h-4 w-4" />
-                Panel admin
-              </Link>
-            ) : null}
-          </div>
         </div>
       </div>
     </header>

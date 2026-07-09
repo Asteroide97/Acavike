@@ -1,9 +1,27 @@
 import { QuickQuoteForm } from "@/components/auth/quick-quote-form";
 import { Card, CardContent } from "@/components/ui/card";
+import { buildQuoteRequirements } from "@/lib/public-catalog";
 
 export const dynamic = "force-dynamic";
 
-export default function QuickQuotePage() {
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+function getSingleValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function QuickQuotePage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const resolved = await searchParams;
+  const initialRequirements = buildQuoteRequirements({
+    sku: getSingleValue(resolved.sku),
+    name: getSingleValue(resolved.producto),
+    quantity: getSingleValue(resolved.cantidad),
+  });
+
   return (
     <div className="section-shell py-10">
       <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
@@ -14,7 +32,7 @@ export default function QuickQuotePage() {
             Comparte productos, SKUs, cantidades o consumo estimado. El equipo comercial convertirá tu solicitud en cotización editable dentro del panel.
           </p>
           <div className="mt-8">
-            <QuickQuoteForm />
+            <QuickQuoteForm initialRequirements={initialRequirements} />
           </div>
         </div>
 

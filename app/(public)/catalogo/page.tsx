@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
-import { PUBLIC_SORT_OPTIONS } from "@/lib/constants";
 import { ProductCard } from "@/components/public/product-card";
-import { EmptyState } from "@/components/ui/empty-state";
-import { Select } from "@/components/ui/select";
+import { CatalogBreadcrumbs } from "@/components/public/catalog-breadcrumbs";
 import { getCatalogPageDataRepository } from "@/lib/repositories/catalog";
 
 export const dynamic = "force-dynamic";
@@ -31,88 +29,95 @@ export default async function CatalogPage({
     sort: sort as "featured" | "price_asc" | "price_desc" | "newest",
   });
 
+  const activeCategory = categories.find((category) => category.slug === categorySlug) || null;
+
   return (
-    <div className="section-shell py-10">
-      <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
-        <aside className="surface h-fit p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Filtros</p>
-          <form className="mt-5 space-y-5" action="/catalogo">
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-800">Buscar</label>
-              <input
-                name="q"
-                defaultValue={query}
-                className="h-11 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm outline-none focus:border-primary"
-                placeholder="Producto, SKU o marca"
-              />
-            </div>
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-800">Categoría</label>
-              <Select name="categoria" defaultValue={categorySlug}>
-                <option value="">Todas</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.slug}>
-                    {category.name}
-                  </option>
-                ))}
-              </Select>
-            </div>
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-800">Orden</label>
-              <Select name="orden" defaultValue={sort}>
-                {PUBLIC_SORT_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Select>
-            </div>
-            <button className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-primary px-4 text-sm font-semibold text-white">
-              Aplicar filtros
-            </button>
-          </form>
+    <div className="section-shell py-4 md:py-6">
+      <CatalogBreadcrumbs
+        items={[
+          { label: "Inicio", href: "/" },
+          { label: "Todos los productos" },
+        ]}
+      />
+
+      <div className="grid gap-4 lg:grid-cols-[250px_1fr]">
+        <aside className="public-panel h-fit p-4">
+          <p className="public-kicker">Catalogo</p>
+          <h1 className="mt-2 text-[24px] font-bold text-slate-900">Categorias</h1>
+          <div className="mt-4 grid gap-2 text-[13px]">
+            <Link
+              href="/catalogo"
+              className={`border px-3 py-2 ${!categorySlug ? "border-[#003A70] bg-[#E8F0F7] font-bold text-[#003A70]" : "border-slate-200 text-slate-700 hover:border-[#003A70]"}`}
+            >
+              Todos los productos
+            </Link>
+            {categories.map((category) => (
+              <Link
+                key={category.id}
+                href={`/catalogo?categoria=${category.slug}`}
+                className={`border px-3 py-2 ${category.slug === categorySlug ? "border-[#003A70] bg-[#E8F0F7] font-bold text-[#003A70]" : "border-slate-200 text-slate-700 hover:border-[#003A70]"}`}
+              >
+                {category.name}
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-4 border-t border-slate-200 pt-4 text-[12px] leading-6 text-slate-600">
+            Compra por transferencia bancaria y solicita cotizacion para volumen o reposicion frecuente.
+          </div>
         </aside>
 
-        <section>
-          <div className="surface p-6">
+        <section className="space-y-4">
+          <div className="public-panel p-4">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Catálogo</p>
-                <h1 className="mt-2 text-3xl font-semibold">Productos industriales</h1>
-                <p className="mt-3 text-sm text-muted-foreground">
-                  {products.length} resultado(s) {query ? `para "${query}"` : "disponibles"}.
+                <p className="public-kicker">Listado general</p>
+                <h2 className="mt-2 text-[28px] font-bold text-slate-900">Todos los productos</h2>
+                <p className="mt-2 text-[13px] text-slate-700">
+                  {products.length} resultado(s)
+                  {activeCategory ? ` en ${activeCategory.name}` : ""}
+                  {query ? ` para "${query}"` : ""}.
                 </p>
               </div>
-              <div className="flex flex-wrap gap-2 text-sm">
-                {categories.slice(0, 8).map((category) => (
-                  <Link
-                    key={category.id}
-                    href={`/catalogo/${category.slug}`}
-                    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-slate-700 hover:border-primary hover:text-primary"
-                  >
-                    {category.name}
-                  </Link>
-                ))}
-              </div>
+
+              <form action="/catalogo" className="grid gap-2 md:grid-cols-[minmax(0,1fr)_180px_auto]">
+                {categorySlug ? <input type="hidden" name="categoria" value={categorySlug} /> : null}
+                <input
+                  name="q"
+                  defaultValue={query}
+                  placeholder="Buscar SKU, producto o categoria"
+                  className="public-input"
+                />
+                <select name="orden" defaultValue={sort} className="public-select">
+                  <option value="featured">Destacados</option>
+                  <option value="price_asc">Precio menor a mayor</option>
+                  <option value="price_desc">Precio mayor a menor</option>
+                  <option value="newest">Mas recientes</option>
+                </select>
+                <button className="public-btn" type="submit">
+                  Aplicar
+                </button>
+              </form>
             </div>
           </div>
 
-          <div className="mt-6">
-            {products.length ? (
-              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                {products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            ) : (
-              <EmptyState
-                title="No encontramos productos"
-                description="Prueba con otra palabra, elimina filtros o navega por una categoría distinta."
-                actionHref="/catalogo"
-                actionLabel="Limpiar filtros"
-              />
-            )}
-          </div>
+          {products.length ? (
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="public-panel p-8 text-center">
+              <h3 className="text-[20px] font-bold text-slate-900">No encontramos productos</h3>
+              <p className="mt-2 text-[13px] text-slate-700">
+                Ajusta la busqueda o elimina filtros para ver mas resultados del catalogo.
+              </p>
+              <Link href="/catalogo" className="public-btn mt-4">
+                Limpiar filtros
+              </Link>
+            </div>
+          )}
         </section>
       </div>
     </div>

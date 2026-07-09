@@ -76,7 +76,7 @@ export default async function CheckoutPage({
 
             <form action={async (formData) => {
               "use server";
-              const { uploadTransferReceiptAction } = await import("@/lib/actions/commerce");
+              const { uploadTransferReceiptAction } = await import("@/lib/actions/cart");
               await uploadTransferReceiptAction(formData);
             }} className="mt-8 space-y-4 rounded-3xl border border-slate-200 bg-white p-6">
               <input type="hidden" name="orderNumber" value={order.orderNumber} />

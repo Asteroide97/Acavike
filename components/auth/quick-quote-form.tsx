@@ -14,7 +14,11 @@ import { Textarea } from "@/components/ui/textarea";
 
 type QuickQuoteValues = z.infer<typeof quickQuoteSchema>;
 
-export function QuickQuoteForm() {
+export function QuickQuoteForm({
+  initialRequirements = "",
+}: {
+  initialRequirements?: string;
+}) {
   const [serverState, setServerState] = useState<{ error?: string; success?: boolean; quoteNumber?: string }>({});
   const [isPending, startTransition] = useTransition();
   const form = useForm<QuickQuoteValues>({
@@ -24,7 +28,7 @@ export function QuickQuoteForm() {
       companyName: "",
       email: "",
       phone: "",
-      requirements: "",
+      requirements: initialRequirements,
       notes: "",
     },
   });

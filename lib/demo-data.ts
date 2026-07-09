@@ -149,7 +149,12 @@ export const demoCategories: Category[] = [
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, ""),
   description: `Linea ${name.toLowerCase()} para operacion, mantenimiento y abastecimiento industrial.`,
-  imageUrl: "/placeholder-category.svg",
+  imageUrl: `/demo-products/category-${name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")}.svg`,
   parentId: null,
   sortOrder: index,
   isActive: true,
@@ -158,6 +163,20 @@ export const demoCategories: Category[] = [
 }));
 
 const categoryBySlug = new Map(demoCategories.map((category) => [category.slug, category]));
+const demoProductImageBySlug: Record<string, string> = {
+  "disco-de-corte-industrial-4-5-pulg": "/demo-products/category-abrasivos.svg",
+  "caja-corrugada-doble-pared-60-x-40": "/demo-products/category-empaque.svg",
+  "guante-anticorte-recubierto": "/demo-products/category-equipo-de-seguridad.svg",
+  "desengrasante-industrial-concentrado": "/demo-products/category-limpieza.svg",
+  "perfil-estructural-ligero-3-m": "/demo-products/category-fabricacion.svg",
+  "taladro-percutor-1-2": "/demo-products/category-herramienta.svg",
+  "tornillo-hexagonal-galvanizado": "/demo-products/category-tornilleria.svg",
+  "renta-de-escalera-dielectrica": "/demo-products/category-renta.svg",
+  "cinta-de-senalizacion-amarilla": "/demo-products/category-construccion.svg",
+  "silla-operativa-tapizada": "/demo-products/category-oficina.svg",
+  "kit-de-cafe-y-azucar-para-oficina": "/demo-products/category-comestibles.svg",
+  "lija-de-agua-grano-400": "/demo-products/category-abrasivos.svg",
+};
 
 const demoProductsBase: Array<
   Omit<Product, "price" | "createdAt" | "updatedAt"> & {
@@ -485,7 +504,7 @@ export const demoProducts: DemoProductRecord[] = demoProductsBase.map((product, 
     {
       id: `image_${index + 1}_1`,
       productId: product.id,
-      url: "/placeholder-product.svg",
+      url: demoProductImageBySlug[product.slug] || "/placeholder-product.svg",
       alt: product.imageAlt,
       sortOrder: 0,
     },

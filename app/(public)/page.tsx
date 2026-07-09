@@ -1,11 +1,9 @@
 import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
-import { ArrowRight, Building2, ClipboardCheck, Search } from "lucide-react";
+import { ArrowRight, ClipboardList, PackageCheck, ShieldCheck, Truck } from "lucide-react";
 import { CategoryCard } from "@/components/public/category-card";
 import { ProductCard } from "@/components/public/product-card";
-import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { getHomeCategories } from "@/lib/public-catalog";
 import { getHomepageData } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -16,146 +14,141 @@ export default async function HomePage() {
   const hero = sections.find((section) => section.key === "hero_home");
   const quickQuote = sections.find((section) => section.key === "quick_quote");
   const trustStrip = sections.find((section) => section.key === "trust_strip");
+  const homeCategories = getHomeCategories(categories);
 
   return (
-    <div className="pb-16">
-      <section className="section-shell pt-10">
-        <div className="surface overflow-hidden p-8 md:p-10">
-          <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.26em] text-primary">
-                {hero?.subtitle || "Acavike Industrial"}
-              </p>
-              <h1 className="mt-4 max-w-4xl text-4xl font-semibold leading-tight md:text-6xl">
-                {hero?.title || "Compra industrial B2B con catálogo claro, cotización rápida y pago por transferencia."}
-              </h1>
-              <p className="mt-5 max-w-2xl text-base text-muted-foreground md:text-lg">
-                {hero?.body ||
-                  "Centraliza consumibles, abrasivos, empaque, EPP, limpieza y herramientas en una sola operación comercial."}
-              </p>
+    <div className="section-shell py-4 md:py-6">
+      <section className="public-panel p-4 md:p-6">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div className="max-w-4xl">
+            <p className="public-kicker">{hero?.subtitle || "Suministro industrial para operacion diaria"}</p>
+            <h1 className="mt-2 text-[28px] font-bold leading-tight text-slate-900 md:text-[34px]">
+              Suministros industriales, empaque y herramientas para empresas
+            </h1>
+            <p className="mt-3 max-w-3xl text-[14px] leading-6 text-slate-700">
+              {hero?.body ||
+                "Compra B2B con catalogo visual, reposicion frecuente, cotizacion rapida y pago por transferencia bancaria."}
+            </p>
 
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/catalogo" className={cn(buttonVariants({ size: "lg" }))}>
-                  Explorar catálogo
-                </Link>
-                <Link href="/cotizacion-rapida" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
-                  Solicitar cotización
-                </Link>
-              </div>
-
-              <div className="mt-10 grid gap-4 sm:grid-cols-3">
-                {[
-                  {
-                    title: "Buscador fuerte",
-                    body: "Encuentra productos por SKU, categoría o texto libre.",
-                    icon: Search,
-                  },
-                  {
-                    title: "Compra por transferencia",
-                    body: "Genera tu pedido y comparte comprobante para validación.",
-                    icon: Building2,
-                  },
-                  {
-                    title: "Cotización rápida",
-                    body: "Convierte requerimientos técnicos en propuestas comerciales.",
-                    icon: ClipboardCheck,
-                  },
-                ].map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <div key={item.title} className="rounded-3xl border border-slate-200 bg-white/80 p-5">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100 text-primary">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <h3 className="mt-4 text-lg font-semibold">{item.title}</h3>
-                      <p className="mt-2 text-sm text-muted-foreground">{item.body}</p>
-                    </div>
-                  );
-                })}
-              </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link href="/catalogo" className="public-btn">
+                Ver productos
+              </Link>
+              <Link href="/cotizacion-rapida" className="public-btn-outline">
+                Cotizacion express
+              </Link>
             </div>
+          </div>
 
-            <Card className="border-white/90">
-              <CardContent className="space-y-5 p-7">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Ruta sugerida</p>
-                <div className="space-y-4">
-                  {[
-                    "Busca o filtra productos por categoría.",
-                    "Agrega al carrito con precio base o mayoreo.",
-                    "Genera el pedido y recibe instrucciones bancarias.",
-                    "Sube tu comprobante y da seguimiento al estatus.",
-                  ].map((step, index) => (
-                    <div key={step} className="flex gap-4 rounded-2xl border border-slate-100 bg-slate-50/80 p-4">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">
-                        {index + 1}
-                      </div>
-                      <p className="text-sm text-slate-700">{step}</p>
-                    </div>
-                  ))}
-                </div>
-                {quickQuote ? (
-                  <div className="rounded-3xl bg-slate-950 p-6 text-white">
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                      {quickQuote.subtitle}
-                    </p>
-                    <h3 className="mt-2 text-2xl font-semibold">{quickQuote.title}</h3>
-                    <p className="mt-3 text-sm text-slate-300">{quickQuote.body}</p>
-                    <Link
-                      href={quickQuote.buttonHref || "/cotizacion-rapida"}
-                      className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-white"
-                    >
-                      {quickQuote.buttonText || "Solicitar"}
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
+          <div className="grid gap-2 sm:grid-cols-3 lg:w-[390px]">
+            {[
+              {
+                title: "Compra directa",
+                body: "Catalogo compacto para surtido operativo.",
+                icon: PackageCheck,
+              },
+              {
+                title: "Pago bancario",
+                body: "Pedido y comprobante sin pasarela.",
+                icon: ShieldCheck,
+              },
+              {
+                title: "Cobertura",
+                body: "Atencion a entregas y reabasto.",
+                icon: Truck,
+              },
+            ].map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <div key={item.title} className="border border-slate-200 bg-slate-50 p-3">
+                  <div className="flex h-9 w-9 items-center justify-center border border-slate-300 bg-white text-[#003A70]">
+                    <Icon className="h-4 w-4" />
                   </div>
-                ) : null}
-              </CardContent>
-            </Card>
+                  <h2 className="mt-3 text-[14px] font-bold text-slate-900">{item.title}</h2>
+                  <p className="mt-1 text-[12px] leading-5 text-slate-600">{item.body}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      <section className="section-shell mt-16">
-        <div className="flex items-end justify-between gap-4">
+      <section className="public-panel mt-4 p-4 md:p-5">
+        <div className="flex flex-col gap-3 border-b border-slate-200 pb-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Categorías</p>
-            <h2 className="mt-2 text-3xl font-semibold">Líneas clave para abastecimiento industrial</h2>
+            <p className="public-kicker">Categorias principales</p>
+            <h2 className="mt-2 text-[26px] font-bold text-slate-900">Catalogo industrial por familia</h2>
           </div>
-          <Link href="/catalogo" className="text-sm font-semibold text-primary">
-            Ver catálogo completo
+          <Link href="/catalogo" className="public-link text-[13px]">
+            Ver catalogo completo
           </Link>
         </div>
-        <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {categories.map((category) => (
+
+        <div className="mt-4 grid gap-4 xl:grid-cols-3 md:grid-cols-2">
+          {homeCategories.map((category) => (
             <CategoryCard key={category.id} category={category} />
           ))}
         </div>
       </section>
 
-      <section className="section-shell mt-16">
-        <div className="flex items-end justify-between gap-4">
+      <section className="public-panel mt-4 p-4 md:p-5">
+        <div className="flex flex-col gap-3 border-b border-slate-200 pb-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Destacados</p>
-            <h2 className="mt-2 text-3xl font-semibold">Productos listos para cotizar o pedir</h2>
+            <p className="public-kicker">Productos populares</p>
+            <h2 className="mt-2 text-[26px] font-bold text-slate-900">Listos para pedido o cotizacion</h2>
           </div>
-          <Link href="/catalogo" className="text-sm font-semibold text-primary">
+          <Link href="/catalogo" className="public-link text-[13px]">
             Ver todos
           </Link>
         </div>
-        <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          {featuredProducts.map((product) => (
+
+        <div className="mt-4 grid gap-4 xl:grid-cols-4 md:grid-cols-2">
+          {featuredProducts.slice(0, 8).map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>
 
-      {trustStrip ? (
-        <section className="section-shell mt-16">
-          <div className="rounded-[2rem] bg-slate-950 p-8 text-white md:p-10">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">{trustStrip.subtitle}</p>
-            <h2 className="mt-3 text-3xl font-semibold">{trustStrip.title}</h2>
-            <p className="mt-4 max-w-3xl text-slate-300">{trustStrip.body}</p>
+      <section className="public-panel mt-4 p-4 md:p-5">
+        <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+          <div>
+            <p className="public-kicker">{quickQuote?.subtitle || "Cotizacion rapida"}</p>
+            <h2 className="mt-2 text-[24px] font-bold text-slate-900">
+              {quickQuote?.title || "Carga SKU o modelo y prepara tu solicitud"}
+            </h2>
+            <p className="mt-2 text-[13px] leading-6 text-slate-700">
+              {quickQuote?.body || "Compra por transferencia bancaria y seguimiento comercial desde el panel de ventas."}
+            </p>
           </div>
+
+          <form action="/cotizacion-rapida" className="grid gap-2 md:grid-cols-[1.25fr_120px_auto]">
+            <input
+              name="sku"
+              placeholder="SKU o modelo"
+              className="public-input"
+            />
+            <input
+              name="cantidad"
+              placeholder="Cantidad"
+              defaultValue="1"
+              className="public-input"
+            />
+            <button className="public-btn" type="submit">
+              <ClipboardList className="h-4 w-4" />
+              Agregar a cotizacion
+            </button>
+          </form>
+        </div>
+      </section>
+
+      {trustStrip ? (
+        <section className="mt-4 border border-[#C9D3DE] bg-[#DDE7F0] px-4 py-3 text-[13px] leading-6 text-slate-800">
+          <span className="font-bold text-[#002B52]">{trustStrip.title}:</span> {trustStrip.body}
+          <Link href="/contacto" className="ml-2 inline-flex items-center gap-1 font-bold text-[#004B8D] hover:underline">
+            Conocer mas
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </section>
       ) : null}
     </div>

@@ -2,13 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
 import { notFound } from "next/navigation";
-import { addToCartAction } from "@/lib/actions/commerce";
-import { formatCurrency } from "@/lib/utils";
+import { addToCartAction } from "@/lib/actions/cart";
+import { CatalogBreadcrumbs } from "@/components/public/catalog-breadcrumbs";
 import { ProductCard } from "@/components/public/product-card";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/ui/table";
+import { buildQuoteRequirements } from "@/lib/public-catalog";
 import { getProductDetailDataRepository } from "@/lib/repositories/catalog";
+import { formatCurrency } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -27,98 +27,123 @@ export default async function ProductDetailPage({
     notFound();
   }
 
+  const quoteRequirements = buildQuoteRequirements({
+    sku: product.sku,
+    name: product.name,
+    quantity: 1,
+  });
+  const quoteHref = `/cotizacion-rapida?sku=${encodeURIComponent(product.sku)}&producto=${encodeURIComponent(product.name)}&cantidad=1`;
+  const specRows = [
+    { label: "SKU", value: product.sku },
+    { label: "Marca", value: product.brand || "Acavike" },
+    { label: "Unidad", value: product.unit },
+    { label: "Categoria", value: product.category.name },
+    { label: "Entrega", value: product.leadTimeText || "Sujeta a disponibilidad" },
+    { label: "Stock", value: String(product.stock) },
+  ];
+
   return (
-    <div className="section-shell py-10">
-      <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="space-y-6">
-          <div className="surface overflow-hidden">
-            <div className="relative aspect-[4/3] bg-slate-100">
-              <Image
-                src={product.images[0]?.url || "/placeholder-product.svg"}
-                alt={product.images[0]?.alt || product.name}
-                fill
-                className="object-cover"
-              />
-            </div>
-          </div>
-          {product.images.length > 1 ? (
-            <div className="grid grid-cols-3 gap-4">
-              {product.images.slice(1).map((image) => (
-                <div key={image.id} className="surface relative aspect-square overflow-hidden">
-                  <Image src={image.url} alt={image.alt || product.name} fill className="object-cover" />
-                </div>
-              ))}
-            </div>
-          ) : null}
-        </div>
+    <div className="section-shell py-4 md:py-6">
+      <CatalogBreadcrumbs
+        items={[
+          { label: "Inicio", href: "/" },
+          { label: "Todos los productos", href: "/catalogo" },
+          { label: product.category.name, href: `/catalogo/${product.category.slug}` },
+          { label: product.name },
+        ]}
+      />
 
-        <div className="space-y-6">
-          <div className="surface p-8">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
-                  {product.category.name}
-                </p>
-                <h1 className="mt-2 text-4xl font-semibold">{product.name}</h1>
-              </div>
-              {product.isFeatured ? <Badge variant="info">Destacado</Badge> : null}
-            </div>
-
-            <div className="mt-6 grid gap-3 text-sm text-muted-foreground">
-              <p>{product.shortDescription || product.description}</p>
-              <p>
-                <strong className="text-slate-800">SKU:</strong> {product.sku}
-              </p>
-              <p>
-                <strong className="text-slate-800">Marca:</strong> {product.brand || "Acavike"}
-              </p>
-              <p>
-                <strong className="text-slate-800">Entrega:</strong> {product.leadTimeText || "Por confirmar"}
-              </p>
-            </div>
-
-            <div className="mt-8 flex flex-wrap items-end gap-6">
-              <div>
-                <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Precio base</p>
-                <p className="mt-1 text-4xl font-semibold">{formatCurrency(product.price)}</p>
-                <p className="mt-1 text-sm text-slate-500">por {product.unit}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Stock disponible</p>
-                <p className="mt-1 text-2xl font-semibold">{product.stock}</p>
-              </div>
-            </div>
-
-            <form action={addToCartAction} className="mt-8 flex flex-col gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-5 md:flex-row md:items-end">
-              <input type="hidden" name="productId" value={product.id} />
-              <div className="w-full max-w-[160px]">
-                <label className="mb-2 block text-sm font-medium text-slate-800">Cantidad</label>
-                <input
-                  type="number"
-                  name="quantity"
-                  min={1}
-                  defaultValue={1}
-                  className="h-11 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm outline-none focus:border-primary"
+      <section className="public-panel p-4 md:p-6">
+        <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="space-y-4">
+            <div className="border border-slate-200 bg-white">
+              <div className="relative aspect-[4/3]">
+                <Image
+                  src={product.images[0]?.url || "/placeholder-product.svg"}
+                  alt={product.images[0]?.alt || product.name}
+                  fill
+                  className="object-contain p-6"
                 />
               </div>
-              <button className="inline-flex h-11 items-center justify-center rounded-2xl bg-primary px-6 text-sm font-semibold text-white">
-                Agregar al carrito
-              </button>
-              <Link href="/cotizacion-rapida" className="text-sm font-semibold text-primary">
-                O solicitar cotización
-              </Link>
-            </form>
+            </div>
+
+            <div className="border border-slate-200 bg-slate-50 p-4">
+              <h2 className="text-[18px] font-bold text-slate-900">Descripcion del producto</h2>
+              <p className="mt-2 text-[13px] leading-6 text-slate-700">
+                {product.description}
+              </p>
+            </div>
           </div>
 
-          <Card>
-            <CardContent className="p-8">
-              <h2 className="text-xl font-semibold">Precios por volumen</h2>
-              {product.priceTiers.length ? (
-                <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200">
+          <div className="space-y-4">
+            <div className="border border-slate-200 bg-white p-4 md:p-5">
+              <p className="public-kicker">{product.category.name}</p>
+              <h1 className="mt-2 text-[30px] font-bold leading-tight text-slate-900">{product.name}</h1>
+
+              <div className="mt-4 grid gap-2 text-[13px] text-slate-700 sm:grid-cols-2">
+                <p>
+                  <span className="font-bold text-slate-900">SKU:</span> {product.sku}
+                </p>
+                <p>
+                  <span className="font-bold text-slate-900">Marca:</span> {product.brand || "Acavike"}
+                </p>
+                <p>
+                  <span className="font-bold text-slate-900">Unidad:</span> {product.unit}
+                </p>
+                <p>
+                  <span className="font-bold text-slate-900">Stock:</span> {product.stock}
+                </p>
+              </div>
+
+              <div className="mt-5 border border-slate-200 bg-slate-50 p-4">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">Precio base</p>
+                <p className="mt-2 text-[32px] font-bold leading-none text-slate-900">{formatCurrency(product.price)}</p>
+                <p className="mt-2 text-[13px] text-slate-700">Entrega: {product.leadTimeText || "Sujeta a disponibilidad"}</p>
+              </div>
+
+              <form action={addToCartAction} className="mt-5 grid gap-3 md:grid-cols-[140px_1fr]">
+                <input type="hidden" name="productId" value={product.id} />
+                <div>
+                  <label className="mb-2 block text-[12px] font-bold uppercase tracking-[0.12em] text-slate-600">
+                    Cantidad
+                  </label>
+                  <input
+                    type="number"
+                    name="quantity"
+                    min={1}
+                    defaultValue={1}
+                    className="public-input"
+                  />
+                </div>
+                <div className="grid gap-2 md:grid-cols-2">
+                  <button className="public-btn w-full" type="submit">
+                    Agregar al carrito
+                  </button>
+                  <Link href={quoteHref} className="public-btn-outline w-full">
+                    Solicitar cotizacion
+                  </Link>
+                </div>
+              </form>
+            </div>
+
+            <div className="border border-slate-200 bg-white p-4">
+              <h2 className="text-[18px] font-bold text-slate-900">Condiciones comerciales</h2>
+              <ul className="mt-3 grid gap-2 text-[13px] leading-6 text-slate-700">
+                <li>Pago por transferencia bancaria.</li>
+                <li>Entrega sujeta a disponibilidad y confirmacion operativa.</li>
+                <li>Facturacion disponible para compras empresariales.</li>
+                <li>Prefill de cotizacion: {quoteRequirements}</li>
+              </ul>
+            </div>
+
+            {product.priceTiers.length ? (
+              <div className="border border-slate-200 bg-white p-4">
+                <h2 className="text-[18px] font-bold text-slate-900">Precios por mayoreo</h2>
+                <div className="mt-3 overflow-hidden border border-slate-200">
                   <Table>
                     <TableHead>
                       <tr>
-                        <TableHeaderCell>Mínimo</TableHeaderCell>
+                        <TableHeaderCell>Minimo</TableHeaderCell>
                         <TableHeaderCell>Precio</TableHeaderCell>
                       </tr>
                     </TableHead>
@@ -132,25 +157,52 @@ export default async function ProductDetailPage({
                     </TableBody>
                   </Table>
                 </div>
-              ) : (
-                <p className="mt-3 text-sm text-muted-foreground">
-                  Este producto aún no tiene escalas de mayoreo configuradas.
-                </p>
-              )}
-            </CardContent>
-          </Card>
+              </div>
+            ) : null}
+          </div>
         </div>
-      </div>
 
-      {relatedProducts.length ? (
-        <section className="mt-16">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Relacionados</p>
-              <h2 className="mt-2 text-3xl font-semibold">Más productos de esta categoría</h2>
+        <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="border border-slate-200 bg-white p-4">
+            <h2 className="text-[18px] font-bold text-slate-900">Especificaciones</h2>
+            <div className="mt-3 overflow-hidden border border-slate-200">
+              <table className="min-w-full text-left text-[13px]">
+                <tbody>
+                  {specRows.map((row) => (
+                    <tr key={row.label} className="border-b border-slate-200 last:border-0">
+                      <th className="w-[160px] bg-slate-50 px-4 py-3 font-semibold text-slate-700">{row.label}</th>
+                      <td className="px-4 py-3 text-slate-800">{row.value}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
-          <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+
+          <div className="border border-slate-200 bg-white p-4">
+            <h2 className="text-[18px] font-bold text-slate-900">Notas operativas</h2>
+            <div className="mt-3 grid gap-3 text-[13px] leading-6 text-slate-700">
+              <p>Producto orientado a surtido B2B y compras de reposicion para operacion, mantenimiento o inventario.</p>
+              <p>Si requieres un paquete mixto, marca propia, tiempos especiales o compras por lote, utiliza la cotizacion express.</p>
+              <p>Las existencias mostradas en demo son referenciales y sirven para validar el flujo comercial sin depender de una base externa.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {relatedProducts.length ? (
+        <section className="public-panel mt-4 p-4 md:p-5">
+          <div className="flex items-end justify-between gap-3 border-b border-slate-200 pb-4">
+            <div>
+              <p className="public-kicker">Relacionados</p>
+              <h2 className="mt-2 text-[24px] font-bold text-slate-900">Mas productos de esta familia</h2>
+            </div>
+            <Link href={`/catalogo/${product.category.slug}`} className="public-link text-[13px]">
+              Volver a {product.category.name}
+            </Link>
+          </div>
+
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {relatedProducts.map((relatedProduct) => (
               <ProductCard key={relatedProduct.id} product={relatedProduct} />
             ))}
