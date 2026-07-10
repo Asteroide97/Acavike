@@ -74,4 +74,6 @@ export const BANK_SETTING_KEYS = {
   supportPhone: "support_phone",
   supportEmail: "support_email",
   companyAddress: "company_address",
+  supportHours: "support_hours",
+  whatsappPhone: "whatsapp_phone",
 };

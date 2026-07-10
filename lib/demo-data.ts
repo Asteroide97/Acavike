@@ -76,9 +76,11 @@ export const demoSiteSettingsMap: Record<string, string> = {
   [BANK_SETTING_KEYS.beneficiary]: "ACAVIKE S.A. DE C.V.",
   [BANK_SETTING_KEYS.clabe]: "000000000000000000",
   [BANK_SETTING_KEYS.referenceHelp]: "Usa tu numero de pedido como referencia de pago.",
-  [BANK_SETTING_KEYS.supportPhone]: "81 0000 0000",
+  [BANK_SETTING_KEYS.supportPhone]: "+52 81 3082 2452",
   [BANK_SETTING_KEYS.supportEmail]: "ventas@acavike.com",
-  [BANK_SETTING_KEYS.companyAddress]: "Centro de Operaciones Acavike, Monterrey, Nuevo Leon",
+  [BANK_SETTING_KEYS.companyAddress]: "Allende, Nuevo Leon, Mexico",
+  [BANK_SETTING_KEYS.supportHours]: "Lun-Vie 8:00 - 18:00",
+  [BANK_SETTING_KEYS.whatsappPhone]: "+52 81 3082 2452",
 };
 
 export const demoSiteSettings: SiteSetting[] = Object.entries(demoSiteSettingsMap).map(([key, value], index) => ({
@@ -92,9 +94,9 @@ export const demoSiteSections: SiteSection[] = [
   {
     id: "section_hero",
     key: "hero_home",
-    title: "Abasto industrial con operacion simple y respuesta rapida",
-    subtitle: "Acavike Industrial",
-    body: "Catalogo B2B para compras tecnicas, resurtido recurrente y atencion comercial centralizada.",
+    title: "Catalogo industrial para surtido operativo, fabricacion y compras recurrentes",
+    subtitle: "Stock visible, transferencia y respuesta comercial directa",
+    body: "Acavike concentra categorias clave para planta, almacen, oficina y proyectos con una experiencia comercial simple.",
     imageUrl: "/placeholder-category.svg",
     buttonText: "Explorar catalogo",
     buttonHref: "/catalogo",
@@ -104,9 +106,9 @@ export const demoSiteSections: SiteSection[] = [
   {
     id: "section_quote",
     key: "quick_quote",
-    title: "Cotizacion rapida para compras urgentes",
-    subtitle: "Respuesta comercial",
-    body: "Envia tus requerimientos por SKU, descripcion o consumo estimado y arma tu pedido por transferencia.",
+    title: "Cotizacion express para volumen, reposicion o proyecto",
+    subtitle: "Respuesta en menos de 24 horas",
+    body: "Comparte SKU, descripcion o cantidades objetivo y te respondemos con una propuesta comercial clara.",
     imageUrl: "/placeholder-category.svg",
     buttonText: "Solicitar cotizacion",
     buttonHref: "/cotizacion-rapida",
@@ -116,9 +118,9 @@ export const demoSiteSections: SiteSection[] = [
   {
     id: "section_trust",
     key: "trust_strip",
-    title: "Operacion enfocada en industria, mantenimiento y abastecimiento",
+    title: "Compra empresarial con enfoque operativo y atencion especializada",
     subtitle: "Cobertura de categorias clave",
-    body: "Abrasivos, empaque, EPP, limpieza, tornilleria, herramienta y lineas operativas para planta.",
+    body: "Abrasivos, empaque, seguridad, fabricacion, construccion, limpieza y abasto recurrente en un solo frente comercial.",
     imageUrl: "/placeholder-category.svg",
     buttonText: "Ver categorias",
     buttonHref: "/catalogo",

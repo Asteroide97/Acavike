@@ -1,24 +1,23 @@
 import type { Category } from "@prisma/client";
 
 export const PUBLIC_NAV_TABS = [
-  { label: "Productos", href: "/catalogo" },
-  { label: "Marca Acavike", href: "/catalogo?q=Acavike" },
-  { label: "Cotizacion Express", href: "/cotizacion-rapida" },
   { label: "Catalogo", href: "/catalogo" },
-  { label: "Ofertas Especiales", href: "/catalogo?orden=price_asc" },
-  { label: "Acerca de Nosotros", href: "/contacto" },
+  { label: "Cotizacion", href: "/cotizacion-rapida" },
+  { label: "Fabricacion", href: "/catalogo?categoria=fabricacion" },
+  { label: "Servicios", href: "/contacto#servicios" },
+  { label: "Nosotros", href: "/contacto#nosotros" },
 ] as const;
 
 const HOME_CATEGORY_ORDER = [
-  "empaque",
   "abrasivos",
-  "construccion",
-  "herramienta",
-  "limpieza",
+  "empaque",
   "equipo-de-seguridad",
+  "herramienta",
+  "fabricacion",
+  "construccion",
+  "limpieza",
+  "comestibles",
   "oficina",
-  "tornilleria",
-  "renta",
 ] as const;
 
 type DemoCategoryMeta = {

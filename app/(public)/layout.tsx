@@ -2,7 +2,7 @@ import { unstable_noStore as noStore } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { getCartTotals, getOrCreateCart } from "@/lib/cart";
 import { RUNTIME_NOTICE } from "@/lib/config";
-import { getPublicNavigationData } from "@/lib/site";
+import { getPublicContactDetails, getPublicNavigationData } from "@/lib/site";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
 import { Alert } from "@/components/ui/alert";
@@ -18,15 +18,17 @@ export default async function PublicLayout({
   const user = await getCurrentUser();
   const [{ categories, settings }, cart] = await Promise.all([getPublicNavigationData(), getOrCreateCart(user?.id)]);
   const totals = getCartTotals(cart);
+  const contact = getPublicContactDetails(settings);
 
   return (
-    <div className="public-app min-h-screen bg-[#EFEFEF]">
+    <div className="public-app min-h-screen bg-[#F3F4F6]">
       <SiteHeader
-        categories={categories}
         cartCount={totals.itemsCount}
         cartTotal={totals.total}
         user={user}
-        supportPhone={settings.support_phone}
+        supportPhone={contact.supportPhone}
+        supportHours={contact.supportHours}
+        supportEmail={contact.supportEmail}
       />
       {RUNTIME_NOTICE ? (
         <div className="section-shell pt-3">
@@ -35,9 +37,11 @@ export default async function PublicLayout({
       ) : null}
       <main>{children}</main>
       <SiteFooter
-        email={settings.support_email}
-        phone={settings.support_phone}
-        address={settings.company_address}
+        email={contact.supportEmail}
+        phone={contact.supportPhone}
+        address={contact.companyAddress}
+        supportHours={contact.supportHours}
+        whatsappHref={contact.whatsappHref}
         categories={categories}
       />
     </div>

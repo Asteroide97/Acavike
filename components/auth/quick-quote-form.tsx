@@ -33,6 +33,9 @@ export function QuickQuoteForm({
     },
   });
 
+  const fieldClassName = "rounded-[6px] border-[#D1D5DB] focus:border-[#1D3B7A] focus:ring-[#1D3B7A]/10";
+  const labelClassName = "text-[12px] font-semibold uppercase tracking-[0.14em] text-slate-600";
+
   const onSubmit = form.handleSubmit((values) => {
     startTransition(async () => {
       const result = await submitQuickQuoteAction(values);
@@ -52,36 +55,37 @@ export function QuickQuoteForm({
         </Alert>
       ) : null}
       <div>
-        <Label htmlFor="quote-name">Nombre</Label>
-        <Input id="quote-name" {...form.register("name")} />
+        <Label htmlFor="quote-name" className={labelClassName}>Nombre</Label>
+        <Input id="quote-name" className={fieldClassName} {...form.register("name")} />
       </div>
       <div>
-        <Label htmlFor="quote-company">Empresa</Label>
-        <Input id="quote-company" {...form.register("companyName")} />
+        <Label htmlFor="quote-company" className={labelClassName}>Empresa</Label>
+        <Input id="quote-company" className={fieldClassName} {...form.register("companyName")} />
       </div>
       <div>
-        <Label htmlFor="quote-email">Correo</Label>
-        <Input id="quote-email" type="email" {...form.register("email")} />
+        <Label htmlFor="quote-email" className={labelClassName}>Correo</Label>
+        <Input id="quote-email" type="email" className={fieldClassName} {...form.register("email")} />
       </div>
       <div>
-        <Label htmlFor="quote-phone">Teléfono</Label>
-        <Input id="quote-phone" {...form.register("phone")} />
+        <Label htmlFor="quote-phone" className={labelClassName}>Telefono</Label>
+        <Input id="quote-phone" className={fieldClassName} {...form.register("phone")} />
       </div>
       <div className="md:col-span-2">
-        <Label htmlFor="quote-requirements">Requerimientos</Label>
+        <Label htmlFor="quote-requirements" className={labelClassName}>Requerimientos</Label>
         <Textarea
           id="quote-requirements"
+          className={fieldClassName}
           placeholder="Ejemplo: Guante anticorte | 24&#10;Caja corrugada doble pared | 50"
           {...form.register("requirements")}
         />
       </div>
       <div className="md:col-span-2">
-        <Label htmlFor="quote-notes">Notas adicionales</Label>
-        <Textarea id="quote-notes" {...form.register("notes")} />
+        <Label htmlFor="quote-notes" className={labelClassName}>Notas adicionales</Label>
+        <Textarea id="quote-notes" className={fieldClassName} {...form.register("notes")} />
       </div>
       <div className="md:col-span-2">
-        <Button type="submit" disabled={isPending}>
-          {isPending ? "Enviando..." : "Solicitar cotización"}
+        <Button type="submit" className="rounded-[6px] bg-[#0B1E4B] hover:bg-[#081632]" disabled={isPending}>
+          {isPending ? "Enviando..." : "Solicitar cotizacion"}
         </Button>
       </div>
     </form>

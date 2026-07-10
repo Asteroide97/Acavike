@@ -8,6 +8,7 @@ import { ProductCard } from "@/components/public/product-card";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/ui/table";
 import { buildQuoteRequirements } from "@/lib/public-catalog";
 import { getProductDetailDataRepository } from "@/lib/repositories/catalog";
+import { getPublicContactDetails, getSiteSettingsMap } from "@/lib/site";
 import { formatCurrency } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -21,12 +22,16 @@ export default async function ProductDetailPage({
 }) {
   noStore();
   const { slug } = await params;
-  const { product, relatedProducts } = await getProductDetailDataRepository(slug);
+  const [{ product, relatedProducts }, settings] = await Promise.all([
+    getProductDetailDataRepository(slug),
+    getSiteSettingsMap(),
+  ]);
 
   if (!product || !product.isActive) {
     notFound();
   }
 
+  const contact = getPublicContactDetails(settings);
   const quoteRequirements = buildQuoteRequirements({
     sku: product.sku,
     name: product.name,
@@ -43,7 +48,7 @@ export default async function ProductDetailPage({
   ];
 
   return (
-    <div className="section-shell py-4 md:py-6">
+    <div className="section-shell py-5 md:py-6">
       <CatalogBreadcrumbs
         items={[
           { label: "Inicio", href: "/" },
@@ -56,7 +61,7 @@ export default async function ProductDetailPage({
       <section className="public-panel p-4 md:p-6">
         <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="space-y-4">
-            <div className="border border-slate-200 bg-white">
+            <div className="overflow-hidden rounded-[6px] border border-[#D1D5DB] bg-[#F9FAFB]">
               <div className="relative aspect-[4/3]">
                 <Image
                   src={product.images[0]?.url || "/placeholder-product.svg"}
@@ -67,18 +72,16 @@ export default async function ProductDetailPage({
               </div>
             </div>
 
-            <div className="border border-slate-200 bg-slate-50 p-4">
-              <h2 className="text-[18px] font-bold text-slate-900">Descripcion del producto</h2>
-              <p className="mt-2 text-[13px] leading-6 text-slate-700">
-                {product.description}
-              </p>
+            <div className="rounded-[6px] border border-[#D1D5DB] bg-[#F9FAFB] p-4">
+              <h2 className="text-[18px] font-semibold text-slate-900">Descripcion del producto</h2>
+              <p className="mt-2 text-[13px] leading-6 text-slate-700">{product.description}</p>
             </div>
           </div>
 
           <div className="space-y-4">
-            <div className="border border-slate-200 bg-white p-4 md:p-5">
+            <div className="rounded-[6px] border border-[#D1D5DB] bg-white p-4 md:p-5">
               <p className="public-kicker">{product.category.name}</p>
-              <h1 className="mt-2 text-[30px] font-bold leading-tight text-slate-900">{product.name}</h1>
+              <h1 className="mt-2 text-[30px] font-semibold leading-tight text-slate-900">{product.name}</h1>
 
               <div className="mt-4 grid gap-2 text-[13px] text-slate-700 sm:grid-cols-2">
                 <p>
@@ -95,7 +98,7 @@ export default async function ProductDetailPage({
                 </p>
               </div>
 
-              <div className="mt-5 border border-slate-200 bg-slate-50 p-4">
+              <div className="mt-5 rounded-[6px] border border-[#E7D28B] bg-[#FFF7DB] p-4">
                 <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">Precio base</p>
                 <p className="mt-2 text-[32px] font-bold leading-none text-slate-900">{formatCurrency(product.price)}</p>
                 <p className="mt-2 text-[13px] text-slate-700">Entrega: {product.leadTimeText || "Sujeta a disponibilidad"}</p>
@@ -107,13 +110,7 @@ export default async function ProductDetailPage({
                   <label className="mb-2 block text-[12px] font-bold uppercase tracking-[0.12em] text-slate-600">
                     Cantidad
                   </label>
-                  <input
-                    type="number"
-                    name="quantity"
-                    min={1}
-                    defaultValue={1}
-                    className="public-input"
-                  />
+                  <input type="number" name="quantity" min={1} defaultValue={1} className="public-input" />
                 </div>
                 <div className="grid gap-2 md:grid-cols-2">
                   <button className="public-btn w-full" type="submit">
@@ -126,20 +123,27 @@ export default async function ProductDetailPage({
               </form>
             </div>
 
-            <div className="border border-slate-200 bg-white p-4">
-              <h2 className="text-[18px] font-bold text-slate-900">Condiciones comerciales</h2>
+            <div className="rounded-[6px] border border-[#D1D5DB] bg-white p-4">
+              <h2 className="text-[18px] font-semibold text-slate-900">Condiciones comerciales</h2>
               <ul className="mt-3 grid gap-2 text-[13px] leading-6 text-slate-700">
                 <li>Pago por transferencia bancaria.</li>
                 <li>Entrega sujeta a disponibilidad y confirmacion operativa.</li>
                 <li>Facturacion disponible para compras empresariales.</li>
                 <li>Prefill de cotizacion: {quoteRequirements}</li>
               </ul>
+              <div className="mt-4 rounded-[6px] bg-[#F9FAFB] p-3 text-[13px] text-slate-700">
+                <p className="font-semibold text-[#0B1E4B]">Contacto comercial</p>
+                <p className="mt-1">{contact.supportPhone}</p>
+                <a href={contact.whatsappHref} target="_blank" rel="noreferrer" className="mt-2 inline-flex font-semibold text-[#1D3B7A] hover:underline">
+                  Abrir WhatsApp Comercial
+                </a>
+              </div>
             </div>
 
             {product.priceTiers.length ? (
-              <div className="border border-slate-200 bg-white p-4">
-                <h2 className="text-[18px] font-bold text-slate-900">Precios por mayoreo</h2>
-                <div className="mt-3 overflow-hidden border border-slate-200">
+              <div className="rounded-[6px] border border-[#D1D5DB] bg-white p-4">
+                <h2 className="text-[18px] font-semibold text-slate-900">Precios por mayoreo</h2>
+                <div className="mt-3 overflow-hidden rounded-[6px] border border-[#D1D5DB]">
                   <Table>
                     <TableHead>
                       <tr>
@@ -163,14 +167,14 @@ export default async function ProductDetailPage({
         </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="border border-slate-200 bg-white p-4">
-            <h2 className="text-[18px] font-bold text-slate-900">Especificaciones</h2>
-            <div className="mt-3 overflow-hidden border border-slate-200">
+          <div className="rounded-[6px] border border-[#D1D5DB] bg-white p-4">
+            <h2 className="text-[18px] font-semibold text-slate-900">Especificaciones</h2>
+            <div className="mt-3 overflow-hidden rounded-[6px] border border-[#D1D5DB]">
               <table className="min-w-full text-left text-[13px]">
                 <tbody>
                   {specRows.map((row) => (
-                    <tr key={row.label} className="border-b border-slate-200 last:border-0">
-                      <th className="w-[160px] bg-slate-50 px-4 py-3 font-semibold text-slate-700">{row.label}</th>
+                    <tr key={row.label} className="border-b border-[#D1D5DB] last:border-0">
+                      <th className="w-[160px] bg-[#F9FAFB] px-4 py-3 font-semibold text-slate-700">{row.label}</th>
                       <td className="px-4 py-3 text-slate-800">{row.value}</td>
                     </tr>
                   ))}
@@ -179,8 +183,8 @@ export default async function ProductDetailPage({
             </div>
           </div>
 
-          <div className="border border-slate-200 bg-white p-4">
-            <h2 className="text-[18px] font-bold text-slate-900">Notas operativas</h2>
+          <div className="rounded-[6px] border border-[#D1D5DB] bg-white p-4">
+            <h2 className="text-[18px] font-semibold text-slate-900">Notas operativas</h2>
             <div className="mt-3 grid gap-3 text-[13px] leading-6 text-slate-700">
               <p>Producto orientado a surtido B2B y compras de reposicion para operacion, mantenimiento o inventario.</p>
               <p>Si requieres un paquete mixto, marca propia, tiempos especiales o compras por lote, utiliza la cotizacion express.</p>
@@ -192,10 +196,10 @@ export default async function ProductDetailPage({
 
       {relatedProducts.length ? (
         <section className="public-panel mt-4 p-4 md:p-5">
-          <div className="flex items-end justify-between gap-3 border-b border-slate-200 pb-4">
+          <div className="flex items-end justify-between gap-3 border-b border-[#D1D5DB] pb-4">
             <div>
               <p className="public-kicker">Relacionados</p>
-              <h2 className="mt-2 text-[24px] font-bold text-slate-900">Mas productos de esta familia</h2>
+              <h2 className="mt-2 text-[24px] font-semibold text-slate-900">Mas productos de esta familia</h2>
             </div>
             <Link href={`/catalogo/${product.category.slug}`} className="public-link text-[13px]">
               Volver a {product.category.name}

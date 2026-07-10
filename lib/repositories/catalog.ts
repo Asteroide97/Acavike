@@ -71,7 +71,7 @@ export async function getHomepageDataRepository() {
   if (DEMO_MODE) {
     return {
       sections: demoSiteSections,
-      categories: demoCategories.filter((category) => category.isActive).slice(0, 6),
+      categories: demoCategories.filter((category) => category.isActive),
       featuredProducts: demoProducts.filter((product) => product.isFeatured).slice(0, 8),
     };
   }
@@ -92,7 +92,6 @@ export async function getHomepageDataRepository() {
     prisma.category.findMany({
       where: { isActive: true },
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-      take: 6,
     }),
     prisma.product.findMany({
       where: { isActive: true, isFeatured: true },

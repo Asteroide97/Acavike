@@ -18,7 +18,7 @@ export function CatalogBreadcrumbs({
         return (
           <span key={`${item.label}-${index}`} className="flex items-center gap-2">
             {item.href && !isLast ? (
-              <Link href={item.href} className="font-medium text-[#004B8D] hover:underline">
+              <Link href={item.href} className="font-medium text-[#1D3B7A] hover:underline">
                 {item.label}
               </Link>
             ) : (

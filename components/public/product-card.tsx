@@ -13,34 +13,38 @@ type ProductCardItem = Product & {
 export function ProductCard({ product }: { product: ProductCardItem }) {
   return (
     <article className="public-panel overflow-hidden">
-      <Link href={`/producto/${product.slug}`} className="block border-b border-slate-200 bg-white">
+      <Link href={`/producto/${product.slug}`} className="block border-b border-[#D1D5DB] bg-[#F9FAFB]">
         <div className="relative aspect-square">
           <Image
             src={product.images[0]?.url || "/placeholder-product.svg"}
             alt={product.images[0]?.alt || product.name}
             fill
-            className="object-contain p-4"
+            className="object-contain p-5"
           />
         </div>
       </Link>
 
       <div className="space-y-3 p-4">
-        <div className="space-y-1">
+        <div className="flex items-start justify-between gap-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{product.category.name}</p>
-          <Link href={`/producto/${product.slug}`} className="block text-[13px] font-bold leading-5 text-[#004B8D] hover:underline">
-            {product.name}
-          </Link>
+          <span className="rounded-full bg-[#F3F4F6] px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+            Stock {product.stock}
+          </span>
         </div>
 
-        <div className="space-y-1 text-[12px] text-slate-700">
+        <Link href={`/producto/${product.slug}`} className="block text-[15px] font-bold leading-5 text-[#1D3B7A] hover:text-[#0B1E4B]">
+          {product.name}
+        </Link>
+
+        <div className="grid gap-1 text-[12px] text-slate-700">
           <p>SKU: {product.sku}</p>
           <p>Unidad: {product.unit}</p>
-          <p>Existencia: {product.stock}</p>
+          <p>Entrega: {product.leadTimeText || "Sujeta a disponibilidad"}</p>
         </div>
 
-        <div className="border-t border-slate-200 pt-3">
+        <div className="border-t border-[#D1D5DB] pt-3">
           <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">Precio</p>
-          <p className="mt-1 text-[22px] font-bold leading-none text-slate-900">{formatCurrency(product.price)}</p>
+          <p className="mt-1 text-[24px] font-bold leading-none text-slate-900">{formatCurrency(product.price)}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-2">

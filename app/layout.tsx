@@ -22,8 +22,8 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Acavike Industrial",
-  description: "Catálogo B2B industrial de Acavike con cotización rápida y compra por transferencia.",
+  title: "Acavike | Catalogo industrial B2B",
+  description: "Catalogo B2B industrial de Acavike con cotizacion rapida y compra por transferencia.",
 };
 
 export default function RootLayout({

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
-import { ProductCard } from "@/components/public/product-card";
 import { CatalogBreadcrumbs } from "@/components/public/catalog-breadcrumbs";
+import { ProductCard } from "@/components/public/product-card";
 import { getCatalogPageDataRepository } from "@/lib/repositories/catalog";
+import { getPublicContactDetails, getSiteSettingsMap } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -23,16 +24,20 @@ export default async function CatalogPage({
   const categorySlug = getSingleValue(resolved.categoria) || "";
   const sort = getSingleValue(resolved.orden) || "featured";
 
-  const { categories, products } = await getCatalogPageDataRepository({
-    query,
-    categorySlug,
-    sort: sort as "featured" | "price_asc" | "price_desc" | "newest",
-  });
+  const [{ categories, products }, settings] = await Promise.all([
+    getCatalogPageDataRepository({
+      query,
+      categorySlug,
+      sort: sort as "featured" | "price_asc" | "price_desc" | "newest",
+    }),
+    getSiteSettingsMap(),
+  ]);
 
   const activeCategory = categories.find((category) => category.slug === categorySlug) || null;
+  const contact = getPublicContactDetails(settings);
 
   return (
-    <div className="section-shell py-4 md:py-6">
+    <div className="section-shell py-5 md:py-6">
       <CatalogBreadcrumbs
         items={[
           { label: "Inicio", href: "/" },
@@ -40,39 +45,52 @@ export default async function CatalogPage({
         ]}
       />
 
-      <div className="grid gap-4 lg:grid-cols-[250px_1fr]">
-        <aside className="public-panel h-fit p-4">
-          <p className="public-kicker">Catalogo</p>
-          <h1 className="mt-2 text-[24px] font-bold text-slate-900">Categorias</h1>
-          <div className="mt-4 grid gap-2 text-[13px]">
-            <Link
-              href="/catalogo"
-              className={`border px-3 py-2 ${!categorySlug ? "border-[#003A70] bg-[#E8F0F7] font-bold text-[#003A70]" : "border-slate-200 text-slate-700 hover:border-[#003A70]"}`}
-            >
-              Todos los productos
-            </Link>
-            {categories.map((category) => (
+      <div className="grid gap-4 lg:grid-cols-[270px_1fr]">
+        <aside className="space-y-4">
+          <div className="public-panel h-fit p-4">
+            <p className="public-kicker">Catalogo</p>
+            <h1 className="mt-2 text-[24px] font-semibold text-slate-900">Categorias</h1>
+            <div className="mt-4 grid gap-2 text-[13px]">
               <Link
-                key={category.id}
-                href={`/catalogo?categoria=${category.slug}`}
-                className={`border px-3 py-2 ${category.slug === categorySlug ? "border-[#003A70] bg-[#E8F0F7] font-bold text-[#003A70]" : "border-slate-200 text-slate-700 hover:border-[#003A70]"}`}
+                href="/catalogo"
+                className={`rounded-[6px] border px-3 py-2 ${!categorySlug ? "border-[#1D3B7A] bg-[#EFF3FA] font-bold text-[#0B1E4B]" : "border-[#D1D5DB] text-slate-700 hover:border-[#1D3B7A]"}`}
               >
-                {category.name}
+                Todos los productos
               </Link>
-            ))}
+              {categories.map((category) => (
+                <Link
+                  key={category.id}
+                  href={`/catalogo?categoria=${category.slug}`}
+                  className={`rounded-[6px] border px-3 py-2 ${category.slug === categorySlug ? "border-[#1D3B7A] bg-[#EFF3FA] font-bold text-[#0B1E4B]" : "border-[#D1D5DB] text-slate-700 hover:border-[#1D3B7A]"}`}
+                >
+                  {category.name}
+                </Link>
+              ))}
+            </div>
           </div>
 
-          <div className="mt-4 border-t border-slate-200 pt-4 text-[12px] leading-6 text-slate-600">
-            Compra por transferencia bancaria y solicita cotizacion para volumen o reposicion frecuente.
+          <div className="rounded-[6px] bg-[#0B1E4B] p-4 text-white">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-blue-100">Atencion comercial</p>
+            <h2 className="mt-2 text-[22px] font-semibold leading-tight">Compra por volumen, reposicion o proyecto</h2>
+            <p className="mt-3 text-[13px] leading-6 text-blue-50">
+              Solicita cotizacion express o contacta a ventas para requerimientos especiales.
+            </p>
+            <div className="mt-4 grid gap-1 text-[13px] text-blue-100">
+              <p>{contact.supportPhone}</p>
+              <p>{contact.supportEmail}</p>
+            </div>
+            <Link href="/cotizacion-rapida" className="public-btn-accent mt-4">
+              Solicitar cotizacion
+            </Link>
           </div>
         </aside>
 
         <section className="space-y-4">
-          <div className="public-panel p-4">
+          <div className="public-panel p-4 md:p-5">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div>
                 <p className="public-kicker">Listado general</p>
-                <h2 className="mt-2 text-[28px] font-bold text-slate-900">Todos los productos</h2>
+                <h2 className="mt-2 text-[28px] font-semibold text-slate-900">Todos los productos</h2>
                 <p className="mt-2 text-[13px] text-slate-700">
                   {products.length} resultado(s)
                   {activeCategory ? ` en ${activeCategory.name}` : ""}
@@ -109,7 +127,7 @@ export default async function CatalogPage({
             </div>
           ) : (
             <div className="public-panel p-8 text-center">
-              <h3 className="text-[20px] font-bold text-slate-900">No encontramos productos</h3>
+              <h3 className="text-[20px] font-semibold text-slate-900">No encontramos productos</h3>
               <p className="mt-2 text-[13px] text-slate-700">
                 Ajusta la busqueda o elimina filtros para ver mas resultados del catalogo.
               </p>
