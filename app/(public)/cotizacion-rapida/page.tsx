@@ -24,12 +24,12 @@ export default async function QuickQuotePage({
   const contact = getPublicContactDetails(await getSiteSettingsMap());
 
   return (
-    <div className="section-shell py-6 md:py-8">
+    <div className="section-shell py-4 md:py-6">
       <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="public-panel p-6 md:p-8">
-          <p className="public-kicker">Cotizacion express</p>
+          <p className="public-kicker">Cotización express</p>
           <h1 className="mt-2 text-[32px] font-semibold leading-tight text-slate-900">
-            Envianos tus requerimientos y armamos la propuesta comercial
+            Envíanos tus requerimientos y armamos la propuesta comercial
           </h1>
           <p className="mt-3 max-w-2xl text-[14px] leading-6 text-slate-700">
             Comparte productos, SKUs, cantidades o consumo estimado. Respondemos en menos de 24 horas y mantenemos compra por transferencia bancaria.
@@ -41,11 +41,11 @@ export default async function QuickQuotePage({
 
         <div className="space-y-4">
           <div className="public-panel p-6">
-            <h2 className="text-[24px] font-semibold text-slate-900">Como acelerar la respuesta</h2>
+            <h2 className="text-[24px] font-semibold text-slate-900">Cómo acelerar la respuesta</h2>
             <div className="mt-4 space-y-4 text-[13px] leading-6 text-slate-700">
               <p>Incluye cantidad estimada por partida, frecuencia de compra y si necesitas entrega local o embarque.</p>
-              <p>Si ya tienes SKUs internos o codigos de proveedor, agregalos en una linea por producto.</p>
-              <p>El folio generado entra como borrador al panel de cotizaciones para revision de ventas.</p>
+              <p>Si ya tienes SKUs internos o códigos de proveedor, agrégalos en una línea por producto.</p>
+              <p>El folio generado entra como borrador al panel de cotizaciones para revisión de ventas.</p>
             </div>
           </div>
 

@@ -67,7 +67,7 @@ export function QuickQuoteForm({
         <Input id="quote-email" type="email" className={fieldClassName} {...form.register("email")} />
       </div>
       <div>
-        <Label htmlFor="quote-phone" className={labelClassName}>Telefono</Label>
+        <Label htmlFor="quote-phone" className={labelClassName}>Teléfono</Label>
         <Input id="quote-phone" className={fieldClassName} {...form.register("phone")} />
       </div>
       <div className="md:col-span-2">
@@ -85,7 +85,7 @@ export function QuickQuoteForm({
       </div>
       <div className="md:col-span-2">
         <Button type="submit" className="rounded-[6px] bg-[#0B1E4B] hover:bg-[#081632]" disabled={isPending}>
-          {isPending ? "Enviando..." : "Solicitar cotizacion"}
+          {isPending ? "Enviando..." : "Solicitar cotización"}
         </Button>
       </div>
     </form>

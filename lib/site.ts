@@ -5,11 +5,11 @@ import { getBankSettingsRepository, getSiteSettingsMapRepository } from "@/lib/r
 
 export const DEFAULT_PUBLIC_CONTACT = {
   brandName: "Acavike",
-  tagline: "Catalogo industrial B2B para compras directas y cotizacion por volumen.",
+  tagline: "Catálogo industrial B2B para compras directas y cotización por volumen.",
   supportPhone: "+52 81 3082 2452",
   supportEmail: "ventas@acavike.com",
-  companyAddress: "Allende, Nuevo Leon, Mexico",
-  supportHours: "Lun-Vie 8:00 - 18:00",
+  companyAddress: "Allende, Nuevo León, México",
+  supportHours: "Lun–Vie 8:00–18:00",
   whatsappPhone: "+52 81 3082 2452",
 };
 
@@ -46,7 +46,7 @@ export function getPublicContactDetails(settings: Record<string, string>) {
     supportHours,
     whatsappPhone,
     whatsappHref: whatsappDigits
-      ? `https://wa.me/${whatsappDigits}?text=${encodeURIComponent("Hola Acavike, necesito una cotizacion.")}`
+      ? `https://wa.me/${whatsappDigits}?text=${encodeURIComponent("Hola Acavike, necesito una cotización.")}`
       : "/contacto",
   };
 }

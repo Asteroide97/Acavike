@@ -42,13 +42,13 @@ export default async function ProductDetailPage({
     { label: "SKU", value: product.sku },
     { label: "Marca", value: product.brand || "Acavike" },
     { label: "Unidad", value: product.unit },
-    { label: "Categoria", value: product.category.name },
+    { label: "Categoría", value: product.category.name },
     { label: "Entrega", value: product.leadTimeText || "Sujeta a disponibilidad" },
     { label: "Stock", value: String(product.stock) },
   ];
 
   return (
-    <div className="section-shell py-5 md:py-6">
+    <div className="section-shell py-4 md:py-6">
       <CatalogBreadcrumbs
         items={[
           { label: "Inicio", href: "/" },
@@ -63,17 +63,18 @@ export default async function ProductDetailPage({
           <div className="space-y-4">
             <div className="overflow-hidden rounded-[6px] border border-[#D1D5DB] bg-[#F9FAFB]">
               <div className="relative aspect-[4/3]">
+                <div className="absolute inset-5 rounded-[18px] bg-white shadow-[0_12px_32px_rgba(11,30,75,0.07)]" />
                 <Image
                   src={product.images[0]?.url || "/placeholder-product.svg"}
                   alt={product.images[0]?.alt || product.name}
                   fill
-                  className="object-contain p-6"
+                  className="object-contain p-7"
                 />
               </div>
             </div>
 
             <div className="rounded-[6px] border border-[#D1D5DB] bg-[#F9FAFB] p-4">
-              <h2 className="text-[18px] font-semibold text-slate-900">Descripcion del producto</h2>
+              <h2 className="text-[18px] font-semibold text-slate-900">Descripción del producto</h2>
               <p className="mt-2 text-[13px] leading-6 text-slate-700">{product.description}</p>
             </div>
           </div>
@@ -117,7 +118,7 @@ export default async function ProductDetailPage({
                     Agregar al carrito
                   </button>
                   <Link href={quoteHref} className="public-btn-outline w-full">
-                    Solicitar cotizacion
+                    Solicitar cotización
                   </Link>
                 </div>
               </form>
@@ -127,9 +128,9 @@ export default async function ProductDetailPage({
               <h2 className="text-[18px] font-semibold text-slate-900">Condiciones comerciales</h2>
               <ul className="mt-3 grid gap-2 text-[13px] leading-6 text-slate-700">
                 <li>Pago por transferencia bancaria.</li>
-                <li>Entrega sujeta a disponibilidad y confirmacion operativa.</li>
-                <li>Facturacion disponible para compras empresariales.</li>
-                <li>Prefill de cotizacion: {quoteRequirements}</li>
+                <li>Entrega sujeta a disponibilidad y confirmación operativa.</li>
+                <li>Facturación disponible para compras empresariales.</li>
+                <li>Solicitud lista para cotización: {quoteRequirements}</li>
               </ul>
               <div className="mt-4 rounded-[6px] bg-[#F9FAFB] p-3 text-[13px] text-slate-700">
                 <p className="font-semibold text-[#0B1E4B]">Contacto comercial</p>
@@ -147,7 +148,7 @@ export default async function ProductDetailPage({
                   <Table>
                     <TableHead>
                       <tr>
-                        <TableHeaderCell>Minimo</TableHeaderCell>
+                        <TableHeaderCell>Mínimo</TableHeaderCell>
                         <TableHeaderCell>Precio</TableHeaderCell>
                       </tr>
                     </TableHead>
@@ -186,8 +187,8 @@ export default async function ProductDetailPage({
           <div className="rounded-[6px] border border-[#D1D5DB] bg-white p-4">
             <h2 className="text-[18px] font-semibold text-slate-900">Notas operativas</h2>
             <div className="mt-3 grid gap-3 text-[13px] leading-6 text-slate-700">
-              <p>Producto orientado a surtido B2B y compras de reposicion para operacion, mantenimiento o inventario.</p>
-              <p>Si requieres un paquete mixto, marca propia, tiempos especiales o compras por lote, utiliza la cotizacion express.</p>
+              <p>Producto orientado a surtido B2B y compras de reposición para operación, mantenimiento o inventario.</p>
+              <p>Si requieres un paquete mixto, marca propia, tiempos especiales o compras por lote, utiliza la cotización express.</p>
               <p>Las existencias mostradas en demo son referenciales y sirven para validar el flujo comercial sin depender de una base externa.</p>
             </div>
           </div>
@@ -199,7 +200,7 @@ export default async function ProductDetailPage({
           <div className="flex items-end justify-between gap-3 border-b border-[#D1D5DB] pb-4">
             <div>
               <p className="public-kicker">Relacionados</p>
-              <h2 className="mt-2 text-[24px] font-semibold text-slate-900">Mas productos de esta familia</h2>
+              <h2 className="mt-2 text-[24px] font-semibold text-slate-900">Más productos de esta familia</h2>
             </div>
             <Link href={`/catalogo/${product.category.slug}`} className="public-link text-[13px]">
               Volver a {product.category.name}

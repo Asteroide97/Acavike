@@ -44,7 +44,7 @@ export function ContactForm() {
   return (
     <form className="grid gap-4 md:grid-cols-2" onSubmit={onSubmit}>
       {serverState.error ? <Alert className="md:col-span-2" tone="danger">{serverState.error}</Alert> : null}
-      {serverState.success ? <Alert className="md:col-span-2" tone="success">Mensaje enviado. El equipo comercial te respondera pronto.</Alert> : null}
+      {serverState.success ? <Alert className="md:col-span-2" tone="success">Mensaje enviado. El equipo comercial te responderá pronto.</Alert> : null}
       <div>
         <Label htmlFor="contact-name" className={labelClassName}>Nombre</Label>
         <Input id="contact-name" className={fieldClassName} {...form.register("name")} />
@@ -60,7 +60,7 @@ export function ContactForm() {
         {form.formState.errors.email ? <p className="mt-2 text-xs text-red-600">{form.formState.errors.email.message}</p> : null}
       </div>
       <div>
-        <Label htmlFor="contact-phone" className={labelClassName}>Telefono</Label>
+        <Label htmlFor="contact-phone" className={labelClassName}>Teléfono</Label>
         <Input id="contact-phone" className={fieldClassName} {...form.register("phone")} />
       </div>
       <div className="md:col-span-2">

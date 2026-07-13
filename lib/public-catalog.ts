@@ -1,9 +1,9 @@
 import type { Category } from "@prisma/client";
 
 export const PUBLIC_NAV_TABS = [
-  { label: "Catalogo", href: "/catalogo" },
-  { label: "Cotizacion", href: "/cotizacion-rapida" },
-  { label: "Fabricacion", href: "/catalogo?categoria=fabricacion" },
+  { label: "Catálogo", href: "/catalogo" },
+  { label: "Cotización", href: "/cotizacion-rapida" },
+  { label: "Fabricación", href: "/catalogo?categoria=fabricacion" },
   { label: "Servicios", href: "/contacto#servicios" },
   { label: "Nosotros", href: "/contacto#nosotros" },
 ] as const;
@@ -27,64 +27,64 @@ type DemoCategoryMeta = {
 };
 
 const FALLBACK_META: DemoCategoryMeta = {
-  blurb: "Suministro industrial para operacion, mantenimiento y compra recurrente.",
-  subcategories: ["Linea general", "Consumibles", "Reposicion", "Entrega programada"],
+  blurb: "Suministro industrial para operación, mantenimiento y compra recurrente.",
+  subcategories: ["Línea general", "Consumibles", "Reposición", "Entrega programada"],
   callout: "Inventario sujeto a disponibilidad.",
 };
 
 export const DEMO_CATEGORY_META: Record<string, DemoCategoryMeta> = {
   abrasivos: {
-    blurb: "Desbaste, corte y acabado para taller, mantenimiento y metalmecanica.",
+    blurb: "Desbaste, corte y acabado para taller, mantenimiento y metalmecánica.",
     subcategories: ["Discos de corte", "Lijas de agua", "Ruedas flap", "Cepillos de alambre"],
-    callout: "Presentaciones para mantenimiento y produccion ligera.",
+    callout: "Presentaciones para mantenimiento y producción ligera.",
   },
   empaque: {
-    blurb: "Cajas, cintas y proteccion para embarque, almacen y resguardo interno.",
-    subcategories: ["Cajas corrugadas", "Cinta canela", "Pelicula stretch", "Burbuja", "Sobres de envio"],
-    callout: "Ideal para operaciones logisticas y surtido diario.",
+    blurb: "Cajas, cintas y protección para embarque, almacén y resguardo interno.",
+    subcategories: ["Cajas corrugadas", "Cinta canela", "Película stretch", "Burbuja", "Sobres de envío"],
+    callout: "Ideal para operaciones logísticas y surtido diario.",
   },
   "equipo-de-seguridad": {
-    blurb: "Proteccion personal para almacen, planta, reparto y cuadrillas operativas.",
+    blurb: "Protección personal para almacén, planta, reparto y cuadrillas operativas.",
     subcategories: ["Guantes", "Cascos", "Lentes", "Chalecos", "Proteccion auditiva"],
-    callout: "Equipos con salida rapida para uso recurrente.",
+    callout: "Equipos con salida rápida para uso recurrente.",
   },
   limpieza: {
     blurb: "Higiene industrial para taller, oficinas, pasillos y zonas de proceso.",
-    subcategories: ["Desengrasantes", "Toallas", "Jaladores", "Sanitizacion", "Contenedores"],
-    callout: "Formatos concentrados y articulos de reposicion continua.",
+    subcategories: ["Desengrasantes", "Toallas", "Jaladores", "Sanitización", "Contenedores"],
+    callout: "Formatos concentrados y artículos de reposición continua.",
   },
   construccion: {
-    blurb: "Consumibles para obra, reparacion, delimitacion y seguridad temporal.",
-    subcategories: ["Senalizacion", "Cintas preventivas", "Impermeabilizantes", "Selladores"],
+    blurb: "Consumibles para obra, reparación, delimitación y seguridad temporal.",
+    subcategories: ["Señalización", "Cintas preventivas", "Impermeabilizantes", "Selladores"],
     callout: "Material listo para cuadrillas y trabajos de campo.",
   },
   herramienta: {
-    blurb: "Herramienta portatil y accesorios para mantenimiento electrico y mecanico.",
+    blurb: "Herramienta portátil y accesorios para mantenimiento eléctrico y mecánico.",
     subcategories: ["Taladros", "Llaves", "Dados", "Consumibles", "Herramienta manual"],
-    callout: "Modelos orientados a operacion diaria.",
+    callout: "Modelos orientados a operación diaria.",
   },
   oficina: {
-    blurb: "Mobiliario y abasto para espacios administrativos y areas de soporte.",
+    blurb: "Mobiliario y abasto para espacios administrativos y áreas de soporte.",
     subcategories: ["Sillas", "Archivo", "Papel", "Escritorio", "Consumibles"],
-    callout: "Categorias para compras internas y reposicion mensual.",
+    callout: "Categorías para compras internas y reposición mensual.",
   },
   tornilleria: {
-    blurb: "Fijacion industrial para instalacion, montaje y mantenimiento general.",
+    blurb: "Fijación industrial para instalación, montaje y mantenimiento general.",
     subcategories: ["Tornillo hexagonal", "Tuercas", "Rondanas", "Anclas", "Birlos"],
     callout: "Disponibilidad por pieza, paquete y volumen.",
   },
   renta: {
     blurb: "Activos de apoyo para trabajos temporales y necesidades programadas.",
     subcategories: ["Escaleras", "Andamios", "Extensiones", "Equipo auxiliar"],
-    callout: "Servicio sujeto a programacion y cobertura.",
+    callout: "Servicio sujeto a programación y cobertura.",
   },
   comestibles: {
-    blurb: "Abasto basico para estaciones de cafe y consumo interno.",
-    subcategories: ["Cafe", "Azucar", "Vasos", "Snacks"],
+    blurb: "Abasto básico para estaciones de café y consumo interno.",
+    subcategories: ["Café", "Azúcar", "Vasos", "Snacks"],
     callout: "Kits listos para oficinas y salas de juntas.",
   },
   fabricacion: {
-    blurb: "Material para adecuaciones ligeras, soporte y fabricacion menor.",
+    blurb: "Material para adecuaciones ligeras, soporte y fabricación menor.",
     subcategories: ["Perfil estructural", "Placas", "Tubular", "Consumibles"],
     callout: "Soluciones para mantenimiento y montaje.",
   },

@@ -75,11 +75,11 @@ export const demoSiteSettingsMap: Record<string, string> = {
   [BANK_SETTING_KEYS.bankName]: "BANCO DEMO",
   [BANK_SETTING_KEYS.beneficiary]: "ACAVIKE S.A. DE C.V.",
   [BANK_SETTING_KEYS.clabe]: "000000000000000000",
-  [BANK_SETTING_KEYS.referenceHelp]: "Usa tu numero de pedido como referencia de pago.",
+  [BANK_SETTING_KEYS.referenceHelp]: "Usa tu número de pedido como referencia de pago.",
   [BANK_SETTING_KEYS.supportPhone]: "+52 81 3082 2452",
   [BANK_SETTING_KEYS.supportEmail]: "ventas@acavike.com",
-  [BANK_SETTING_KEYS.companyAddress]: "Allende, Nuevo Leon, Mexico",
-  [BANK_SETTING_KEYS.supportHours]: "Lun-Vie 8:00 - 18:00",
+  [BANK_SETTING_KEYS.companyAddress]: "Allende, Nuevo León, México",
+  [BANK_SETTING_KEYS.supportHours]: "Lun–Vie 8:00–18:00",
   [BANK_SETTING_KEYS.whatsappPhone]: "+52 81 3082 2452",
 };
 
@@ -94,11 +94,11 @@ export const demoSiteSections: SiteSection[] = [
   {
     id: "section_hero",
     key: "hero_home",
-    title: "Catalogo industrial para surtido operativo, fabricacion y compras recurrentes",
+    title: "Catálogo industrial para surtido operativo, fabricación y compras recurrentes",
     subtitle: "Stock visible, transferencia y respuesta comercial directa",
-    body: "Acavike concentra categorias clave para planta, almacen, oficina y proyectos con una experiencia comercial simple.",
+    body: "Acavike concentra categorías clave para planta, almacén, oficina y proyectos con una experiencia comercial simple.",
     imageUrl: "/placeholder-category.svg",
-    buttonText: "Explorar catalogo",
+    buttonText: "Explorar catálogo",
     buttonHref: "/catalogo",
     isActive: true,
     sortOrder: 1,
@@ -106,11 +106,11 @@ export const demoSiteSections: SiteSection[] = [
   {
     id: "section_quote",
     key: "quick_quote",
-    title: "Cotizacion express para volumen, reposicion o proyecto",
+    title: "Cotización express para volumen, reposición o proyecto",
     subtitle: "Respuesta en menos de 24 horas",
-    body: "Comparte SKU, descripcion o cantidades objetivo y te respondemos con una propuesta comercial clara.",
+    body: "Comparte SKU, descripción o cantidades objetivo y te respondemos con una propuesta comercial clara.",
     imageUrl: "/placeholder-category.svg",
-    buttonText: "Solicitar cotizacion",
+    buttonText: "Solicitar cotización",
     buttonHref: "/cotizacion-rapida",
     isActive: true,
     sortOrder: 2,
@@ -118,11 +118,11 @@ export const demoSiteSections: SiteSection[] = [
   {
     id: "section_trust",
     key: "trust_strip",
-    title: "Compra empresarial con enfoque operativo y atencion especializada",
-    subtitle: "Cobertura de categorias clave",
-    body: "Abrasivos, empaque, seguridad, fabricacion, construccion, limpieza y abasto recurrente en un solo frente comercial.",
+    title: "Compra empresarial con enfoque operativo y atención especializada",
+    subtitle: "Cobertura de categorías clave",
+    body: "Abrasivos, empaque, seguridad, fabricación, construcción, limpieza y abasto recurrente en un solo frente comercial.",
     imageUrl: "/placeholder-category.svg",
-    buttonText: "Ver categorias",
+    buttonText: "Ver categorías",
     buttonHref: "/catalogo",
     isActive: true,
     sortOrder: 3,
@@ -135,11 +135,11 @@ export const demoCategories: Category[] = [
   "Equipo de Seguridad",
   "Limpieza",
   "Comestibles",
-  "Fabricacion",
+  "Fabricación",
   "Oficina",
-  "Construccion",
+  "Construcción",
   "Herramienta",
-  "Tornilleria",
+  "Tornillería",
   "Renta",
 ].map((name, index) => ({
   id: `cat_${index + 1}`,
@@ -150,7 +150,7 @@ export const demoCategories: Category[] = [
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, ""),
-  description: `Linea ${name.toLowerCase()} para operacion, mantenimiento y abastecimiento industrial.`,
+  description: `Línea ${name.toLowerCase()} para operación, mantenimiento y abastecimiento industrial.`,
   imageUrl: `/demo-products/category-${name
     .toLowerCase()
     .normalize("NFD")

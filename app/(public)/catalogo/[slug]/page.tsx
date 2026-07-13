@@ -28,7 +28,7 @@ export default async function CategoryCatalogPage({
   const subcategories = getCategorySubcategories(category.slug);
 
   return (
-    <div className="section-shell py-5 md:py-6">
+    <div className="section-shell py-4 md:py-6">
       <CatalogBreadcrumbs
         items={[
           { label: "Inicio", href: "/" },
@@ -41,7 +41,7 @@ export default async function CategoryCatalogPage({
         <section className="public-panel overflow-hidden">
           <div className="grid gap-5 p-5 md:p-6 lg:grid-cols-[1fr_300px] lg:items-center">
             <div>
-              <p className="public-kicker">Familia de catalogo</p>
+              <p className="public-kicker">Familia de catálogo</p>
               <h1 className="mt-2 text-[30px] font-semibold uppercase tracking-[0.04em] text-slate-900">
                 {category.name}
               </h1>
@@ -53,11 +53,12 @@ export default async function CategoryCatalogPage({
             </div>
 
             <div className="relative min-h-[200px] overflow-hidden rounded-[6px] border border-[#D1D5DB] bg-[#F3F4F6]">
+              <div className="absolute inset-4 rounded-[16px] bg-white shadow-[0_10px_28px_rgba(11,30,75,0.06)]" />
               <Image
                 src={category.imageUrl || "/placeholder-category.svg"}
                 alt={category.name}
                 fill
-                className="object-contain p-6"
+                className="object-contain p-7"
               />
             </div>
           </div>
@@ -67,8 +68,8 @@ export default async function CategoryCatalogPage({
           <section className="public-panel p-4 md:p-5">
             <div className="flex items-end justify-between gap-3 border-b border-[#D1D5DB] pb-4">
               <div>
-                <p className="public-kicker">Subcategorias demo</p>
-                <h2 className="mt-2 text-[24px] font-semibold text-slate-900">Lineas relacionadas</h2>
+                <p className="public-kicker">Subcategorías demo</p>
+                <h2 className="mt-2 text-[24px] font-semibold text-slate-900">Líneas relacionadas</h2>
               </div>
               <Link href="#productos" className="public-link text-[13px]">
                 Ir a productos
@@ -107,7 +108,7 @@ export default async function CategoryCatalogPage({
               <h2 className="mt-2 text-[24px] font-semibold text-slate-900">Disponibles en {category.name}</h2>
             </div>
             <Link href="/catalogo" className="public-link text-[13px]">
-              Ver todo el catalogo
+              Ver todo el catálogo
             </Link>
           </div>
 
@@ -121,7 +122,7 @@ export default async function CategoryCatalogPage({
             <div className="mt-4 rounded-[6px] border border-dashed border-[#D1D5DB] bg-[#F9FAFB] p-6 text-center">
               <p className="text-[14px] font-semibold text-slate-900">No hay productos activos en esta familia</p>
               <p className="mt-2 text-[13px] text-slate-700">
-                Revisa otra categoria o solicita una cotizacion express para requerimientos especiales.
+                Revisa otra categoría o solicita una cotización express para requerimientos especiales.
               </p>
             </div>
           )}

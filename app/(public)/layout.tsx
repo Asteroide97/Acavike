@@ -21,7 +21,7 @@ export default async function PublicLayout({
   const contact = getPublicContactDetails(settings);
 
   return (
-    <div className="public-app min-h-screen bg-[#F3F4F6]">
+    <div className="public-app min-h-screen overflow-x-hidden bg-[#F3F4F6]">
       <SiteHeader
         cartCount={totals.itemsCount}
         cartTotal={totals.total}

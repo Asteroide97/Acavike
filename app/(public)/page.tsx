@@ -27,39 +27,39 @@ export default async function HomePage() {
     },
     {
       title: "Compra en minutos",
-      body: "Proceso de compra agil y directo",
+      body: "Proceso de compra ágil y directo",
       icon: ShoppingCart,
     },
     {
-      title: "Cotizacion express",
+      title: "Cotización express",
       body: "Respuesta en menos de 24 hrs",
       icon: ClipboardList,
     },
     {
       title: "Precios actualizados",
-      body: "Sincronizacion automatica de catalogo",
+      body: "Sincronización automática de catálogo",
       icon: RefreshCcw,
     },
     {
-      title: "Asesoria B2B",
-      body: "Atencion especializada para empresas",
+      title: "Asesoría B2B",
+      body: "Atención especializada para empresas",
       icon: Headset,
     },
   ];
 
   return (
-    <div className="section-shell py-5 md:py-6">
-      <div className="space-y-5">
+    <div className="section-shell py-4 md:py-6">
+      <div className="space-y-4 md:space-y-5">
         <section className="public-panel overflow-hidden">
-          <div className="grid gap-6 p-5 md:p-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <div className="grid gap-5 p-4 md:p-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
             <div>
-              <p className="public-kicker">{hero?.subtitle || "Catalogo industrial B2B"}</p>
-              <h1 className="mt-2 text-[30px] font-semibold leading-tight text-slate-900 md:text-[36px]">
+              <p className="public-kicker">{hero?.subtitle || "Catálogo industrial B2B"}</p>
+              <h1 className="mt-2 text-[28px] font-semibold leading-tight text-slate-900 sm:text-[30px] md:text-[36px]">
                 Suministros industriales, empaque y herramientas para empresas
               </h1>
               <p className="mt-3 max-w-3xl text-[14px] leading-6 text-slate-700">
                 {hero?.body ||
-                  "Acavike concentra compra operativa, cotizacion comercial y pago por transferencia en una sola experiencia."}
+                  "Acavike concentra compra operativa, cotización comercial y pago por transferencia en una sola experiencia."}
               </p>
 
               <div className="mt-4 flex flex-wrap gap-2">
@@ -67,7 +67,7 @@ export default async function HomePage() {
                   Ver productos
                 </Link>
                 <Link href="/cotizacion-rapida" className="public-btn-accent">
-                  Cotizacion express
+                  Cotización express
                 </Link>
               </div>
             </div>
@@ -75,20 +75,20 @@ export default async function HomePage() {
             <div className="grid gap-3 sm:grid-cols-2">
               {[
                 {
-                  title: "Catalogo comercial",
-                  body: "Categorias listas para compra directa o cotizacion por proyecto.",
+                  title: "Catálogo comercial",
+                  body: "Categorías listas para compra directa o cotización por proyecto.",
                 },
                 {
                   title: "Compra por transferencia",
                   body: "Checkout visual y seguimiento comercial sin pasarelas externas.",
                 },
                 {
-                  title: "Atencion directa",
+                  title: "Atención directa",
                   body: `${contact.supportPhone} | ${contact.supportHours}`,
                 },
                 {
                   title: "Cobertura industrial",
-                  body: "Empaque, fabricacion, limpieza, oficina y abasto recurrente.",
+                  body: "Empaque, fabricación, limpieza, oficina y abasto recurrente.",
                 },
               ].map((item) => (
                 <div key={item.title} className="rounded-[6px] border border-[#D1D5DB] bg-[#F9FAFB] p-4">
@@ -101,7 +101,7 @@ export default async function HomePage() {
         </section>
 
         <section className="public-panel px-4 py-4 md:px-5">
-          <div className="grid gap-3 lg:grid-cols-5">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
             {benefits.map((item) => {
               const Icon = item.icon;
 
@@ -123,11 +123,11 @@ export default async function HomePage() {
         <section className="space-y-4">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="public-kicker">Categorias principales</p>
+              <p className="public-kicker">Categorías principales</p>
               <h2 className="mt-2 text-[28px] font-semibold text-slate-900">Compra por familia de producto</h2>
             </div>
             <Link href="/catalogo" className="public-link text-[13px]">
-              Ver catalogo completo
+              Ver catálogo completo
             </Link>
           </div>
 
@@ -139,8 +139,8 @@ export default async function HomePage() {
             </div>
           ) : (
             <div className="public-panel p-8 text-center">
-              <h3 className="text-[20px] font-semibold text-slate-900">No hay categorias disponibles</h3>
-              <p className="mt-2 text-[13px] text-slate-700">Activa datos demo o configura categorias en la base real.</p>
+              <h3 className="text-[20px] font-semibold text-slate-900">No hay categorías disponibles</h3>
+              <p className="mt-2 text-[13px] text-slate-700">Activa datos demo o configura categorías en la base real.</p>
             </div>
           )}
         </section>
@@ -149,7 +149,7 @@ export default async function HomePage() {
           <div className="flex flex-col gap-3 border-b border-[#D1D5DB] pb-4 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="public-kicker">Productos populares</p>
-              <h2 className="mt-2 text-[28px] font-semibold text-slate-900">Listos para pedido o cotizacion</h2>
+              <h2 className="mt-2 text-[28px] font-semibold text-slate-900">Listos para pedido o cotización</h2>
             </div>
             <Link href="/catalogo" className="public-link text-[13px]">
               Ver todos
@@ -172,7 +172,7 @@ export default async function HomePage() {
         <section className="public-panel p-5 md:p-6">
           <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
-              <p className="public-kicker">{quickQuote?.subtitle || "Cotizacion express"}</p>
+              <p className="public-kicker">{quickQuote?.subtitle || "Cotización express"}</p>
               <h2 className="mt-2 text-[24px] font-semibold text-slate-900">
                 {quickQuote?.title || "Carga SKU o modelo y prepara tu solicitud"}
               </h2>
@@ -192,17 +192,17 @@ export default async function HomePage() {
             <input name="cantidad" placeholder="Cantidad" defaultValue="1" className="public-input" />
             <button className="public-btn" type="submit">
               <ClipboardList className="h-4 w-4" />
-              Agregar a cotizacion
+              Agregar a cotización
             </button>
           </form>
         </section>
 
-        <section className="rounded-[6px] bg-[#F4B000] p-6 md:p-7">
+        <section className="rounded-[6px] bg-[#F4B000] p-5 md:p-6">
           <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
               <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#0B1E4B]">Compra comercial</p>
-              <h2 className="mt-2 text-[28px] font-semibold leading-tight text-[#0B1E4B]">
-                Compra por volumen o proyecto?
+              <h2 className="mt-2 text-[24px] font-semibold leading-tight text-[#0B1E4B] md:text-[28px]">
+                ¿Compra por volumen o proyecto?
               </h2>
               <p className="mt-2 max-w-2xl text-[14px] leading-6 text-[#243042]">
                 Cotiza sin compromiso. Respondemos en menos de 24 horas.
@@ -211,7 +211,7 @@ export default async function HomePage() {
 
             <div className="flex flex-wrap gap-2">
               <Link href="/cotizacion-rapida" className="public-btn">
-                Solicitar cotizacion
+                Solicitar cotización
               </Link>
               <a
                 href={contact.whatsappHref}
@@ -229,7 +229,7 @@ export default async function HomePage() {
           <section className="rounded-[6px] bg-[#0B1E4B] px-5 py-4 text-[13px] leading-6 text-blue-50">
             <span className="font-semibold text-white">{trustStrip.title}:</span> {trustStrip.body}
             <Link href="/contacto" className="ml-2 inline-flex items-center gap-1 font-semibold text-[#F4B000]">
-              Conocer mas
+              Conocer más
               <ArrowRight className="h-4 w-4" />
             </Link>
           </section>

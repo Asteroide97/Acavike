@@ -12,19 +12,20 @@ type ProductCardItem = Product & {
 
 export function ProductCard({ product }: { product: ProductCardItem }) {
   return (
-    <article className="public-panel overflow-hidden">
+    <article className="public-panel h-full overflow-hidden">
       <Link href={`/producto/${product.slug}`} className="block border-b border-[#D1D5DB] bg-[#F9FAFB]">
-        <div className="relative aspect-square">
+        <div className="relative aspect-[4/3] sm:aspect-square">
+          <div className="absolute inset-4 rounded-[12px] bg-white shadow-[0_8px_24px_rgba(11,30,75,0.06)]" />
           <Image
             src={product.images[0]?.url || "/placeholder-product.svg"}
             alt={product.images[0]?.alt || product.name}
             fill
-            className="object-contain p-5"
+            className="object-contain p-6"
           />
         </div>
       </Link>
 
-      <div className="space-y-3 p-4">
+      <div className="flex h-full flex-col p-4">
         <div className="flex items-start justify-between gap-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{product.category.name}</p>
           <span className="rounded-full bg-[#F3F4F6] px-2.5 py-1 text-[11px] font-semibold text-slate-600">
@@ -32,22 +33,22 @@ export function ProductCard({ product }: { product: ProductCardItem }) {
           </span>
         </div>
 
-        <Link href={`/producto/${product.slug}`} className="block text-[15px] font-bold leading-5 text-[#1D3B7A] hover:text-[#0B1E4B]">
+        <Link href={`/producto/${product.slug}`} className="mt-3 block text-[15px] font-bold leading-5 text-[#1D3B7A] hover:text-[#0B1E4B]">
           {product.name}
         </Link>
 
-        <div className="grid gap-1 text-[12px] text-slate-700">
+        <div className="mt-3 grid gap-1 text-[12px] text-slate-700">
           <p>SKU: {product.sku}</p>
           <p>Unidad: {product.unit}</p>
           <p>Entrega: {product.leadTimeText || "Sujeta a disponibilidad"}</p>
         </div>
 
-        <div className="border-t border-[#D1D5DB] pt-3">
+        <div className="mt-auto border-t border-[#D1D5DB] pt-3">
           <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">Precio</p>
           <p className="mt-1 text-[24px] font-bold leading-none text-slate-900">{formatCurrency(product.price)}</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="mt-3 grid grid-cols-2 gap-2">
           <Link href={`/producto/${product.slug}`} className="public-btn-outline w-full">
             Ver detalles
           </Link>

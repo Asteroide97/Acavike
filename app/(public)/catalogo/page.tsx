@@ -37,7 +37,7 @@ export default async function CatalogPage({
   const contact = getPublicContactDetails(settings);
 
   return (
-    <div className="section-shell py-5 md:py-6">
+    <div className="section-shell py-4 md:py-6">
       <CatalogBreadcrumbs
         items={[
           { label: "Inicio", href: "/" },
@@ -48,8 +48,8 @@ export default async function CatalogPage({
       <div className="grid gap-4 lg:grid-cols-[270px_1fr]">
         <aside className="space-y-4">
           <div className="public-panel h-fit p-4">
-            <p className="public-kicker">Catalogo</p>
-            <h1 className="mt-2 text-[24px] font-semibold text-slate-900">Categorias</h1>
+            <p className="public-kicker">Catálogo</p>
+            <h1 className="mt-2 text-[24px] font-semibold text-slate-900">Categorías</h1>
             <div className="mt-4 grid gap-2 text-[13px]">
               <Link
                 href="/catalogo"
@@ -70,17 +70,17 @@ export default async function CatalogPage({
           </div>
 
           <div className="rounded-[6px] bg-[#0B1E4B] p-4 text-white">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-blue-100">Atencion comercial</p>
-            <h2 className="mt-2 text-[22px] font-semibold leading-tight">Compra por volumen, reposicion o proyecto</h2>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-blue-100">Atención comercial</p>
+            <h2 className="mt-2 text-[22px] font-semibold leading-tight">Compra por volumen, reposición o proyecto</h2>
             <p className="mt-3 text-[13px] leading-6 text-blue-50">
-              Solicita cotizacion express o contacta a ventas para requerimientos especiales.
+              Solicita cotización express o contacta a ventas para requerimientos especiales.
             </p>
             <div className="mt-4 grid gap-1 text-[13px] text-blue-100">
               <p>{contact.supportPhone}</p>
               <p>{contact.supportEmail}</p>
             </div>
             <Link href="/cotizacion-rapida" className="public-btn-accent mt-4">
-              Solicitar cotizacion
+              Solicitar cotización
             </Link>
           </div>
         </aside>
@@ -103,14 +103,14 @@ export default async function CatalogPage({
                 <input
                   name="q"
                   defaultValue={query}
-                  placeholder="Buscar SKU, producto o categoria"
+                  placeholder="Buscar SKU, producto o categoría"
                   className="public-input"
                 />
                 <select name="orden" defaultValue={sort} className="public-select">
                   <option value="featured">Destacados</option>
                   <option value="price_asc">Precio menor a mayor</option>
                   <option value="price_desc">Precio mayor a menor</option>
-                  <option value="newest">Mas recientes</option>
+                  <option value="newest">Más recientes</option>
                 </select>
                 <button className="public-btn" type="submit">
                   Aplicar
@@ -129,7 +129,7 @@ export default async function CatalogPage({
             <div className="public-panel p-8 text-center">
               <h3 className="text-[20px] font-semibold text-slate-900">No encontramos productos</h3>
               <p className="mt-2 text-[13px] text-slate-700">
-                Ajusta la busqueda o elimina filtros para ver mas resultados del catalogo.
+                Ajusta la búsqueda o elimina filtros para ver más resultados del catálogo.
               </p>
               <Link href="/catalogo" className="public-btn mt-4">
                 Limpiar filtros
