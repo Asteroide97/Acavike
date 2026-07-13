@@ -20,8 +20,8 @@ export default async function AnalyticsPage() {
     <div className="space-y-6">
       <AdminPageHeader
         eyebrow="Analytics"
-        title="Indicadores de operacion"
-        description="Corte rapido por estado de pedido, cotizacion, ventas por producto y trazabilidad de auditoria."
+        title="Indicadores de operación"
+        description="Corte rápido por estado de pedido, cotización, ventas por producto y trazabilidad de auditoría."
       />
 
       <div className="grid gap-6 xl:grid-cols-2">
@@ -104,7 +104,7 @@ export default async function AnalyticsPage() {
         <div className="space-y-6">
           <Card className="admin-surface">
             <CardContent className="space-y-4 p-6">
-              <h2 className="text-xl font-semibold">Categorias con mas productos</h2>
+              <h2 className="text-xl font-semibold">Categorías con más productos</h2>
               <div className="space-y-3">
                 {sortedCategories.map((category) => (
                   <div key={category.id} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
@@ -123,7 +123,7 @@ export default async function AnalyticsPage() {
 
           <Card className="admin-surface">
             <CardContent className="space-y-4 p-6">
-              <h2 className="text-xl font-semibold">Auditoria reciente</h2>
+              <h2 className="text-xl font-semibold">Auditoría reciente</h2>
               <div className="space-y-3">
                 {auditLogs.map((log) => (
                   <div key={log.id} className="rounded-3xl border border-slate-200 bg-white p-4">

@@ -30,9 +30,9 @@ export default async function AdminLayout({
           <div className="admin-surface flex flex-col gap-4 p-5 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Backoffice</p>
-              <h1 className="mt-2 text-2xl font-semibold">Operacion Acavike</h1>
+              <h1 className="mt-2 text-2xl font-semibold">Operación Acavike</h1>
               <p className="mt-2 text-sm text-muted-foreground">
-                Sesion activa: {user.name} · {USER_ROLE_LABELS[user.role]}
+                Sesión activa: {user.name} · {USER_ROLE_LABELS[user.role]}
               </p>
             </div>
 
@@ -43,7 +43,7 @@ export default async function AdminLayout({
                 </span>
               ) : null}
               <Link href="/" className={cn(buttonVariants({ variant: "outline" }))}>
-                Ver sitio publico
+                Ver sitio público
               </Link>
               <Link href="/mi-cuenta" className={cn(buttonVariants({ variant: "ghost" }))}>
                 Mi cuenta
@@ -54,7 +54,7 @@ export default async function AdminLayout({
                   await logoutAction();
                 }}
               >
-                <button className={cn(buttonVariants({ variant: "default" }))}>Cerrar sesion</button>
+                <button className={cn(buttonVariants({ variant: "default" }))}>Cerrar sesión</button>
               </form>
             </div>
           </div>

@@ -27,9 +27,9 @@ export default async function WarehousePage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        eyebrow="Almacen"
-        title="Operacion de surtido"
-        description="Prioriza pedidos operativos y detecta productos por debajo del umbral minimo."
+        eyebrow="Almacén"
+        title="Operación de surtido"
+        description="Prioriza pedidos operativos y detecta productos por debajo del umbral mínimo."
       />
 
       <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
@@ -40,9 +40,9 @@ export default async function WarehousePage() {
               <TableHead>
                 <tr>
                   <TableHeaderCell>Producto</TableHeaderCell>
-                  <TableHeaderCell>Categoria</TableHeaderCell>
+                  <TableHeaderCell>Categoría</TableHeaderCell>
                   <TableHeaderCell>Stock</TableHeaderCell>
-                  <TableHeaderCell>Minimo</TableHeaderCell>
+                  <TableHeaderCell>Mínimo</TableHeaderCell>
                 </tr>
               </TableHead>
               <TableBody>

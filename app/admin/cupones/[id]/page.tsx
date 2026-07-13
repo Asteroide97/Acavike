@@ -83,7 +83,7 @@ export default async function CouponEditorPage({
                   className="flex h-11 w-full rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm outline-none focus:border-primary"
                 />
               </AdminField>
-              <AdminField label="Descripcion" className="md:col-span-2">
+              <AdminField label="Descripción" className="md:col-span-2">
                 <Textarea name="description" defaultValue={coupon?.description || ""} />
               </AdminField>
               <div className="md:col-span-2 flex items-center gap-3">

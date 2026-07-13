@@ -6,8 +6,15 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { logAuditEntry } from "@/lib/audit";
 import { getCurrentUser } from "@/lib/auth";
-import { getOrCreateCart } from "@/lib/cart";
+import {
+  addDemoCartItem,
+  clearDemoCartItems,
+  getDemoCartProductIdFromItemId,
+  getOrCreateCart,
+  setDemoCartItemQuantity,
+} from "@/lib/cart";
 import { DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
+import { demoProductsById } from "@/lib/demo-data";
 import { prisma } from "@/lib/prisma";
 
 type ProductWithTiers = {
@@ -33,6 +40,17 @@ function appendSearchParam(pathname: string, params: Record<string, string>) {
 
 export async function addToCartAction(formData: FormData) {
   if (DEMO_MODE) {
+    const productId = String(formData.get("productId") ?? "");
+    const quantity = Math.max(1, Number(formData.get("quantity") ?? 1));
+    const product = demoProductsById.get(productId);
+
+    if (!product || !product.isActive) {
+      redirect("/catalogo?error=producto-invalido");
+    }
+
+    await addDemoCartItem(productId, quantity);
+    revalidatePath("/carrito");
+    revalidatePath("/checkout");
     redirect("/carrito?added=1&demo=1");
   }
 
@@ -86,6 +104,12 @@ export async function addToCartAction(formData: FormData) {
 
 export async function updateCartItemAction(formData: FormData) {
   if (DEMO_MODE) {
+    const itemId = String(formData.get("itemId") ?? "");
+    const quantity = Math.max(0, Number(formData.get("quantity") ?? 0));
+
+    await setDemoCartItemQuantity(getDemoCartProductIdFromItemId(itemId), quantity);
+    revalidatePath("/carrito");
+    revalidatePath("/checkout");
     redirect("/carrito?demo=1");
   }
 
@@ -125,6 +149,10 @@ export async function updateCartItemAction(formData: FormData) {
 
 export async function removeCartItemAction(formData: FormData) {
   if (DEMO_MODE) {
+    const itemId = String(formData.get("itemId") ?? "");
+    await setDemoCartItemQuantity(getDemoCartProductIdFromItemId(itemId), 0);
+    revalidatePath("/carrito");
+    revalidatePath("/checkout");
     redirect("/carrito?demo=1");
   }
 
@@ -141,6 +169,9 @@ export async function removeCartItemAction(formData: FormData) {
 
 export async function clearCartAction() {
   if (DEMO_MODE) {
+    await clearDemoCartItems();
+    revalidatePath("/carrito");
+    revalidatePath("/checkout");
     redirect("/carrito?demo=1");
   }
 

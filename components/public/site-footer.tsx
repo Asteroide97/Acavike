@@ -59,7 +59,7 @@ export function SiteFooter({
         </div>
 
         <div>
-          <h4 className="text-[13px] font-bold uppercase tracking-[0.18em] text-slate-400">Categorias</h4>
+          <h4 className="text-[13px] font-bold uppercase tracking-[0.18em] text-slate-400">Categorías</h4>
           <div className="mt-4 grid gap-3 text-[13px]">
             {categories.slice(0, 6).map((category) => (
               <Link key={category.id} href={`/catalogo/${category.slug}`} className="text-slate-200 hover:text-white">

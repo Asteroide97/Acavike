@@ -2,6 +2,7 @@ import type { UserRole } from "@prisma/client";
 
 export const TAX_RATE = 0.16;
 export const CART_COOKIE = "acavike_cart";
+export const DEMO_CART_COOKIE = "acavike_demo_cart";
 export const SESSION_COOKIE = "acavike_session";
 
 export const ADMIN_ROLES: UserRole[] = ["SUPERADMIN", "ADMIN"];

@@ -45,10 +45,10 @@ export default async function CustomerDetailPage({
               <span className="font-semibold">Correo:</span> {customer.email}
             </p>
             <p>
-              <span className="font-semibold">Telefono:</span> {customer.phone || "Sin dato"}
+              <span className="font-semibold">Teléfono:</span> {customer.phone || "Sin dato"}
             </p>
             <p>
-              <span className="font-semibold">Direccion:</span> {customer.address || "Sin dato"}
+              <span className="font-semibold">Dirección:</span> {customer.address || "Sin dato"}
             </p>
             <p>
               <span className="font-semibold">RFC:</span> {customer.rfc || "Sin dato"}

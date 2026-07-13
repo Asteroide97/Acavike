@@ -28,7 +28,7 @@ export default async function PaymentsPage({
     <div className="space-y-6">
       <AdminPageHeader
         eyebrow="Pagos"
-        title="Revision de transferencias"
+        title="Revisión de transferencias"
         description="Valida comprobantes, agrega notas internas y sincroniza el estado financiero del pedido."
       />
 

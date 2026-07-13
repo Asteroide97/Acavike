@@ -33,11 +33,11 @@ export default async function QuotesAdminPage({
         actions={
           DEMO_MODE ? (
             <span className={cn(buttonVariants({ variant: "outline" }), "pointer-events-none opacity-60")}>
-              Nueva cotizacion
+              Nueva cotización
             </span>
           ) : (
             <Link href="/admin/cotizaciones/nuevo" className={cn(buttonVariants())}>
-              Nueva cotizacion
+              Nueva cotización
             </Link>
           )
         }

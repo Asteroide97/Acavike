@@ -60,8 +60,8 @@ export default async function QuoteEditorPage({
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        eyebrow="Cotizacion"
-        title={isNew ? "Nueva cotizacion" : quote?.quoteNumber || "Cotizacion"}
+        eyebrow="Cotización"
+        title={isNew ? "Nueva cotización" : quote?.quoteNumber || "Cotización"}
         description="Formato de partidas: SKU|Nombre|Cantidad|Precio|ProductId. El ProductId es opcional."
       />
 
@@ -117,7 +117,7 @@ export default async function QuoteEditorPage({
 
               <div className="md:col-span-2 flex flex-wrap gap-3">
                 <button className="inline-flex h-11 items-center justify-center rounded-2xl bg-primary px-5 text-sm font-semibold text-white">
-                  Guardar cotizacion
+                  Guardar cotización
                 </button>
               </div>
             </form>

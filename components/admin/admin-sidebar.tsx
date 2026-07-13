@@ -28,18 +28,18 @@ const items: Array<{
   { href: "/admin", label: "Resumen", icon: LayoutDashboard, roles: ["SUPERADMIN", "ADMIN", "WAREHOUSE", "SALES"] },
   { href: "/admin/analytics", label: "Analytics", icon: ChartNoAxesCombined, roles: ["SUPERADMIN", "ADMIN"] },
   { href: "/admin/pedidos", label: "Pedidos", icon: ShoppingBasket, roles: ["SUPERADMIN", "ADMIN", "WAREHOUSE"] },
-  { href: "/admin/almacen", label: "Almacen", icon: Truck, roles: ["SUPERADMIN", "ADMIN", "WAREHOUSE"] },
+  { href: "/admin/almacen", label: "Almacén", icon: Truck, roles: ["SUPERADMIN", "ADMIN", "WAREHOUSE"] },
   { href: "/admin/cotizaciones", label: "Cotizaciones", icon: ClipboardList, roles: ["SUPERADMIN", "ADMIN", "SALES"] },
   { href: "/admin/clientes", label: "Clientes", icon: Users, roles: ["SUPERADMIN", "ADMIN", "SALES"] },
   { href: "/admin/productos", label: "Productos", icon: Package, roles: ["SUPERADMIN", "ADMIN"] },
-  { href: "/admin/categorias", label: "Categorias", icon: FolderKanban, roles: ["SUPERADMIN", "ADMIN"] },
+  { href: "/admin/categorias", label: "Categorías", icon: FolderKanban, roles: ["SUPERADMIN", "ADMIN"] },
   { href: "/admin/cupones", label: "Cupones", icon: BadgePercent, roles: ["SUPERADMIN", "ADMIN"] },
   { href: "/admin/pagos", label: "Pagos", icon: CreditCard, roles: ["SUPERADMIN", "ADMIN"] },
   { href: "/admin/email-templates", label: "Email Templates", icon: FileCog, roles: ["SUPERADMIN", "ADMIN"] },
   { href: "/admin/contenido", label: "Contenido", icon: Files, roles: ["SUPERADMIN", "ADMIN"] },
   { href: "/admin/usuarios", label: "Usuarios", icon: Shield, roles: ["SUPERADMIN", "ADMIN"] },
   { href: "/admin/mensajes", label: "Mensajes", icon: Boxes, roles: ["SUPERADMIN", "ADMIN"] },
-  { href: "/admin/auditoria", label: "Auditoria", icon: Shield, roles: ["SUPERADMIN", "ADMIN"] },
+  { href: "/admin/auditoria", label: "Auditoría", icon: Shield, roles: ["SUPERADMIN", "ADMIN"] },
   { href: "/admin/settings", label: "Settings", icon: FileCog, roles: ["SUPERADMIN", "ADMIN"] },
 ] as const;
 
@@ -77,7 +77,7 @@ export function AdminSidebar({ role }: { role: UserRole }) {
       </nav>
 
       <div className="mt-auto rounded-3xl bg-white/5 p-4 text-sm text-slate-400">
-        Las ediciones de catalogo, precios, contenido y usuarios se limitan a admin y superadmin.
+        Las ediciones de catálogo, precios, contenido y usuarios se limitan a admin y superadmin.
       </div>
     </aside>
   );

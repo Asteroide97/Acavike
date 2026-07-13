@@ -41,7 +41,7 @@ export default async function AdminHomePage({
       <AdminPageHeader
         eyebrow="Resumen"
         title="Tablero operativo"
-        description="Vision general del estado comercial, pedidos, stock y cobranza por transferencia."
+        description="Visión general del estado comercial, pedidos, stock y cobranza por transferencia."
         actions={
           <>
             <Link href="/admin/pedidos" className={cn(buttonVariants({ variant: "outline" }))}>
@@ -72,7 +72,7 @@ export default async function AdminHomePage({
         <DashboardStatCard
           title="Pedidos"
           value={String(orderMetrics._count._all ?? 0)}
-          caption="Ordenes creadas en la plataforma"
+          caption="Órdenes creadas en la plataforma"
           icon={ShoppingCart}
         />
         <DashboardStatCard
@@ -102,7 +102,7 @@ export default async function AdminHomePage({
         <DashboardStatCard
           title="Bajo stock"
           value={String(lowStockProducts.length)}
-          caption="Productos por debajo del minimo"
+          caption="Productos por debajo del mínimo"
           icon={PackageSearch}
         />
         <DashboardStatCard
@@ -156,7 +156,7 @@ export default async function AdminHomePage({
                   <h2 className="mt-2 text-xl font-semibold">Alertas de inventario</h2>
                 </div>
                 <Link href="/admin/almacen" className="text-sm font-semibold text-primary">
-                  Ir a almacen
+                  Ir a almacén
                 </Link>
               </div>
 
@@ -172,7 +172,7 @@ export default async function AdminHomePage({
                       </div>
                       <div className="text-right text-sm">
                         <p className="font-semibold">{product.stock} disponibles</p>
-                        <p className="text-muted-foreground">Minimo {product.lowStockThreshold}</p>
+                        <p className="text-muted-foreground">Mínimo {product.lowStockThreshold}</p>
                       </div>
                     </div>
                   </div>
@@ -189,7 +189,7 @@ export default async function AdminHomePage({
                   <h2 className="mt-2 text-xl font-semibold">Seguimiento reciente</h2>
                 </div>
                 <Link href="/admin/cotizaciones" className="text-sm font-semibold text-primary">
-                  Ver modulo
+                  Ver módulo
                 </Link>
               </div>
 

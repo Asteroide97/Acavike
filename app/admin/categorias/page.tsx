@@ -19,17 +19,17 @@ export default async function CategoriesPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        eyebrow="Categorias"
-        title="Estructura del catalogo"
-        description="Define jerarquia, orden visual, visibilidad publica y contexto de navegacion."
+        eyebrow="Categorías"
+        title="Estructura del catálogo"
+        description="Define jerarquía, orden visual, visibilidad pública y contexto de navegación."
         actions={
           DEMO_MODE ? (
             <span className={cn(buttonVariants({ variant: "outline" }), "pointer-events-none opacity-60")}>
-              Nueva categoria
+              Nueva categoría
             </span>
           ) : (
             <Link href="/admin/categorias/nuevo" className={cn(buttonVariants())}>
-              Nueva categoria
+              Nueva categoría
             </Link>
           )
         }
@@ -39,10 +39,10 @@ export default async function CategoriesPage() {
         <Table>
           <TableHead>
             <tr>
-              <TableHeaderCell>Categoria</TableHeaderCell>
+              <TableHeaderCell>Categoría</TableHeaderCell>
               <TableHeaderCell>Padre</TableHeaderCell>
               <TableHeaderCell>Productos</TableHeaderCell>
-              <TableHeaderCell>Subcategorias</TableHeaderCell>
+              <TableHeaderCell>Subcategorías</TableHeaderCell>
               <TableHeaderCell>Estatus</TableHeaderCell>
               <TableHeaderCell></TableHeaderCell>
             </tr>
@@ -56,7 +56,7 @@ export default async function CategoriesPage() {
                     <p className="text-sm text-muted-foreground">{category.slug}</p>
                   </div>
                 </TableCell>
-                <TableCell>{category.parent?.name || "Raiz"}</TableCell>
+                <TableCell>{category.parent?.name || "Raíz"}</TableCell>
                 <TableCell>{category._count.products}</TableCell>
                 <TableCell>{category._count.children}</TableCell>
                 <TableCell>

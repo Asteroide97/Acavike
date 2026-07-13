@@ -17,9 +17,9 @@ const SETTINGS_CONFIG = [
   { key: BANK_SETTING_KEYS.beneficiary, label: "Beneficiario", multiline: false },
   { key: BANK_SETTING_KEYS.clabe, label: "CLABE", multiline: false },
   { key: BANK_SETTING_KEYS.referenceHelp, label: "Ayuda de referencia", multiline: true },
-  { key: BANK_SETTING_KEYS.supportPhone, label: "Telefono de soporte", multiline: false },
+  { key: BANK_SETTING_KEYS.supportPhone, label: "Teléfono de soporte", multiline: false },
   { key: BANK_SETTING_KEYS.supportEmail, label: "Correo de soporte", multiline: false },
-  { key: BANK_SETTING_KEYS.companyAddress, label: "Direccion comercial", multiline: true },
+  { key: BANK_SETTING_KEYS.companyAddress, label: "Dirección comercial", multiline: true },
 ] as const;
 
 export default async function SettingsPage({
@@ -40,8 +40,8 @@ export default async function SettingsPage({
     <div className="space-y-6">
       <AdminPageHeader
         eyebrow="Settings"
-        title="Configuracion general"
-        description="Datos bancarios, contacto comercial y textos base utilizados por checkout y sitio publico."
+        title="Configuración general"
+        description="Datos bancarios, contacto comercial y textos base utilizados por checkout y sitio público."
       />
 
       <AdminFlash searchParams={resolvedSearchParams} />

@@ -16,19 +16,19 @@ export function AdminFlash({ searchParams }: { searchParams: SearchParamsRecord 
   }
 
   if (denied) {
-    return <Alert tone="warning">Tu rol no tiene permisos para acceder a esta seccion.</Alert>;
+    return <Alert tone="warning">Tu rol no tiene permisos para acceder a esta sección.</Alert>;
   }
 
   if (deleted) {
-    return <Alert tone="success">El registro se elimino correctamente.</Alert>;
+    return <Alert tone="success">El registro se eliminó correctamente.</Alert>;
   }
 
   if (converted) {
-    return <Alert tone="success">La cotizacion se convirtio en pedido correctamente.</Alert>;
+    return <Alert tone="success">La cotización se convirtió en pedido correctamente.</Alert>;
   }
 
   if (saved) {
-    return <Alert tone="success">{demo ? "Accion simulada correctamente en modo demo." : "Los cambios se guardaron correctamente."}</Alert>;
+    return <Alert tone="success">{demo ? "Acción simulada correctamente en modo demo." : "Los cambios se guardaron correctamente."}</Alert>;
   }
 
   return null;

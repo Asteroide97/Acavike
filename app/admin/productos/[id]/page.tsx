@@ -62,7 +62,7 @@ export default async function ProductEditorPage({
       <AdminPageHeader
         eyebrow="Producto"
         title={isNew ? "Nuevo producto" : product?.name || "Producto"}
-        description="Configura informacion comercial, inventario, galeria y escalas por volumen."
+        description="Configura información comercial, inventario, galería y escalas por volumen."
       />
 
       <AdminFlash searchParams={resolvedSearchParams} />
@@ -82,9 +82,9 @@ export default async function ProductEditorPage({
               <AdminField label="Slug">
                 <Input name="slug" defaultValue={product?.slug || ""} />
               </AdminField>
-              <AdminField label="Categoria">
+              <AdminField label="Categoría">
                 <Select name="categoryId" defaultValue={product?.categoryId || ""}>
-                  <option value="">Selecciona una categoria</option>
+                  <option value="">Selecciona una categoría</option>
                   {categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {category.name}
@@ -104,7 +104,7 @@ export default async function ProductEditorPage({
               <AdminField label="Stock">
                 <Input name="stock" type="number" defaultValue={product?.stock ?? 0} />
               </AdminField>
-              <AdminField label="Stock minimo">
+              <AdminField label="Stock mínimo">
                 <Input
                   name="lowStockThreshold"
                   type="number"
@@ -114,22 +114,22 @@ export default async function ProductEditorPage({
               <AdminField label="Lead time">
                 <Input name="leadTimeText" defaultValue={product?.leadTimeText || ""} />
               </AdminField>
-              <AdminField label="Descripcion corta" className="md:col-span-2">
+              <AdminField label="Descripción corta" className="md:col-span-2">
                 <Textarea name="shortDescription" defaultValue={product?.shortDescription || ""} />
               </AdminField>
-              <AdminField label="Descripcion completa" className="md:col-span-2">
+              <AdminField label="Descripción completa" className="md:col-span-2">
                 <Textarea name="description" defaultValue={product?.description || ""} className="min-h-[180px]" />
               </AdminField>
               <AdminField
-                label="Imagenes"
-                hint="Una linea por imagen: URL|Alt"
+                label="Imágenes"
+                hint="Una línea por imagen: URL|Alt"
                 className="md:col-span-2"
               >
                 <Textarea name="imagesText" defaultValue={imagesText} className="min-h-[140px]" />
               </AdminField>
               <AdminField
                 label="Precios por volumen"
-                hint="Una linea por escala: Cantidad minima|Precio"
+                hint="Una línea por escala: Cantidad mínima|Precio"
                 className="md:col-span-2"
               >
                 <Textarea name="tiersText" defaultValue={tiersText} className="min-h-[140px]" />
@@ -161,9 +161,9 @@ export default async function ProductEditorPage({
           <Card className="admin-surface">
             <CardContent className="space-y-3 p-6 text-sm">
               <h2 className="text-xl font-semibold">Tips de captura</h2>
-              <p>Usa SKU consistentes para facilitar busqueda en catalogo y seguimiento en pedidos.</p>
-              <p>Si dejas el slug vacio, la accion lo generara desde el nombre.</p>
-              <p>Configura escalas para que el carrito calcule precio por mayoreo automaticamente.</p>
+              <p>Usa SKU consistentes para facilitar búsqueda en catálogo y seguimiento en pedidos.</p>
+              <p>Si dejas el slug vacío, la acción lo generará desde el nombre.</p>
+              <p>Configura escalas para que el carrito calcule precio por mayoreo automáticamente.</p>
             </CardContent>
           </Card>
 

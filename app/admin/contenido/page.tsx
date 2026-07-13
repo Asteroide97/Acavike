@@ -79,7 +79,7 @@ export default async function ContentPage({
                 </div>
                 <div className="md:col-span-2">
                   <button className="inline-flex h-11 items-center justify-center rounded-2xl bg-primary px-5 text-sm font-semibold text-white">
-                    Guardar seccion
+                    Guardar sección
                   </button>
                 </div>
               </form>

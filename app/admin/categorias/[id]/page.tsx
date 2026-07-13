@@ -43,9 +43,9 @@ export default async function CategoryEditorPage({
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        eyebrow="Categoria"
-        title={isNew ? "Nueva categoria" : category?.name || "Categoria"}
-        description="Usa categorias activas para navegar el catalogo publico y agrupar productos."
+        eyebrow="Categoría"
+        title={isNew ? "Nueva categoría" : category?.name || "Categoría"}
+        description="Usa categorías activas para navegar el catálogo público y agrupar productos."
       />
 
       <AdminFlash searchParams={resolvedSearchParams} />
@@ -62,7 +62,7 @@ export default async function CategoryEditorPage({
               <AdminField label="Slug">
                 <Input name="slug" defaultValue={category?.slug || ""} />
               </AdminField>
-              <AdminField label="Categoria padre">
+              <AdminField label="Categoría padre">
                 <Select name="parentId" defaultValue={category?.parentId || ""}>
                   <option value="">Sin padre</option>
                   {categories
@@ -80,19 +80,19 @@ export default async function CategoryEditorPage({
               <AdminField label="Imagen" className="md:col-span-2">
                 <Input name="imageUrl" defaultValue={category?.imageUrl || ""} />
               </AdminField>
-              <AdminField label="Descripcion" className="md:col-span-2">
+              <AdminField label="Descripción" className="md:col-span-2">
                 <Textarea name="description" defaultValue={category?.description || ""} />
               </AdminField>
               <div className="flex items-center gap-3 md:col-span-2">
                 <Checkbox id="isActive" name="isActive" defaultChecked={category ? category.isActive : true} />
                 <label htmlFor="isActive" className="text-sm font-medium text-slate-800">
-                  Categoria activa
+                  Categoría activa
                 </label>
               </div>
 
               <div className="md:col-span-2">
                 <button className="inline-flex h-11 items-center justify-center rounded-2xl bg-primary px-5 text-sm font-semibold text-white">
-                  Guardar categoria
+                  Guardar categoría
                 </button>
               </div>
             </form>
@@ -104,12 +104,12 @@ export default async function CategoryEditorPage({
             <CardContent className="space-y-4 p-6">
               <h2 className="text-xl font-semibold">Zona de riesgo</h2>
               <p className="text-sm text-muted-foreground">
-                Solo puedes eliminar categorias sin productos ni subcategorias asociadas.
+                Solo puedes eliminar categorías sin productos ni subcategorías asociadas.
               </p>
               <form action={deleteCategoryAction}>
                 <input type="hidden" name="categoryId" value={category.id} />
                 <button className="inline-flex h-11 items-center justify-center rounded-2xl bg-red-600 px-5 text-sm font-semibold text-white">
-                  Eliminar categoria
+                  Eliminar categoría
                 </button>
               </form>
             </CardContent>

@@ -37,14 +37,16 @@ export function ProductCard({ product }: { product: ProductCardItem }) {
           {product.name}
         </Link>
 
-        <div className="mt-3 grid gap-1 text-[12px] text-slate-700">
+        <p className="mt-2 text-[12px] leading-5 text-slate-600">{product.shortDescription}</p>
+
+        <div className="mt-3 grid gap-1 rounded-[6px] bg-[#F9FAFB] p-3 text-[12px] text-slate-700">
           <p>SKU: {product.sku}</p>
           <p>Unidad: {product.unit}</p>
           <p>Entrega: {product.leadTimeText || "Sujeta a disponibilidad"}</p>
         </div>
 
         <div className="mt-auto border-t border-[#D1D5DB] pt-3">
-          <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">Precio</p>
+          <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">Precio base</p>
           <p className="mt-1 text-[24px] font-bold leading-none text-slate-900">{formatCurrency(product.price)}</p>
         </div>
 

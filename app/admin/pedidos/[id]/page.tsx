@@ -117,10 +117,10 @@ export default async function OrderDetailAdminPage({
                 <span className="font-semibold">Correo:</span> {order.customer.email}
               </p>
               <p>
-                <span className="font-semibold">Telefono:</span> {order.customer.phone || "Sin dato"}
+                <span className="font-semibold">Teléfono:</span> {order.customer.phone || "Sin dato"}
               </p>
               <p>
-                <span className="font-semibold">Direccion:</span> {order.deliveryAddress}
+                <span className="font-semibold">Dirección:</span> {order.deliveryAddress}
               </p>
             </CardContent>
           </Card>
@@ -152,7 +152,7 @@ export default async function OrderDetailAdminPage({
                   )}
                 </p>
                 <p>
-                  <span className="font-semibold">Revision:</span>{" "}
+                  <span className="font-semibold">Revisión:</span>{" "}
                   {order.payment.reviewedAt ? `${reviewedByName} - ${formatDate(order.payment.reviewedAt)}` : "Pendiente"}
                 </p>
               </CardContent>

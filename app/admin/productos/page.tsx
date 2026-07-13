@@ -20,8 +20,8 @@ export default async function ProductsAdminPage() {
     <div className="space-y-6">
       <AdminPageHeader
         eyebrow="Productos"
-        title="Catalogo de productos"
-        description="Administra nombres, SKU, categoria, stock, precios y escalas por mayoreo."
+        title="Catálogo de productos"
+        description="Administra nombres, SKU, categoría, stock, precios y escalas por mayoreo."
         actions={
           DEMO_MODE ? (
             <span className={cn(buttonVariants({ variant: "outline" }), "pointer-events-none opacity-60")}>
@@ -40,7 +40,7 @@ export default async function ProductsAdminPage() {
           <TableHead>
             <tr>
               <TableHeaderCell>Producto</TableHeaderCell>
-              <TableHeaderCell>Categoria</TableHeaderCell>
+              <TableHeaderCell>Categoría</TableHeaderCell>
               <TableHeaderCell>Precio</TableHeaderCell>
               <TableHeaderCell>Stock</TableHeaderCell>
               <TableHeaderCell>Estatus</TableHeaderCell>

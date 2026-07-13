@@ -105,11 +105,7 @@ export function SiteHeader({
               className="inline-flex h-9 w-full min-w-0 items-center justify-center gap-1.5 rounded-[6px] border border-[#D1D5DB] px-2.5 text-[11px] font-semibold text-[#0B1E4B] hover:bg-[#F3F4F6] sm:h-10 sm:w-auto sm:gap-2 sm:px-3 sm:text-[13px]"
             >
               <ShoppingCart className="h-4 w-4" />
-              <span className="sm:hidden">Carrito{cartCount ? ` (${cartCount})` : ""}</span>
-              <span className="hidden sm:inline">
-                Carrito {formatCurrency(cartTotal)}
-                {cartCount ? ` (${cartCount})` : ""}
-              </span>
+              <span className="truncate">Carrito {formatCurrency(cartTotal)} ({cartCount})</span>
             </Link>
             <Link
               href={authHref}
@@ -124,7 +120,7 @@ export function SiteHeader({
 
       <div className="border-t border-[#D1D5DB] bg-white">
         <div className="section-shell">
-          <nav className="grid w-full grid-cols-3 gap-px bg-[#D1D5DB] lg:flex lg:bg-transparent" aria-label="Navegacion principal">
+          <nav className="grid w-full grid-cols-3 gap-px bg-[#D1D5DB] lg:flex lg:bg-transparent" aria-label="Navegación principal">
             {PUBLIC_NAV_TABS.map((item, index) => (
               <Link
                 key={item.label}

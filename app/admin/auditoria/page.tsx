@@ -19,9 +19,9 @@ export default async function AuditPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        eyebrow="Auditoria"
+        eyebrow="Auditoría"
         title="Registro de acciones"
-        description="Historial de eventos relevantes en autenticacion, catalogo, ventas y operaciones."
+        description="Historial de eventos relevantes en autenticación, catálogo, ventas y operaciones."
       />
 
       <div className="admin-surface overflow-hidden">
@@ -30,7 +30,7 @@ export default async function AuditPage() {
             <tr>
               <TableHeaderCell>Fecha</TableHeaderCell>
               <TableHeaderCell>Usuario</TableHeaderCell>
-              <TableHeaderCell>Accion</TableHeaderCell>
+              <TableHeaderCell>Acción</TableHeaderCell>
               <TableHeaderCell>Entidad</TableHeaderCell>
               <TableHeaderCell>Metadata</TableHeaderCell>
             </tr>
