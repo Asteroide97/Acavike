@@ -6,6 +6,16 @@ import { formatCurrency } from "@/lib/utils";
 
 type Viewer = (User & { customer?: { id: string } | null }) | null;
 
+function getSafeCartLabel(cartTotal: number, cartCount: number) {
+  try {
+    const safeTotal = Number.isFinite(Number(cartTotal)) ? Number(cartTotal) : 0;
+    const safeCount = Number.isFinite(Number(cartCount)) ? Math.max(0, Math.floor(Number(cartCount))) : 0;
+    return `Carrito ${formatCurrency(safeTotal)} (${safeCount})`;
+  } catch {
+    return "Carrito $0.00 (0)";
+  }
+}
+
 export function SiteHeader({
   cartCount,
   cartTotal,
@@ -27,6 +37,7 @@ export function SiteHeader({
       ? "Admin"
       : user.name?.split(" ")[0] || "Usuario"
     : "Ingresar";
+  const cartLabel = getSafeCartLabel(cartTotal, cartCount);
 
   return (
     <header className="border-b border-[#D1D5DB] bg-white">
@@ -105,7 +116,7 @@ export function SiteHeader({
               className="inline-flex h-9 w-full min-w-0 items-center justify-center gap-1.5 rounded-[6px] border border-[#D1D5DB] px-2.5 text-[11px] font-semibold text-[#0B1E4B] hover:bg-[#F3F4F6] sm:h-10 sm:w-auto sm:gap-2 sm:px-3 sm:text-[13px]"
             >
               <ShoppingCart className="h-4 w-4" />
-              <span className="truncate">Carrito {formatCurrency(cartTotal)} ({cartCount})</span>
+              <span className="truncate">{cartLabel}</span>
             </Link>
             <Link
               href={authHref}

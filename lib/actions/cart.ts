@@ -10,7 +10,7 @@ import {
   addDemoCartItem,
   clearDemoCartItems,
   getDemoCartProductIdFromItemId,
-  getOrCreateCart,
+  getOrCreateCartForMutation,
   setDemoCartItemQuantity,
 } from "@/lib/cart";
 import { DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
@@ -73,7 +73,7 @@ export async function addToCartAction(formData: FormData) {
     redirect("/catalogo?error=producto-invalido");
   }
 
-  const cart = await getOrCreateCart(user?.id);
+  const cart = await getOrCreateCartForMutation(user?.id);
   const existing = cart.items.find((item) => item.productId === product.id);
   const nextQuantity = (existing?.quantity ?? 0) + quantity;
   const unitPrice = resolveTieredPrice(product, nextQuantity);
@@ -180,7 +180,7 @@ export async function clearCartAction() {
   }
 
   const user = await getCurrentUser();
-  const cart = await getOrCreateCart(user?.id);
+  const cart = await getOrCreateCartForMutation(user?.id);
   await prisma.cartItem.deleteMany({
     where: { cartId: cart.id },
   });

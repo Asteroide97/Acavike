@@ -10,14 +10,27 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   noStore();
-  const [{ sections, categories, featuredProducts }, settings] = await Promise.all([
+  const [homepageDataResult, settingsResult] = await Promise.allSettled([
     getHomepageData(),
     getSiteSettingsMap(),
   ]);
+  const homepageData =
+    homepageDataResult.status === "fulfilled"
+      ? homepageDataResult.value
+      : { sections: [], categories: [], featuredProducts: [] };
+  const settings =
+    settingsResult.status === "fulfilled" && settingsResult.value
+      ? settingsResult.value
+      : {};
+  const sections = Array.isArray(homepageData.sections) ? homepageData.sections : [];
+  const categories = Array.isArray(homepageData.categories) ? homepageData.categories : [];
+  const featuredProducts = Array.isArray(homepageData.featuredProducts)
+    ? homepageData.featuredProducts
+    : [];
   const hero = sections.find((section) => section.key === "hero_home");
   const quickQuote = sections.find((section) => section.key === "quick_quote");
   const trustStrip = sections.find((section) => section.key === "trust_strip");
-  const homeCategories = getHomeCategories(categories);
+  const homeCategories = getHomeCategories(categories ?? []);
   const contact = getPublicContactDetails(settings);
   const benefits = [
     {
@@ -46,6 +59,7 @@ export default async function HomePage() {
       icon: Headset,
     },
   ];
+  const safeBenefits = benefits ?? [];
 
   return (
     <div className="section-shell py-4 md:py-6">
@@ -102,7 +116,7 @@ export default async function HomePage() {
 
         <section className="public-panel px-4 py-4 md:px-5">
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-            {benefits.map((item) => {
+            {safeBenefits.map((item) => {
               const Icon = item.icon;
 
               return (

@@ -22,10 +22,20 @@ export default async function ProductDetailPage({
 }) {
   noStore();
   const { slug } = await params;
-  const [{ product, relatedProducts }, settings] = await Promise.all([
+  const [productResult, settingsResult] = await Promise.allSettled([
     getProductDetailDataRepository(slug),
     getSiteSettingsMap(),
   ]);
+  const productData =
+    productResult.status === "fulfilled"
+      ? productResult.value
+      : { product: null, relatedProducts: [] };
+  const settings =
+    settingsResult.status === "fulfilled" && settingsResult.value
+      ? settingsResult.value
+      : {};
+  const { product, relatedProducts } = productData;
+  const safeRelatedProducts = Array.isArray(relatedProducts) ? relatedProducts : [];
 
   if (!product || !product.isActive) {
     notFound();
@@ -195,7 +205,7 @@ export default async function ProductDetailPage({
         </div>
       </section>
 
-      {relatedProducts.length ? (
+      {safeRelatedProducts.length ? (
         <section className="public-panel mt-4 p-4 md:p-5">
           <div className="flex items-end justify-between gap-3 border-b border-[#D1D5DB] pb-4">
             <div>
@@ -208,7 +218,7 @@ export default async function ProductDetailPage({
           </div>
 
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {relatedProducts.map((relatedProduct) => (
+            {safeRelatedProducts.map((relatedProduct) => (
               <ProductCard key={relatedProduct.id} product={relatedProduct} />
             ))}
           </div>

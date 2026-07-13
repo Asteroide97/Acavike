@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createSession, getCurrentUser } from "@/lib/auth";
 import { logAuditEntry } from "@/lib/audit";
-import { getCartTotals, getOrCreateCart } from "@/lib/cart";
+import { getCartTotals, getOrCreateCartForMutation } from "@/lib/cart";
 import { DATABASE_CONFIG_ERROR, DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
 import { demoOrders, demoQuotes } from "@/lib/demo-data";
 import { prisma } from "@/lib/prisma";
@@ -72,7 +72,7 @@ export async function addToCartAction(formData: FormData) {
     redirect("/catalogo?error=producto-invalido");
   }
 
-  const cart = await getOrCreateCart(user?.id);
+  const cart = await getOrCreateCartForMutation(user?.id);
   const existing = cart.items.find((item) => item.productId === product.id);
   const nextQuantity = (existing?.quantity ?? 0) + quantity;
   const unitPrice = resolveTieredPrice(product, nextQuantity);
@@ -166,7 +166,7 @@ export async function clearCartAction() {
   }
 
   const user = await getCurrentUser();
-  const cart = await getOrCreateCart(user?.id);
+  const cart = await getOrCreateCartForMutation(user?.id);
   await prisma.cartItem.deleteMany({
     where: { cartId: cart.id },
   });
@@ -291,7 +291,7 @@ export async function submitCheckoutAction(input: unknown): Promise<CheckoutActi
   }
 
   const currentUser = await getCurrentUser();
-  const cart = await getOrCreateCart(currentUser?.id);
+  const cart = await getOrCreateCartForMutation(currentUser?.id);
   const totals = getCartTotals(cart);
 
   if (!cart.items.length) {

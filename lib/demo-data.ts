@@ -177,6 +177,10 @@ export const demoCategories: Category[] = [
 
 const categoryBySlug = new Map(demoCategories.map((category) => [category.slug, category]));
 
+function getDemoProductImageUrl(imageKey?: string) {
+  return `/demo-products/product-${imageKey?.trim() || "box"}.svg`;
+}
+
 const demoProductsBase: Array<
   Omit<Product, "price" | "createdAt" | "updatedAt"> & {
     price: number;
@@ -189,26 +193,33 @@ const demoProductsBase: Array<
   }
 > = demoProductSeeds.map((product: DemoProductSeed, index) => ({
   id: `prod_${index + 1}`,
-  name: product.name,
-  slug: toDemoSlug(product.name),
-  sku: product.sku,
-  brand: product.brand,
-  shortDescription: product.shortDescription,
-  description: product.description,
+  name: product.name?.trim() || `Producto demo ${index + 1}`,
+  slug: toDemoSlug(product.name?.trim() || `producto-demo-${index + 1}`),
+  sku: product.sku?.trim() || `DEMO-${String(index + 1).padStart(3, "0")}`,
+  brand: product.brand?.trim() || "Acavike",
+  shortDescription:
+    product.shortDescription?.trim() ||
+    "Producto demo disponible para operación, reposición o compra por volumen.",
+  description:
+    product.description?.trim() ||
+    product.shortDescription?.trim() ||
+    "Producto demo disponible para operación, reposición o compra por volumen.",
   categoryId: "",
-  categorySlug: product.categorySlug,
-  price: product.price,
-  unit: product.unit,
-  stock: product.stock,
-  lowStockThreshold: product.lowStockThreshold,
-  leadTimeText: product.leadTimeText,
+  categorySlug: product.categorySlug?.trim() || demoCategories[0]?.slug || "abrasivos",
+  price: Number.isFinite(product.price) ? product.price : 0,
+  unit: product.unit?.trim() || "pieza",
+  stock: Number.isFinite(product.stock) ? product.stock : 0,
+  lowStockThreshold: Number.isFinite(product.lowStockThreshold) ? product.lowStockThreshold : 0,
+  leadTimeText: product.leadTimeText?.trim() || "Entrega sujeta a disponibilidad",
   isActive: true,
-  isFeatured: product.isFeatured,
-  createdAt: daysAgo(product.daysOffset),
-  updatedAt: daysAgo(Math.max(1, product.daysOffset - 2)),
-  imageAlt: product.imageAlt,
-  imageKey: product.imageKey,
-  tiers: product.tiers.map((tier, tierIndex) => ({
+  isFeatured: Boolean(product.isFeatured),
+  createdAt: daysAgo(Number.isFinite(product.daysOffset) ? product.daysOffset : 0),
+  updatedAt: daysAgo(Math.max(1, (Number.isFinite(product.daysOffset) ? product.daysOffset : 0) - 2)),
+  imageAlt: product.imageAlt?.trim() || product.name?.trim() || "Producto demo",
+  imageKey: product.imageKey?.trim() || "box",
+  tiers: (product.tiers || [])
+    .filter((tier) => Number.isFinite(tier.minQuantity) && Number.isFinite(tier.price))
+    .map((tier, tierIndex) => ({
     id: `tier_${index + 1}_${tierIndex + 1}`,
     minQuantity: tier.minQuantity,
     price: tier.price,
@@ -241,7 +252,7 @@ export const demoProducts: DemoProductRecord[] = demoProductsBase.map((product, 
     {
       id: `image_${index + 1}_1`,
       productId: product.id,
-      url: `/demo-products/product-${product.imageKey}.svg`,
+      url: getDemoProductImageUrl(product.imageKey),
       alt: product.imageAlt,
       sortOrder: 0,
     },
@@ -264,6 +275,79 @@ export const demoProducts: DemoProductRecord[] = demoProductsBase.map((product, 
 
 export const demoProductsById = new Map(demoProducts.map((product) => [product.id, product]));
 export const demoProductsBySlug = new Map(demoProducts.map((product) => [product.slug, product]));
+
+export type DemoCatalogDiagnostics = {
+  totalCategories: number;
+  totalProducts: number;
+  totalFeatured: number;
+  empaqueProducts: number;
+  hasCajaProduct: boolean;
+  invalidCategorySlugs: string[];
+  missingFields: Array<{
+    productId: string;
+    productSlug: string;
+    missing: string[];
+  }>;
+};
+
+export function getDemoCatalogDiagnostics(): DemoCatalogDiagnostics {
+  const validCategorySlugs = new Set(demoCategories.map((category) => category.slug));
+  const missingFields = demoProductsBase.flatMap((product) => {
+    const imageUrl = getDemoProductImageUrl(product.imageKey);
+    const fieldsToValidate: Array<[string, unknown]> = [
+      ["id", product.id],
+      ["slug", product.slug],
+      ["sku", product.sku],
+      ["name", product.name],
+      ["price", product.price],
+      ["stock", product.stock],
+      ["unit", product.unit],
+      ["categorySlug", product.categorySlug],
+      ["imageUrl", imageUrl],
+    ];
+    const missing = fieldsToValidate.flatMap<string>(([field, value]) => {
+      if (typeof value === "string") {
+        return value.trim() ? [] : [field];
+      }
+
+      if (typeof value === "number") {
+        return Number.isFinite(value) ? [] : [field];
+      }
+
+      return value ? [] : [field];
+    });
+
+    return missing.length
+      ? [
+          {
+            productId: product.id,
+            productSlug: product.slug,
+            missing,
+          },
+        ]
+      : [];
+  });
+
+  const invalidCategorySlugs = Array.from(
+    new Set(
+      demoProductsBase
+        .map((product) => product.categorySlug)
+        .filter((categorySlug) => !validCategorySlugs.has(categorySlug)),
+    ),
+  );
+
+  return {
+    totalCategories: demoCategories.length,
+    totalProducts: demoProducts.length,
+    totalFeatured: demoProducts.filter((product) => product.isFeatured).length,
+    empaqueProducts: demoProducts.filter((product) => product.category.slug === "empaque").length,
+    hasCajaProduct: demoProducts.some(
+      (product) => product.slug === "caja-corrugada-doble-pared-60-x-40",
+    ),
+    invalidCategorySlugs,
+    missingFields,
+  };
+}
 
 export const demoUsers: User[] = [
   {

@@ -18,7 +18,11 @@ export default async function CategoryCatalogPage({
 }) {
   noStore();
   const { slug } = await params;
-  const { category, products } = await getCategoryCatalogDataRepository(slug);
+  const { category, products } = await getCategoryCatalogDataRepository(slug).catch(() => ({
+    category: null,
+    products: [],
+  }));
+  const safeProducts = Array.isArray(products) ? products : [];
 
   if (!category) {
     notFound();
@@ -47,7 +51,7 @@ export default async function CategoryCatalogPage({
               </h1>
               <p className="mt-3 max-w-3xl text-[13px] leading-6 text-slate-700">{meta.blurb}</p>
               <div className="mt-4 flex flex-wrap gap-2 text-[12px] text-slate-600">
-                <span className="public-chip">{products.length} SKU activos</span>
+                <span className="public-chip">{safeProducts.length} SKU activos</span>
                 <span className="public-chip">{meta.callout}</span>
               </div>
             </div>
@@ -112,9 +116,9 @@ export default async function CategoryCatalogPage({
             </Link>
           </div>
 
-          {products.length ? (
+          {safeProducts.length ? (
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {products.map((product) => (
+              {safeProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>

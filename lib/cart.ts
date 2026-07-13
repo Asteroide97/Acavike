@@ -11,6 +11,15 @@ type DemoCartCookieItem = {
 };
 
 const cookieLifetime = 60 * 60 * 24 * 30;
+export const SAFE_CART_FALLBACK = {
+  items: [],
+  itemCount: 0,
+  itemsCount: 0,
+  subtotal: 0,
+  tax: 0,
+  discount: 0,
+  total: 0,
+} as const;
 
 function getCookieOptions() {
   return {
@@ -19,6 +28,33 @@ function getCookieOptions() {
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: cookieLifetime,
+  };
+}
+
+async function getCookieStoreSafe() {
+  try {
+    return await cookies();
+  } catch {
+    return null;
+  }
+}
+
+function toSafeInteger(value: unknown, fallback = 0) {
+  const parsed = Math.floor(Number(value));
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function toSafeMoney(value: unknown, fallback = 0) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function buildSafeCart(userId?: string | null, sessionId?: string | null) {
+  return {
+    ...demoCart,
+    sessionId: sessionId || demoCart.sessionId,
+    userId: userId ?? null,
+    items: [],
   };
 }
 
@@ -93,62 +129,88 @@ function buildDemoCartItems(items: DemoCartCookieItem[]) {
 }
 
 async function persistDemoCartItems(items: DemoCartCookieItem[]) {
-  const cookieStore = await cookies();
-  const normalized = normalizeDemoCartItems(items);
-
-  if (!normalized.length) {
-    cookieStore.set(DEMO_CART_COOKIE, "", {
-      ...getCookieOptions(),
-      maxAge: 0,
-    });
+  const cookieStore = await getCookieStoreSafe();
+  if (!cookieStore) {
     return;
   }
 
-  cookieStore.set(DEMO_CART_COOKIE, JSON.stringify(normalized), getCookieOptions());
+  const normalized = normalizeDemoCartItems(items);
+
+  if (!normalized.length) {
+    try {
+      cookieStore.set(DEMO_CART_COOKIE, "", {
+        ...getCookieOptions(),
+        maxAge: 0,
+      });
+    } catch {
+      return;
+    }
+    return;
+  }
+
+  try {
+    cookieStore.set(DEMO_CART_COOKIE, JSON.stringify(normalized), getCookieOptions());
+  } catch {
+    return;
+  }
+}
+
+async function readCartSessionId() {
+  const cookieStore = await getCookieStoreSafe();
+  return cookieStore?.get(CART_COOKIE)?.value ?? null;
 }
 
 export async function getOrCreateCartSessionId() {
-  const cookieStore = await cookies();
-  let sessionId = cookieStore.get(CART_COOKIE)?.value;
+  const cookieStore = await getCookieStoreSafe();
+  let sessionId = cookieStore?.get(CART_COOKIE)?.value ?? null;
 
   if (!sessionId) {
     sessionId = randomUUID();
-    cookieStore.set(CART_COOKIE, sessionId, getCookieOptions());
+
+    if (cookieStore) {
+      try {
+        cookieStore.set(CART_COOKIE, sessionId, getCookieOptions());
+      } catch {
+        return sessionId;
+      }
+    }
   }
 
   return sessionId;
 }
 
 export async function getDemoCartItems() {
-  const cookieStore = await cookies();
-  return parseDemoCartCookie(cookieStore.get(DEMO_CART_COOKIE)?.value);
+  try {
+    const cookieStore = await getCookieStoreSafe();
+    return parseDemoCartCookie(cookieStore?.get(DEMO_CART_COOKIE)?.value);
+  } catch {
+    return [];
+  }
 }
 
 export async function addDemoCartItem(productId: string, quantity: number) {
   const items = await getDemoCartItems();
   const currentQuantity = items.find((item) => item.productId === productId)?.quantity ?? 0;
-  const nextItems = items
-    .filter((item) => item.productId !== productId)
-    .concat({
-      productId,
-      quantity: currentQuantity + Math.max(1, Math.floor(quantity)),
-    });
+  const nextItems = items.filter((item) => item.productId !== productId);
+
+  nextItems.push({
+    productId,
+    quantity: currentQuantity + Math.max(1, toSafeInteger(quantity, 1)),
+  });
 
   await persistDemoCartItems(nextItems);
 }
 
 export async function setDemoCartItemQuantity(productId: string, quantity: number) {
   const items = await getDemoCartItems();
-  const nextItems = items
-    .filter((item) => item.productId !== productId)
-    .concat(
-      quantity > 0
-        ? {
-            productId,
-            quantity: Math.max(1, Math.floor(quantity)),
-          }
-        : [],
-    );
+  const nextItems = items.filter((item) => item.productId !== productId);
+
+  if (quantity > 0) {
+    nextItems.push({
+      productId,
+      quantity: Math.max(1, toSafeInteger(quantity, 1)),
+    });
+  }
 
   await persistDemoCartItems(nextItems);
 }
@@ -163,46 +225,114 @@ export function getDemoCartProductIdFromItemId(itemId: string) {
 
 export async function getOrCreateCart(userId?: string) {
   if (DEMO_MODE) {
-    const sessionId = await getOrCreateCartSessionId();
-    const items = buildDemoCartItems(await getDemoCartItems());
+    try {
+      const sessionId = (await readCartSessionId()) ?? demoCart.sessionId;
+      const items = buildDemoCartItems(await getDemoCartItems());
 
-    return {
-      ...demoCart,
-      sessionId,
-      userId: userId ?? demoCart.userId,
-      updatedAt: items.length ? new Date() : demoCart.updatedAt,
-      items,
-    };
+      return {
+        ...buildSafeCart(userId ?? demoCart.userId, sessionId),
+        updatedAt: items.length ? new Date() : demoCart.updatedAt,
+        items,
+      };
+    } catch {
+      return buildSafeCart(userId ?? demoCart.userId);
+    }
   }
 
   if (!DATABASE_ENABLED) {
-    return {
-      ...demoCart,
-      userId: userId ?? null,
-      items: [],
-    };
+    return buildSafeCart(userId);
   }
 
-  const sessionId = await getOrCreateCartSessionId();
+  const sessionId = await readCartSessionId();
+  if (!sessionId) {
+    return buildSafeCart(userId);
+  }
 
-  let cart = await prisma.cart.findUnique({
-    where: { sessionId },
-    include: {
-      items: {
-        include: {
-          product: {
-            include: {
-              images: true,
-              category: true,
-              priceTiers: {
-                orderBy: { minQuantity: "asc" },
+  const cart = await prisma.cart
+    .findUnique({
+      where: { sessionId },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                images: true,
+                category: true,
+                priceTiers: {
+                  orderBy: { minQuantity: "asc" },
+                },
               },
             },
           },
         },
       },
-    },
-  });
+    })
+    .catch(() => null);
+
+  if (!cart) {
+    return buildSafeCart(userId, sessionId);
+  }
+
+  if (userId && cart.userId !== userId) {
+    const updatedCart = await prisma.cart
+      .update({
+        where: { id: cart.id },
+        data: { userId },
+        include: {
+          items: {
+            include: {
+              product: {
+                include: {
+                  images: true,
+                  category: true,
+                  priceTiers: {
+                    orderBy: { minQuantity: "asc" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      })
+      .catch(() => cart);
+
+    return updatedCart ?? cart;
+  }
+
+  return cart;
+}
+
+export async function getOrCreateCartForMutation(userId?: string) {
+  if (DEMO_MODE) {
+    return getOrCreateCart(userId);
+  }
+
+  if (!DATABASE_ENABLED) {
+    return buildSafeCart(userId);
+  }
+
+  const sessionId = await getOrCreateCartSessionId();
+
+  let cart = await prisma.cart
+    .findUnique({
+      where: { sessionId },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                images: true,
+                category: true,
+                priceTiers: {
+                  orderBy: { minQuantity: "asc" },
+                },
+              },
+            },
+          },
+        },
+      },
+    })
+    .catch(() => null);
 
   if (!cart) {
     cart = await prisma.cart.create({
@@ -258,15 +388,21 @@ export function getCartTotals(
   discount = 0,
 ) {
   const subtotal =
-    cart?.items.reduce((sum, item) => sum + Number(item.unitPrice) * item.quantity, 0) ?? 0;
+    cart?.items.reduce((sum, item) => {
+      const unitPrice = toSafeMoney(item?.unitPrice, 0);
+      const quantity = Math.max(0, toSafeInteger(item?.quantity, 0));
+      return sum + unitPrice * quantity;
+    }, 0) ?? 0;
   const tax = subtotal * 0.16;
   const total = Math.max(subtotal + tax - discount, 0);
+  const itemsCount =
+    cart?.items.reduce((sum, item) => sum + Math.max(0, toSafeInteger(item?.quantity, 0)), 0) ?? 0;
 
   return {
-    subtotal,
-    tax,
-    discount,
-    total,
-    itemsCount: cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0,
+    subtotal: toSafeMoney(subtotal, 0),
+    tax: toSafeMoney(tax, 0),
+    discount: toSafeMoney(discount, 0),
+    total: toSafeMoney(total, 0),
+    itemsCount,
   };
 }

@@ -24,7 +24,7 @@ export default async function CatalogPage({
   const categorySlug = getSingleValue(resolved.categoria) || "";
   const sort = getSingleValue(resolved.orden) || "featured";
 
-  const [{ categories, products }, settings] = await Promise.all([
+  const [catalogResult, settingsResult] = await Promise.allSettled([
     getCatalogPageDataRepository({
       query,
       categorySlug,
@@ -32,8 +32,19 @@ export default async function CatalogPage({
     }),
     getSiteSettingsMap(),
   ]);
+  const catalogData =
+    catalogResult.status === "fulfilled"
+      ? catalogResult.value
+      : { categories: [], products: [] };
+  const settings =
+    settingsResult.status === "fulfilled" && settingsResult.value
+      ? settingsResult.value
+      : {};
+  const { categories, products } = catalogData;
+  const safeCategories = Array.isArray(categories) ? categories : [];
+  const safeProducts = Array.isArray(products) ? products : [];
 
-  const activeCategory = categories.find((category) => category.slug === categorySlug) || null;
+  const activeCategory = safeCategories.find((category) => category.slug === categorySlug) || null;
   const contact = getPublicContactDetails(settings);
 
   return (
@@ -57,7 +68,7 @@ export default async function CatalogPage({
               >
                 Todos los productos
               </Link>
-              {categories.map((category) => (
+              {safeCategories.map((category) => (
                 <Link
                   key={category.id}
                   href={`/catalogo?categoria=${category.slug}`}
@@ -92,7 +103,7 @@ export default async function CatalogPage({
                 <p className="public-kicker">Listado general</p>
                 <h2 className="mt-2 text-[28px] font-semibold text-slate-900">Todos los productos</h2>
                 <p className="mt-2 text-[13px] text-slate-700">
-                  {products.length} resultado(s)
+                  {safeProducts.length} resultado(s)
                   {activeCategory ? ` en ${activeCategory.name}` : ""}
                   {query ? ` para "${query}"` : ""}.
                 </p>
@@ -119,9 +130,9 @@ export default async function CatalogPage({
             </div>
           </div>
 
-          {products.length ? (
+          {safeProducts.length ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {products.map((product) => (
+              {safeProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
