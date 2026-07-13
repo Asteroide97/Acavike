@@ -28,50 +28,59 @@ export function ProductCard({ product }: { product: ProductCardItem }) {
   return (
     <article className="public-panel h-full overflow-hidden">
       <Link href={productHref} className="block border-b border-[#D1D5DB] bg-[#F9FAFB]">
-        <div className="relative aspect-[4/3] sm:aspect-square">
-          <div className="absolute inset-4 rounded-[12px] bg-white shadow-[0_8px_24px_rgba(11,30,75,0.06)]" />
+        <div className="relative aspect-[4/3] md:aspect-[6/5]">
+          <div className="absolute inset-3 rounded-[10px] bg-white shadow-[0_6px_18px_rgba(11,30,75,0.06)]" />
           <Image
             src={imageUrl}
             alt={imageAlt}
             fill
-            className="object-contain p-6"
+            className="object-contain p-4"
           />
         </div>
       </Link>
 
-      <div className="flex h-full flex-col p-4">
-        <div className="flex items-start justify-between gap-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{categoryName}</p>
-          <span className="rounded-full bg-[#F3F4F6] px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+      <div className="flex h-full flex-col gap-2.5 p-3">
+        <div className="flex items-start justify-between gap-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">{categoryName}</p>
+          <span className="shrink-0 rounded-full bg-[#F3F4F6] px-2 py-0.5 text-[10px] font-semibold text-slate-600">
             Stock {stock}
           </span>
         </div>
 
-        <Link href={productHref} className="mt-3 block text-[15px] font-bold leading-5 text-[#1D3B7A] hover:text-[#0B1E4B]">
+        <Link href={productHref} className="block text-[14px] font-bold leading-[1.3] text-[#1D3B7A] hover:text-[#0B1E4B]">
           {name}
         </Link>
 
-        <p className="mt-2 text-[12px] leading-5 text-slate-600">{shortDescription}</p>
+        <p className="min-h-[2.2rem] overflow-hidden text-[11px] leading-[1.45] text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+          {shortDescription}
+        </p>
 
-        <div className="mt-3 grid gap-1 rounded-[6px] bg-[#F9FAFB] p-3 text-[12px] text-slate-700">
+        <div className="grid gap-1 rounded-[6px] bg-[#F9FAFB] px-2.5 py-2 text-[11px] leading-4 text-slate-700">
           <p>SKU: {product.sku || "DEMO-SKU"}</p>
           <p>Unidad: {unit}</p>
           <p>Entrega: {delivery}</p>
         </div>
 
-        <div className="mt-auto border-t border-[#D1D5DB] pt-3">
-          <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">Precio base</p>
-          <p className="mt-1 text-[24px] font-bold leading-none text-slate-900">{formatCurrency(price)}</p>
+        <div className="mt-auto border-t border-[#D1D5DB] pt-2.5">
+          <p className="text-[10px] uppercase tracking-[0.14em] text-slate-500">Precio base</p>
+          <p className="mt-1 text-[21px] font-bold leading-none text-slate-900">{formatCurrency(price)}</p>
         </div>
 
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <Link href={productHref} className="public-btn-outline w-full">
+        <div className="grid grid-cols-2 gap-1.5">
+          <Link
+            href={productHref}
+            className="public-btn-outline min-h-[36px] w-full px-2.5 py-2 text-[12px]"
+          >
             Ver detalles
           </Link>
-          <form action={addToCartAction}>
+          <form action={addToCartAction} className="w-full">
             <input type="hidden" name="productId" value={productId} />
             <input type="hidden" name="quantity" value="1" />
-            <button className="public-btn w-full" type="submit" disabled={!productId}>
+            <button
+              className="public-btn min-h-[36px] w-full px-2.5 py-2 text-[12px]"
+              type="submit"
+              disabled={!productId}
+            >
               Agregar
             </button>
           </form>
