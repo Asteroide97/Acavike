@@ -3,24 +3,12 @@ import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
 import type { Category, PriceTier, Product, ProductImage } from "@prisma/client";
 import { ArrowRight } from "lucide-react";
-import { getCategoryMeta } from "@/lib/public-catalog";
 import { getHomepageData } from "@/lib/site";
 import { formatCurrency } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 const HERO_BANNER_SLUGS = ["empaque", "equipo-de-seguridad", "herramienta", "limpieza"] as const;
-const HOME_CATEGORY_SLUGS = [
-  "empaque",
-  "abrasivos",
-  "equipo-de-seguridad",
-  "herramienta",
-  "fabricacion",
-  "construccion",
-  "limpieza",
-  "oficina",
-  "tornilleria",
-] as const;
 
 const HERO_BANNER_TITLES: Record<(typeof HERO_BANNER_SLUGS)[number], string> = {
   empaque: "Empaque y cajas",
@@ -28,6 +16,29 @@ const HERO_BANNER_TITLES: Record<(typeof HERO_BANNER_SLUGS)[number], string> = {
   herramienta: "Herramientas y construcción",
   limpieza: "Limpieza y mantenimiento",
 };
+
+const COMMERCIAL_STRENGTHS = [
+  {
+    label: "01",
+    title: "Catálogo industrial",
+    body: "Surtido claro para compras operativas y reposición.",
+  },
+  {
+    label: "02",
+    title: "Cotización rápida",
+    body: "Respuesta comercial simple para SKU, volumen o proyecto.",
+  },
+  {
+    label: "03",
+    title: "Compra por volumen",
+    body: "Apoyo para pedidos recurrentes, resurtido y mayoreo.",
+  },
+  {
+    label: "04",
+    title: "Atención comercial directa",
+    body: "Seguimiento por WhatsApp, correo y contacto humano.",
+  },
+] as const;
 
 type HomeCategory = Category;
 type HomeProduct = Product & {
@@ -104,33 +115,6 @@ function HomeBannerCard({ category }: { category: HomeCategory }) {
   );
 }
 
-function HomeCategoryTile({ category }: { category: HomeCategory }) {
-  const meta = getCategoryMeta(category.slug);
-  const secondary = meta.subcategories[0] || meta.callout || "Catálogo industrial";
-
-  return (
-    <article className="public-panel group overflow-hidden">
-      <Link href={`/catalogo/${category.slug}`} className="block">
-        <div className="relative aspect-[4/3] border-b border-[#D1D5DB] bg-white">
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,#ffffff_0%,#F9FAFB_100%)]" />
-          <Image
-            src={category.imageUrl || "/demo-products/category-empaque.svg"}
-            alt={category.name}
-            fill
-            className="object-contain p-6 transition duration-300 group-hover:scale-[1.03]"
-          />
-        </div>
-        <div className="space-y-1.5 p-4">
-          <h3 className="text-[18px] font-semibold leading-tight text-[#0B1E4B]">{category.name}</h3>
-          <p className="overflow-hidden text-[12px] text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:1]">
-            {secondary}
-          </p>
-        </div>
-      </Link>
-    </article>
-  );
-}
-
 function HomeProductTile({ product }: { product: HomeProduct }) {
   const productHref = product.slug ? `/producto/${product.slug}` : "/catalogo";
   const imageUrl = product.images?.[0]?.url || "/demo-products/product-box.svg";
@@ -179,9 +163,6 @@ export default async function HomePage() {
   const bannerCategories = HERO_BANNER_SLUGS.map((slug) => categoryMap.get(slug)).filter(
     (category): category is HomeCategory => Boolean(category),
   );
-  const homeCategories = HOME_CATEGORY_SLUGS.map((slug) => categoryMap.get(slug)).filter(
-    (category): category is HomeCategory => Boolean(category),
-  );
   const popularProducts = featuredProducts.slice(0, 4);
 
   return (
@@ -220,35 +201,6 @@ export default async function HomePage() {
           </section>
         ) : null}
 
-        <section className="space-y-3">
-          <div className="flex items-end justify-between gap-3">
-            <div>
-              <p className="public-kicker">Categorías principales</p>
-              <h2 className="mt-2 text-[24px] font-semibold text-slate-900 md:text-[28px]">
-                Compra por categoría
-              </h2>
-            </div>
-            <Link href="/catalogo" className="public-link hidden text-[13px] md:inline-flex">
-              Ver catálogo completo
-            </Link>
-          </div>
-
-          {homeCategories.length ? (
-            <div className="grid gap-3 lg:grid-cols-3">
-              {homeCategories.map((category) => (
-                <HomeCategoryTile key={category.id} category={category} />
-              ))}
-            </div>
-          ) : (
-            <div className="public-panel p-8 text-center">
-              <h3 className="text-[20px] font-semibold text-slate-900">No hay categorías disponibles</h3>
-              <p className="mt-2 text-[13px] text-slate-700">
-                Activa datos demo o configura categorías en la base real.
-              </p>
-            </div>
-          )}
-        </section>
-
         <section className="public-panel p-4 md:p-5">
           <div className="flex items-end justify-between gap-3 border-b border-[#D1D5DB] pb-3">
             <div>
@@ -273,23 +225,24 @@ export default async function HomePage() {
           )}
         </section>
 
-        <section className="rounded-[6px] bg-[#F4B000] p-5 md:p-6">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#0B1E4B]">
-                Compra comercial
-              </p>
-              <h2 className="mt-2 text-[24px] font-semibold leading-tight text-[#0B1E4B]">
-                ¿Compra por volumen?
-              </h2>
-              <p className="mt-2 text-[14px] leading-6 text-[#243042]">
-                Solicita una cotización comercial.
-              </p>
-            </div>
+        <section className="public-panel overflow-hidden">
+          <div className="border-b border-[#D1D5DB] px-4 py-3 md:px-5">
+            <p className="public-kicker">Fortalezas comerciales</p>
+            <h2 className="mt-2 text-[24px] font-semibold text-slate-900">Operación B2B clara y directa</h2>
+          </div>
 
-            <Link href="/cotizacion-rapida" className="public-btn">
-              Cotizar
-            </Link>
+          <div className="grid gap-px bg-[#D1D5DB] sm:grid-cols-2 xl:grid-cols-4">
+            {COMMERCIAL_STRENGTHS.map((item) => (
+              <div key={item.label} className="bg-white px-4 py-4 md:px-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                  {item.label}
+                </p>
+                <h3 className="mt-2 text-[18px] font-semibold leading-tight text-[#0B1E4B]">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-[12px] leading-5 text-slate-600">{item.body}</p>
+              </div>
+            ))}
           </div>
         </section>
       </div>
