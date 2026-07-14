@@ -22,7 +22,7 @@ export function SiteFooter({
         <div>
           <h3 className="text-[30px] font-bold tracking-[-0.05em] text-white">Acavike</h3>
           <p className="mt-4 max-w-sm text-[13px] leading-6 text-slate-300">
-            Catálogo industrial B2B para compras directas, cotizaciones de volumen y atención operativa para empresas.
+            Catálogo industrial B2B para compras directas y cotizaciones comerciales.
           </p>
           <div className="mt-5 grid gap-2 text-[13px] text-slate-300">
             <p>{phone}</p>
@@ -97,7 +97,7 @@ export function SiteFooter({
 
       <div className="border-t border-white/10">
         <div className="section-shell flex flex-col gap-2 py-4 text-[12px] text-slate-400 md:flex-row md:items-center md:justify-between">
-          <p>Acavike. Plantilla comercial B2B con catálogo industrial y compra por transferencia.</p>
+          <p>Acavike. Plantilla comercial B2B para catálogo industrial.</p>
           <div className="flex flex-wrap gap-4">
             <Link href="/contacto#nosotros" className="hover:text-white">
               Nosotros
