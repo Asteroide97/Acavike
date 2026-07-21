@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   BadgePercent,
@@ -17,6 +18,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { UserRole } from "@prisma/client";
+import { BRAND_LOGO_URL } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 const items: Array<{
@@ -49,11 +51,16 @@ export function AdminSidebar({ role }: { role: UserRole }) {
   return (
     <aside className="flex h-full flex-col rounded-[2rem] bg-slate-950 p-6 text-slate-200">
       <Link href="/admin" className="flex items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10">
-          <Boxes className="h-6 w-6" />
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white p-1.5">
+          <Image
+            src={BRAND_LOGO_URL}
+            alt="Acavike Supplies"
+            width={1024}
+            height={1024}
+            className="h-full w-auto object-contain"
+          />
         </div>
         <div>
-          <p className="font-heading text-lg font-semibold text-white">Acavike</p>
           <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Control Panel</p>
         </div>
       </Link>

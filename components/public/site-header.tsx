@@ -1,6 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Clock3, Mail, Search, ShoppingCart, UserRound, Boxes, Phone } from "lucide-react";
+import { Clock3, Mail, Search, ShoppingCart, UserRound, Phone } from "lucide-react";
 import type { User } from "@prisma/client";
+import { BRAND_LOGO_URL } from "@/lib/constants";
 import { PUBLIC_NAV_TABS } from "@/lib/public-catalog";
 import { formatCurrency } from "@/lib/utils";
 
@@ -67,17 +69,18 @@ export function SiteHeader({
       </div>
 
       <div className="section-shell py-3 sm:py-4">
-        <div className="grid gap-2.5 lg:grid-cols-[220px_minmax(0,1fr)_auto] lg:items-center">
-          <Link href="/" className="flex w-full min-w-0 items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[#0B1E4B] text-white">
-              <Boxes className="h-6 w-6" />
-            </div>
-            <div className="min-w-0">
-              <div className="text-[27px] font-bold leading-none tracking-[-0.05em] text-[#0B1E4B]">Acavike</div>
-              <div className="mt-1 text-[10px] uppercase tracking-[0.22em] text-slate-500 sm:text-[11px] sm:tracking-[0.24em]">
-                Suministros industriales
-              </div>
-            </div>
+        <div className="grid gap-2.5 lg:grid-cols-[210px_minmax(0,1fr)_auto] lg:items-center">
+          <Link href="/" className="flex w-full min-w-0 items-center">
+            <span className="flex h-[54px] w-[138px] items-center justify-center rounded-[6px] border border-[#D1D5DB] bg-white p-1.5 shadow-[0_1px_2px_rgba(17,24,39,0.05)] sm:w-[158px] lg:w-[178px]">
+              <Image
+                src={BRAND_LOGO_URL}
+                alt="Acavike Supplies"
+                width={1024}
+                height={1024}
+                priority
+                className="h-full w-auto object-contain"
+              />
+            </span>
           </Link>
 
           <form

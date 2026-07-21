@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import { BRAND_LOGO_URL } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 const heading = Space_Grotesk({
@@ -22,8 +23,21 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Acavike | Catálogo industrial B2B",
-  description: "Catálogo B2B industrial de Acavike con cotización rápida y compra por transferencia.",
+  metadataBase: new URL("https://acavike.com"),
+  title: "Acavike Supplies",
+  description: "Catálogo industrial B2B para compras por transferencia y cotización comercial.",
+  openGraph: {
+    title: "Acavike Supplies",
+    description: "Catálogo industrial B2B para compras por transferencia y cotización comercial.",
+    images: [
+      {
+        url: BRAND_LOGO_URL,
+        width: 1024,
+        height: 1024,
+        alt: "Acavike Supplies",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
