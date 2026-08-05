@@ -1,116 +1,73 @@
 # Acavike Industrial
 
-E-commerce B2B y catalogo industrial construido con `Next.js 15`, `TypeScript`, `App Router`, `Tailwind CSS`, `Prisma` y `PostgreSQL`.
+Catalogo B2B construido con `Next.js 15`, `TypeScript`, `App Router`, `Tailwind CSS` y `Prisma`.
 
-La plataforma incluye:
+La aplicacion mantiene el demo actual sin base obligatoria y deja preparada una ruta clara para SQLite local y PostgreSQL real.
 
-- Sitio publico con home, catalogo, detalle de producto, carrito, checkout por transferencia, contacto, cuenta y pedidos.
-- Panel admin con dashboard, analytics, pedidos, almacen, cotizaciones, clientes, productos, categorias, cupones, pagos, contenido, usuarios, mensajes, auditoria y settings.
-- Compra sin gateway de pago. El flujo se cierra con transferencia bancaria y carga de comprobante.
+## Modos de operacion
 
-## Requisitos
+### 1. Demo sin base
 
-- `Node.js 20+`
-- `npm`
-- `PostgreSQL` solo para instalaciones reales con base de datos
+- Uso recomendado: demo comercial en Vercel o muestras internas.
+- Variables clave: `DEMO_MODE=true` y sin `DATABASE_URL`.
+- Persistencia: no.
+- Fuente de datos: `lib/demo-data.ts` y repositorios demo.
+- Health esperado: `{"ok":true,"mode":"demo"}`.
 
-## Variables de entorno
+Documentacion completa: [README_DEMO.md](C:/Users/joseh/OneDrive/Desktop/Acavike/README_DEMO.md)
 
-La aplicacion soporta dos modos.
+### 2. Local con SQLite
 
-### Modo demo sin base de datos
+- Uso recomendado: laptop, VPS con disco persistente o instalacion local de un cliente.
+- Variables clave: `DEMO_MODE=false` y `DATABASE_URL="file:./prisma/local.db"`.
+- Persistencia: si.
+- Provider Prisma: `sqlite`.
+- Schema Prisma: `prisma/schema.sqlite.prisma`.
+- No usar en Vercel.
 
-```env
-DEMO_MODE="true"
-AUTH_SECRET="cambia-esta-clave-por-una-cadena-larga-y-segura"
-NEXT_PUBLIC_SITE_URL="http://localhost:3000"
-```
+Documentacion completa: [README_LOCAL_SQLITE.md](C:/Users/joseh/OneDrive/Desktop/Acavike/README_LOCAL_SQLITE.md)
 
-Notas:
+### 3. Produccion con PostgreSQL
 
-- `DATABASE_URL` no es obligatoria.
-- La home, el catalogo, los productos, las categorias, el carrito visual, el checkout visual y el admin cargan con datos demo internos.
-- Las acciones del admin se muestran en modo simulado.
+- Uso recomendado: cliente real en hosting formal.
+- Variables clave: `DEMO_MODE=false` y `DATABASE_URL="postgresql://..."`.
+- Persistencia: si.
+- Provider Prisma: `postgresql`.
+- Schema Prisma canonico: `prisma/schema.prisma`.
 
-### Modo real con PostgreSQL
+Documentacion completa: [README_PRODUCTION.md](C:/Users/joseh/OneDrive/Desktop/Acavike/README_PRODUCTION.md)
 
-```env
-DEMO_MODE="false"
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/acavike?schema=public"
-AUTH_SECRET="cambia-esta-clave-por-una-cadena-larga-y-segura"
-NEXT_PUBLIC_SITE_URL="http://localhost:3000"
-```
+## Decision tecnica sobre Prisma
 
-Notas:
+- `prisma/schema.prisma` se conserva como schema canonico para PostgreSQL real.
+- `prisma/schema.sqlite.prisma` replica el mismo modelo funcional para SQLite local.
+- Esta fase no cambia la logica de runtime actual para inferir modos automaticamente.
+- El demo-memory sigue entrando por `DEMO_MODE=true`.
+- Si alguien deja `DEMO_MODE=false` y no define `DATABASE_URL`, la app mantiene el guardrail actual y responde con modo controlado `real-missing-database`.
 
-- Si `DEMO_MODE=false` y falta `DATABASE_URL`, la aplicacion muestra errores controlados y no rompe los Server Components.
-- `AUTH_SECRET` es la variable recomendada. Tambien se aceptan `JWT_SECRET` o `SESSION_SECRET` por compatibilidad.
+Esto evita una migracion riesgosa y mantiene intacto el comportamiento del demo ya publicado.
 
-## Instalacion
-
-```bash
-npm install
-npx prisma generate
-```
-
-## Desarrollo
-
-### Correr en modo demo
+## Scripts utiles
 
 ```bash
 npm run dev
-```
-
-Con `DEMO_MODE=true`, el sitio funciona sin base de datos.
-
-### Correr en modo real
-
-1. Configura `DEMO_MODE=false`.
-2. Define `DATABASE_URL`.
-3. Genera Prisma y aplica migraciones.
-
-```bash
-npx prisma generate
-npm run db:migrate -- --name init
-npm run dev
-```
-
-Si solo quieres sincronizar el esquema local rapidamente:
-
-```bash
-npm run db:push
-```
-
-Si necesitas datos iniciales para entorno real:
-
-```bash
-npm run db:seed
-```
-
-## Variables de Vercel
-
-### Demo
-
-```env
-DEMO_MODE="true"
-AUTH_SECRET="..."
-```
-
-### Produccion real
-
-```env
-DEMO_MODE="false"
-DATABASE_URL="..."
-AUTH_SECRET="..."
-```
-
-## Build y validacion
-
-```bash
 npm run lint
 npm run build
-npx prisma generate
+npm run db:generate
+npm run db:migrate
+npm run db:push
+npm run db:seed
+npm run db:studio
+npm run db:sqlite:push
+npm run db:sqlite:seed
 ```
+
+## Notas de uso
+
+- `npm run db:generate` genera el cliente Prisma usando `prisma/schema.prisma` de PostgreSQL.
+- `npm run db:sqlite:push` y `npm run db:sqlite:seed` regeneran el cliente Prisma usando `prisma/schema.sqlite.prisma`.
+- Si cambias de SQLite local a PostgreSQL o al flujo normal del repo, vuelve a correr `npm run db:generate`.
+- `prisma/seed.ts` se reutiliza para SQLite y PostgreSQL porque el modelo funcional es el mismo.
 
 ## Acceso demo
 
@@ -124,24 +81,3 @@ Usuarios demo adicionales:
 - `warehouse@acavike.com` / `Admin123!`
 - `ventas@acavike.com` / `Admin123!`
 - `cliente@acavike.com` / `Cliente123!`
-
-## Comandos utiles
-
-```bash
-npm run dev
-npm run lint
-npm run build
-npm run db:generate
-npm run db:migrate
-npm run db:push
-npm run db:seed
-```
-
-## Notas funcionales
-
-- El checkout genera pedidos con estado `PENDING_TRANSFER`.
-- El comprobante se carga en `public/uploads/receipts`.
-- Solo `SUPERADMIN` y `ADMIN` pueden editar catalogo, contenido, precios y usuarios.
-- `WAREHOUSE` opera pedidos y estados logisticos.
-- `SALES` administra cotizaciones y clientes.
-- `CUSTOMER` consulta cuenta y pedidos desde el frente publico.

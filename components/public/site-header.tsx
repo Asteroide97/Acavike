@@ -69,16 +69,16 @@ export function SiteHeader({
       </div>
 
       <div className="section-shell py-3 sm:py-4">
-        <div className="grid gap-2.5 lg:grid-cols-[210px_minmax(0,1fr)_auto] lg:items-center">
+        <div className="grid gap-2.5 lg:grid-cols-[220px_minmax(0,1fr)_auto] lg:items-center">
           <Link href="/" className="flex w-full min-w-0 items-center">
-            <span className="flex h-[54px] w-[138px] items-center justify-center rounded-[6px] border border-[#D1D5DB] bg-white p-1.5 shadow-[0_1px_2px_rgba(17,24,39,0.05)] sm:w-[158px] lg:w-[178px]">
+            <span className="relative flex h-[54px] w-[150px] items-center justify-center overflow-hidden rounded-[6px] border border-[#D1D5DB] bg-white px-1 py-0.5 shadow-[0_1px_2px_rgba(17,24,39,0.05)] sm:h-[58px] sm:w-[162px] sm:px-1.5 lg:h-[64px] lg:w-[190px] lg:px-2">
               <Image
                 src={BRAND_LOGO_URL}
                 alt="Acavike Supplies"
                 width={1024}
                 height={1024}
                 priority
-                className="h-full w-auto object-contain"
+                className="pointer-events-none absolute left-1/2 top-[-22px] h-[150px] w-[150px] max-w-none -translate-x-1/2 object-contain sm:top-[-23px] sm:h-[158px] sm:w-[158px] lg:top-[-25px] lg:h-[170px] lg:w-[170px]"
               />
             </span>
           </Link>

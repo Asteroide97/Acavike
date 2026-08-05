@@ -10,7 +10,10 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
+    "db:sqlite:push": "prisma db push --schema prisma/schema.sqlite.prisma && prisma generate --schema prisma/schema.sqlite.prisma",
+    "db:sqlite:seed": "prisma generate --schema prisma/schema.sqlite.prisma && prisma db seed --schema prisma/schema.sqlite.prisma"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

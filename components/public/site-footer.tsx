@@ -24,13 +24,13 @@ export function SiteFooter({
       <div className="section-shell py-8 md:py-10">
         <div className="rounded-[6px] border border-white/10 bg-white/[0.03] p-6 md:p-8 lg:p-10">
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-            <div className="flex h-[108px] w-[150px] items-center justify-center rounded-[8px] border border-white/10 bg-white p-2 shadow-[0_12px_30px_rgba(0,0,0,0.18)] md:h-[120px] md:w-[170px]">
+            <div className="relative flex h-[96px] w-[176px] items-center justify-center overflow-hidden rounded-[8px] border border-white/10 bg-white px-2 py-1.5 shadow-[0_12px_30px_rgba(0,0,0,0.18)] sm:w-[188px] md:h-[112px] md:w-[220px] md:px-3 md:py-2">
               <Image
                 src={BRAND_LOGO_URL}
                 alt="Acavike Supplies"
                 width={1024}
                 height={1024}
-                className="h-full w-auto object-contain"
+                className="pointer-events-none absolute left-1/2 top-[-30px] h-[176px] w-[176px] max-w-none -translate-x-1/2 object-contain sm:top-[-32px] sm:h-[188px] sm:w-[188px] md:top-[-40px] md:h-[220px] md:w-[220px]"
               />
             </div>
             <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-slate-400">

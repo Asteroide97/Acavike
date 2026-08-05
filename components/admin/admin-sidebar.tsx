@@ -50,14 +50,14 @@ export function AdminSidebar({ role }: { role: UserRole }) {
 
   return (
     <aside className="flex h-full flex-col rounded-[2rem] bg-slate-950 p-6 text-slate-200">
-      <Link href="/admin" className="flex items-center gap-3">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white p-1.5">
+      <Link href="/admin" className="flex items-center gap-4">
+        <div className="relative flex h-[70px] w-full max-w-[164px] shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white px-2 py-1.5">
           <Image
             src={BRAND_LOGO_URL}
             alt="Acavike Supplies"
             width={1024}
             height={1024}
-            className="h-full w-auto object-contain"
+            className="pointer-events-none absolute left-1/2 top-[-31px] h-[168px] w-[168px] max-w-none -translate-x-1/2 object-contain"
           />
         </div>
         <div>
