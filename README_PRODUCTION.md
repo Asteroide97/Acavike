@@ -29,7 +29,9 @@ NEXT_PUBLIC_SITE_URL="https://tu-dominio.com"
 
 Notas:
 
-- Si `DEMO_MODE=false` y falta `DATABASE_URL`, la app conserva el guardrail actual y entra en `real-missing-database`.
+- Si existe `DATABASE_URL` y no activas `DEMO_MODE=true`, la app opera en modo real.
+- Si quieres impedir el fallback automatico a demo cuando falta base, define `FORCE_REAL_MODE=true`.
+- Si `FORCE_REAL_MODE=true` y falta `DATABASE_URL`, la app entra en `real-missing-database`.
 - Para produccion real, siempre define `DATABASE_URL`.
 
 ## Comandos

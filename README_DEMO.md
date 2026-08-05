@@ -21,7 +21,9 @@ NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 Notas:
 
 - `DATABASE_URL` no es obligatoria.
-- Si `DATABASE_URL` no existe y `DEMO_MODE=true`, el sitio usa `lib/demo-data.ts`.
+- Si `DATABASE_URL` no existe y no fuerzas modo real, la app entra automaticamente en demo-memory.
+- Si `DEMO_MODE=true`, el sitio usa `lib/demo-data.ts` aunque no exista base.
+- `FORCE_REAL_MODE=true` desactiva ese fallback automatico y obliga el guardrail `real-missing-database` cuando falta `DATABASE_URL`.
 - `/api/health` debe responder `{"ok":true,"mode":"demo"}` en produccion.
 
 ## Comandos
