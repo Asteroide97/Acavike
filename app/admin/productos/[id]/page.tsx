@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { AdminField } from "@/components/admin/admin-field";
 import { AdminFlash } from "@/components/admin/admin-flash";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { ProductImageUpload } from "@/components/admin/product-image-upload";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,7 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { deleteProductAction, saveProductAction } from "@/lib/actions/admin";
 import { requireUser } from "@/lib/auth";
+import { DATABASE_ENABLED } from "@/lib/config";
 import { ADMIN_ROLES } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 
@@ -125,7 +127,8 @@ export default async function ProductEditorPage({
                 hint="Una línea por imagen: URL|Alt"
                 className="md:col-span-2"
               >
-                <Textarea name="imagesText" defaultValue={imagesText} className="min-h-[140px]" />
+                {DATABASE_ENABLED ? <ProductImageUpload textareaId="imagesText" /> : null}
+                <Textarea id="imagesText" name="imagesText" defaultValue={imagesText} className="min-h-[140px]" />
               </AdminField>
               <AdminField
                 label="Precios por volumen"

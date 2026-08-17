@@ -28,14 +28,29 @@ function ensureWritableAction(path: string, mode: "saved" | "deleted" | "convert
 }
 
 function parseImageLines(value: string) {
-  return parseLines(value).map((line, index) => {
-    const [url, alt] = line.split("|").map((part) => part.trim());
-    return {
-      url,
-      alt: alt || null,
-      sortOrder: index,
-    };
-  });
+  const parsedImages = parseLines(value)
+    .map((line) => {
+      const [url, alt] = line.split("|").map((part) => part.trim());
+      return {
+        url,
+        alt: alt || null,
+      };
+    })
+    .filter((image) => Boolean(image.url));
+
+  const imagesWithoutPlaceholder =
+    parsedImages.length > 1
+      ? parsedImages.filter((image) => image.url !== "/placeholder-product.svg")
+      : parsedImages;
+
+  const safeImages = imagesWithoutPlaceholder.length
+    ? imagesWithoutPlaceholder
+    : [{ url: "/placeholder-product.svg", alt: "Imagen principal" }];
+
+  return safeImages.map((image, index) => ({
+    ...image,
+    sortOrder: index,
+  }));
 }
 
 function parseTierLines(value: string) {
