@@ -31,6 +31,7 @@ type UploadResponse =
     }
   | {
       error: string;
+      detail?: string;
     };
 
 function formatBytes(value: number | null | undefined) {
@@ -202,7 +203,7 @@ export function ProductImageUpload({ initialImages = [], productId }: ProductIma
       } catch {
         setFeedback({
           type: "error",
-          message: "La subida fallo. Verifica Blob y vuelve a intentarlo.",
+          message: "No se pudo subir la imagen. Blob no está configurado para este entorno o el upload falló.",
         });
       }
     });

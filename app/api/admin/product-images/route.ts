@@ -8,6 +8,21 @@ import { slugify } from "@/lib/utils";
 
 export const runtime = "nodejs";
 
+function getBlobEnvironmentState() {
+  const hasBlobToken = Boolean(process.env.BLOB_READ_WRITE_TOKEN?.trim());
+  const hasBlobStoreId = Boolean(process.env.BLOB_STORE_ID?.trim());
+  const hasVercelOidcToken = Boolean(process.env.VERCEL_OIDC_TOKEN?.trim());
+  const isVercelRuntime = process.env.VERCEL === "1" || Boolean(process.env.VERCEL_ENV);
+
+  return {
+    hasBlobToken,
+    hasBlobStoreId,
+    hasVercelOidcToken,
+    isVercelRuntime,
+    canAttemptUpload: hasBlobToken || hasBlobStoreId || hasVercelOidcToken || isVercelRuntime,
+  };
+}
+
 function sanitizeFileName(fileName: string) {
   const trimmed = fileName.trim();
   const extension = trimmed.includes(".") ? trimmed.split(".").pop()?.toLowerCase() || "bin" : "bin";
@@ -34,9 +49,19 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+  const blobEnvironment = getBlobEnvironmentState();
+
+  if (!blobEnvironment.canAttemptUpload) {
     return NextResponse.json(
-      { error: "BLOB_READ_WRITE_TOKEN no configurado" },
+      {
+        error: "Blob no está configurado para este entorno.",
+        ...(process.env.NODE_ENV !== "production"
+          ? {
+              detail:
+                "No se detectó BLOB_READ_WRITE_TOKEN, BLOB_STORE_ID ni un runtime de Vercel con OIDC disponible.",
+            }
+          : {}),
+      },
       { status: 503 },
     );
   }
@@ -82,9 +107,14 @@ export async function POST(request: Request) {
       size: file.size,
       alt: alt || file.name,
     });
-  } catch {
+  } catch (error) {
     return NextResponse.json(
-      { error: "No fue posible completar la subida a Vercel Blob." },
+      {
+        error: "No se pudo subir la imagen a Vercel Blob.",
+        ...(process.env.NODE_ENV !== "production" && error instanceof Error
+          ? { detail: error.message }
+          : {}),
+      },
       { status: 500 },
     );
   }
