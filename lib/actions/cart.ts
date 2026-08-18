@@ -1,10 +1,7 @@
 "use server";
 
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { logAuditEntry } from "@/lib/audit";
 import { getCurrentUser } from "@/lib/auth";
 import {
   addDemoCartItem,
@@ -16,6 +13,7 @@ import {
 import { DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
 import { demoProductsById } from "@/lib/demo-data";
 import { prisma } from "@/lib/prisma";
+import { processTransferReceiptUpload } from "@/lib/transfer-receipts";
 
 type ProductWithTiers = {
   price: { toString(): string };
@@ -193,7 +191,6 @@ export async function uploadTransferReceiptAction(formData: FormData) {
   const orderNumber = String(formData.get("orderNumber") ?? "");
   const reference = String(formData.get("reference") ?? "");
   const redirectTo = String(formData.get("redirectTo") ?? `/checkout?orden=${orderNumber}`);
-  const receipt = formData.get("receipt");
 
   if (DEMO_MODE) {
     redirect(appendSearchParam(redirectTo, { receipt: "1", demo: "1" }));
@@ -203,50 +200,17 @@ export async function uploadTransferReceiptAction(formData: FormData) {
     redirect(appendSearchParam(redirectTo, { receiptError: "1" }));
   }
 
-  if (!(receipt instanceof File) || receipt.size === 0) {
-    redirect(`${redirectTo}&receiptError=1`);
-  }
-
-  const order = await prisma.order.findUnique({
-    where: { orderNumber },
-    include: { payment: true },
+  const result = await processTransferReceiptUpload({
+    orderNumber,
+    reference,
+    receipt: formData.get("receipt"),
   });
 
-  if (!order?.payment) {
-    redirect(`${redirectTo}&receiptError=1`);
+  if (!result.ok) {
+    redirect(appendSearchParam(redirectTo, { receiptError: result.code }));
   }
-
-  const extension = receipt.name.split(".").pop()?.toLowerCase() || "bin";
-  const fileName = `${orderNumber}-${Date.now()}.${extension}`;
-  const uploadsDir = path.join(process.cwd(), "public", "uploads", "receipts");
-
-  await mkdir(uploadsDir, { recursive: true });
-  const fileBuffer = Buffer.from(await receipt.arrayBuffer());
-  await writeFile(path.join(uploadsDir, fileName), fileBuffer);
-
-  await prisma.$transaction([
-    prisma.transferPayment.update({
-      where: { orderId: order.id },
-      data: {
-        receiptUrl: `/uploads/receipts/${fileName}`,
-        reference: reference || orderNumber,
-        status: "IN_REVIEW",
-      },
-    }),
-    prisma.order.update({
-      where: { id: order.id },
-      data: { status: "RECEIPT_UPLOADED" },
-    }),
-  ]);
-
-  await logAuditEntry({
-    action: "TRANSFER_RECEIPT_UPLOADED",
-    entity: "order",
-    entityId: order.id,
-    metadata: { orderNumber },
-  });
 
   revalidatePath("/admin/pagos");
   revalidatePath(`/mis-pedidos/${orderNumber}`);
-  redirect(`${redirectTo}${redirectTo.includes("?") ? "&" : "?"}receipt=1`);
+  redirect(appendSearchParam(redirectTo, { receipt: "1" }));
 }

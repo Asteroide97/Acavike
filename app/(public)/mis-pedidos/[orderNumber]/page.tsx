@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { getOrderDetails } from "@/lib/site";
+import { getTransferReceiptErrorMessage } from "@/lib/transfer-receipts";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -37,6 +38,7 @@ export default async function OrderDetailPage({
   }
 
   const receiptUploaded = getSingleValue((await searchParams).receipt);
+  const receiptError = getSingleValue((await searchParams).receiptError);
 
   return (
     <div className="section-shell py-10">
@@ -54,6 +56,11 @@ export default async function OrderDetailPage({
           {receiptUploaded ? (
             <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
               Comprobante subido correctamente.
+            </div>
+          ) : null}
+          {receiptError ? (
+            <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+              {getTransferReceiptErrorMessage(receiptError)}
             </div>
           ) : null}
 
@@ -82,7 +89,7 @@ export default async function OrderDetailPage({
             }} className="mt-8 space-y-4 rounded-3xl border border-slate-200 bg-white p-6">
               <input type="hidden" name="orderNumber" value={order.orderNumber} />
               <input type="hidden" name="redirectTo" value={`/mis-pedidos/${order.orderNumber}`} />
-              <h2 className="text-xl font-semibold">Subir comprobante</h2>
+              <h2 className="text-xl font-semibold">Subir comprobante de transferencia</h2>
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-800">Referencia</label>
                 <input
@@ -92,11 +99,12 @@ export default async function OrderDetailPage({
                 />
               </div>
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-800">Archivo</label>
-                <input type="file" name="receipt" accept=".jpg,.jpeg,.png,.pdf" className="block w-full text-sm" />
+                <label className="mb-2 block text-sm font-medium text-slate-800">Subir comprobante de transferencia</label>
+                <input type="file" name="receipt" accept=".pdf,.jpg,.jpeg,.png,.webp" className="block w-full text-sm" />
+                <p className="mt-2 text-xs text-slate-500">Aceptamos PDF, JPG, PNG o WEBP. Máximo 5 MB.</p>
               </div>
               <button className="inline-flex h-11 items-center justify-center rounded-2xl bg-primary px-5 text-sm font-semibold text-white">
-                Cargar comprobante
+                Enviar comprobante
               </button>
             </form>
           ) : null}
@@ -111,7 +119,7 @@ export default async function OrderDetailPage({
                 <span>{formatCurrency(order.subtotal)}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span>IVA</span>
+                <span>IVA incluido</span>
                 <span>{formatCurrency(order.tax)}</span>
               </div>
               <div className="flex items-center justify-between border-t border-slate-200 pt-3 font-semibold">

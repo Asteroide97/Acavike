@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { AdminField } from "@/components/admin/admin-field";
 import { AdminFlash } from "@/components/admin/admin-flash";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { QuoteItemsBuilder } from "@/components/admin/quote-items-builder";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -35,7 +36,14 @@ export default async function QuoteEditorPage({
     prisma.product.findMany({
       where: { isActive: true },
       orderBy: { name: "asc" },
-      take: 10,
+      take: 150,
+      select: {
+        id: true,
+        name: true,
+        sku: true,
+        price: true,
+        unit: true,
+      },
     }),
     isNew
       ? Promise.resolve(null)
@@ -56,13 +64,20 @@ export default async function QuoteEditorPage({
     quote?.items
       .map((item) => [item.sku || "", item.name, item.quantity, item.unitPrice.toString(), item.productId || ""].join("|"))
       .join("\n") || "";
+  const productOptions = products.map((product) => ({
+    id: product.id,
+    name: product.name,
+    sku: product.sku,
+    price: Number(product.price),
+    unit: product.unit,
+  }));
 
   return (
     <div className="space-y-6">
       <AdminPageHeader
         eyebrow="Cotización"
         title={isNew ? "Nueva cotización" : quote?.quoteNumber || "Cotización"}
-        description="Formato de partidas: SKU|Nombre|Cantidad|Precio|ProductId. El ProductId es opcional."
+        description="Agrega partidas con el selector asistido o conserva el formato manual en modo avanzado. Los precios capturados ya incluyen IVA."
       />
 
       <AdminFlash searchParams={resolvedSearchParams} />
@@ -109,10 +124,10 @@ export default async function QuoteEditorPage({
 
               <AdminField
                 label="Partidas"
-                hint="Una linea por partida. Ejemplo: HER-009|Taladro demo|2|1785|cm123..."
+                hint="Agrega productos con cantidad y precio editable. Si lo necesitas, abajo puedes seguir capturando líneas manuales."
                 className="md:col-span-2"
               >
-                <Textarea name="itemsText" defaultValue={serializedItems} className="min-h-[220px]" />
+                <QuoteItemsBuilder products={productOptions} defaultValue={serializedItems} />
               </AdminField>
 
               <div className="md:col-span-2 flex flex-wrap gap-3">
@@ -127,15 +142,16 @@ export default async function QuoteEditorPage({
         <div className="space-y-6">
           <Card className="admin-surface">
             <CardContent className="space-y-3 p-6">
-              <h2 className="text-xl font-semibold">Productos de referencia</h2>
-              {products.map((product) => (
-                <div key={product.id} className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm">
-                  <p className="font-semibold">{product.name}</p>
-                  <p className="text-muted-foreground">
-                    {product.sku} | {product.price.toString()} | {product.id}
-                  </p>
-                </div>
-              ))}
+              <h2 className="text-xl font-semibold">Guía rápida</h2>
+              <div className="space-y-3 rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+                <p>1. Selecciona un cliente y agrega las partidas desde el buscador.</p>
+                <p>2. Ajusta cantidad y precio si la cotización requiere un valor especial.</p>
+                <p>3. El total se calcula con IVA incluido, sin recargos adicionales.</p>
+                <p>4. Si necesitas una captura técnica, usa el modo avanzado con el formato manual existente.</p>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Productos disponibles para el selector: {products.length}
+              </p>
             </CardContent>
           </Card>
 
@@ -150,7 +166,7 @@ export default async function QuoteEditorPage({
                   <span className="font-semibold">Subtotal:</span> {formatCurrency(quote.subtotal)}
                 </p>
                 <p>
-                  <span className="font-semibold">IVA:</span> {formatCurrency(quote.tax)}
+                  <span className="font-semibold">IVA incluido:</span> {formatCurrency(quote.tax)}
                 </p>
                 <p>
                   <span className="font-semibold">Total:</span> {formatCurrency(quote.total)}

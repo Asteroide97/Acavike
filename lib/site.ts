@@ -19,8 +19,8 @@ function normalizePhoneDigits(value: string) {
 
 export function calculateTaxes(subtotal: number, discount = 0) {
   const taxableBase = Math.max(subtotal - discount, 0);
-  const tax = Number((taxableBase * TAX_RATE).toFixed(2));
-  const total = Number((taxableBase + tax).toFixed(2));
+  const tax = Number((taxableBase * TAX_RATE / (1 + TAX_RATE)).toFixed(2));
+  const total = Number(taxableBase.toFixed(2));
 
   return { tax, total };
 }

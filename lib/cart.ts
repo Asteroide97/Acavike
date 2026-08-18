@@ -5,6 +5,7 @@ import { DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
 import { demoCart, demoProductsById, type DemoProductRecord } from "@/lib/demo-data";
 import { productImageSelect } from "@/lib/product-images";
 import { prisma } from "@/lib/prisma";
+import { calculateTaxes } from "@/lib/site";
 
 type DemoCartCookieItem = {
   productId: string;
@@ -404,8 +405,7 @@ export function getCartTotals(
       const quantity = Math.max(0, toSafeInteger(item?.quantity, 0));
       return sum + unitPrice * quantity;
     }, 0) ?? 0;
-  const tax = subtotal * 0.16;
-  const total = Math.max(subtotal + tax - discount, 0);
+  const { tax, total } = calculateTaxes(subtotal, discount);
   const itemsCount =
     cart?.items.reduce((sum, item) => sum + Math.max(0, toSafeInteger(item?.quantity, 0)), 0) ?? 0;
 

@@ -7,6 +7,7 @@ import { Alert } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { getTransferReceiptErrorMessage } from "@/lib/transfer-receipts";
 import { cn, formatCurrency } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -49,10 +50,20 @@ export default async function CheckoutPage({
         <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
           <div className="surface p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Pedido generado</p>
-            <h1 className="mt-2 text-4xl font-semibold">Tu folio es {order.orderNumber}</h1>
-            <p className="mt-4 text-muted-foreground">
-              El pedido quedó en estado pendiente de transferencia. Usa estos datos bancarios y comparte tu comprobante para validación.
-            </p>
+            <h1 className="mt-2 text-4xl font-semibold">Pedido generado</h1>
+            <p className="mt-3 text-lg font-semibold text-slate-900">Folio: {order.orderNumber}</p>
+            <p className="mt-4 text-muted-foreground">Tu pedido quedó pendiente de validación de pago.</p>
+
+            <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-6">
+              <h2 className="text-xl font-semibold">Instrucciones de pago</h2>
+              <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                <li>Realiza la transferencia bancaria por el total indicado.</li>
+                <li>Usa la referencia exacta del pedido.</li>
+                <li>Sube tu comprobante en esta misma pantalla.</li>
+                <li>Nuestro equipo validará el pago y actualizará el estado del pedido.</li>
+                <li>Recibirás confirmación por correo cuando el pedido sea registrado y cuando el pago sea validado.</li>
+              </ul>
+            </div>
 
             <div className="mt-6 grid gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-6 md:grid-cols-2">
               <div>
@@ -67,11 +78,22 @@ export default async function CheckoutPage({
                 <p className="text-xs uppercase tracking-[0.18em] text-slate-500">CLABE</p>
                 <p className="mt-2 font-semibold">{bankSettings.clabe}</p>
               </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Referencia</p>
+                <p className="mt-2 font-semibold">{order.payment?.reference || order.orderNumber}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Total a transferir</p>
+                <p className="mt-2 font-semibold">{formatCurrency(order.total)}</p>
+              </div>
+              <div className="md:col-span-2">
+                <p className="text-xs text-slate-500">{bankSettings.referenceHelp}</p>
+              </div>
             </div>
 
             <div className="mt-6 space-y-3">
               {receiptUploaded ? <Alert tone="success">Comprobante cargado correctamente. El equipo revisará el pago.</Alert> : null}
-              {receiptError ? <Alert tone="danger">No fue posible cargar el comprobante. Intenta otra vez.</Alert> : null}
+              {receiptError ? <Alert tone="danger">{getTransferReceiptErrorMessage(receiptError)}</Alert> : null}
             </div>
 
             <form action={async (formData) => {
@@ -90,16 +112,17 @@ export default async function CheckoutPage({
                 />
               </div>
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-800">Comprobante</label>
+                <label className="mb-2 block text-sm font-medium text-slate-800">Subir comprobante de transferencia</label>
                 <input
                   type="file"
                   name="receipt"
-                  accept=".jpg,.jpeg,.png,.pdf"
+                  accept=".pdf,.jpg,.jpeg,.png,.webp"
                   className="block w-full text-sm text-slate-700"
                 />
+                <p className="mt-2 text-xs text-slate-500">Aceptamos PDF, JPG, PNG o WEBP. Máximo 5 MB.</p>
               </div>
               <button className="inline-flex h-11 items-center justify-center rounded-2xl bg-primary px-5 text-sm font-semibold text-white">
-                Subir comprobante
+                Enviar comprobante
               </button>
             </form>
           </div>
@@ -113,7 +136,7 @@ export default async function CheckoutPage({
                   <span>{formatCurrency(order.subtotal)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span>IVA</span>
+                  <span>IVA incluido</span>
                   <span>{formatCurrency(order.tax)}</span>
                 </div>
                 <div className="flex items-center justify-between border-t border-slate-200 pt-3 font-semibold">
@@ -184,7 +207,7 @@ export default async function CheckoutPage({
                 <span>{formatCurrency(totals.subtotal)}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span>IVA</span>
+                <span>IVA incluido</span>
                 <span>{formatCurrency(totals.tax)}</span>
               </div>
               <div className="flex items-center justify-between border-t border-slate-200 pt-3 text-base font-semibold">
@@ -192,8 +215,9 @@ export default async function CheckoutPage({
                 <span>{formatCurrency(totals.total)}</span>
               </div>
             </div>
+            <p className="text-xs text-muted-foreground">Los precios del pedido ya incluyen IVA.</p>
             <div className="rounded-3xl bg-slate-50 p-5 text-sm text-muted-foreground">
-              <p className="font-semibold text-slate-800">Pago bancario demo</p>
+              <p className="font-semibold text-slate-800">Datos bancarios de transferencia</p>
               <p className="mt-3">Banco: {bankSettings.bankName}</p>
               <p>Beneficiario: {bankSettings.beneficiary}</p>
               <p>CLABE: {bankSettings.clabe}</p>

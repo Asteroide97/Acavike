@@ -1,7 +1,5 @@
 "use server";
 
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { hash } from "bcrypt";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -10,8 +8,10 @@ import { logAuditEntry } from "@/lib/audit";
 import { getCartTotals, getOrCreateCartForMutation } from "@/lib/cart";
 import { DATABASE_CONFIG_ERROR, DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
 import { demoOrders, demoQuotes } from "@/lib/demo-data";
+import { notifyOrderGenerated } from "@/lib/notifications";
 import { prisma } from "@/lib/prisma";
 import { calculateTaxes, getBankSettings, makeOrderNumber, makeQuoteNumber } from "@/lib/site";
+import { processTransferReceiptUpload } from "@/lib/transfer-receipts";
 import { parseLines } from "@/lib/utils";
 import { checkoutSchema, contactSchema, quickQuoteSchema } from "@/lib/validators";
 
@@ -429,6 +429,10 @@ export async function submitCheckoutAction(input: unknown): Promise<CheckoutActi
     revalidatePath("/checkout");
     revalidatePath("/admin/pedidos");
     revalidatePath("/admin");
+    await notifyOrderGenerated({
+      orderId: order.id,
+      userId: currentUser?.id,
+    });
     return { success: true, orderNumber: order.orderNumber };
   } catch (error) {
     return {
@@ -442,7 +446,6 @@ export async function uploadTransferReceiptAction(formData: FormData) {
   const orderNumber = String(formData.get("orderNumber") ?? "");
   const reference = String(formData.get("reference") ?? "");
   const redirectTo = String(formData.get("redirectTo") ?? `/checkout?orden=${orderNumber}`);
-  const receipt = formData.get("receipt");
 
   if (DEMO_MODE) {
     redirect(appendSearchParam(redirectTo, { receipt: "1", demo: "1" }));
@@ -452,50 +455,17 @@ export async function uploadTransferReceiptAction(formData: FormData) {
     redirect(appendSearchParam(redirectTo, { receiptError: "1" }));
   }
 
-  if (!(receipt instanceof File) || receipt.size === 0) {
-    redirect(`${redirectTo}&receiptError=1`);
-  }
-
-  const order = await prisma.order.findUnique({
-    where: { orderNumber },
-    include: { payment: true },
+  const result = await processTransferReceiptUpload({
+    orderNumber,
+    reference,
+    receipt: formData.get("receipt"),
   });
 
-  if (!order?.payment) {
-    redirect(`${redirectTo}&receiptError=1`);
+  if (!result.ok) {
+    redirect(appendSearchParam(redirectTo, { receiptError: result.code }));
   }
-
-  const extension = receipt.name.split(".").pop()?.toLowerCase() || "bin";
-  const fileName = `${orderNumber}-${Date.now()}.${extension}`;
-  const uploadsDir = path.join(process.cwd(), "public", "uploads", "receipts");
-
-  await mkdir(uploadsDir, { recursive: true });
-  const fileBuffer = Buffer.from(await receipt.arrayBuffer());
-  await writeFile(path.join(uploadsDir, fileName), fileBuffer);
-
-  await prisma.$transaction([
-    prisma.transferPayment.update({
-      where: { orderId: order.id },
-      data: {
-        receiptUrl: `/uploads/receipts/${fileName}`,
-        reference: reference || orderNumber,
-        status: "IN_REVIEW",
-      },
-    }),
-    prisma.order.update({
-      where: { id: order.id },
-      data: { status: "RECEIPT_UPLOADED" },
-    }),
-  ]);
-
-  await logAuditEntry({
-    action: "TRANSFER_RECEIPT_UPLOADED",
-    entity: "order",
-    entityId: order.id,
-    metadata: { orderNumber },
-  });
 
   revalidatePath("/admin/pagos");
   revalidatePath(`/mis-pedidos/${orderNumber}`);
-  redirect(`${redirectTo}${redirectTo.includes("?") ? "&" : "?"}receipt=1`);
+  redirect(appendSearchParam(redirectTo, { receipt: "1" }));
 }

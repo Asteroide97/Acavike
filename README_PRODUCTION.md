@@ -24,8 +24,13 @@ Este es el modo canonico de produccion.
 DEMO_MODE="false"
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/acavike?schema=public"
 AUTH_SECRET="cambia-esta-clave"
-BLOB_READ_WRITE_TOKEN="vercel_blob_rw_..."
 NEXT_PUBLIC_SITE_URL="https://tu-dominio.com"
+EMAIL_FROM="Acavike <ventas@acavike.com>"
+SALES_EMAIL="ventas@acavike.com"
+RESEND_API_KEY="re_..."
+BLOB_STORE_ID="store_..."
+# Opcional si no usas Blob conectado con OIDC en Vercel:
+BLOB_READ_WRITE_TOKEN="vercel_blob_rw_..."
 ```
 
 Notas:
@@ -34,7 +39,9 @@ Notas:
 - Si quieres impedir el fallback automatico a demo cuando falta base, define `FORCE_REAL_MODE=true`.
 - Si `FORCE_REAL_MODE=true` y falta `DATABASE_URL`, la app entra en `real-missing-database`.
 - Para produccion real, siempre define `DATABASE_URL`.
-- `BLOB_READ_WRITE_TOKEN` habilita la subida de imagenes de producto desde `/admin/productos`.
+- `BLOB_STORE_ID` o `BLOB_READ_WRITE_TOKEN` habilitan la subida a Vercel Blob.
+- En proyectos conectados a Blob con OIDC en Vercel, `BLOB_STORE_ID` suele ser suficiente.
+- `EMAIL_FROM`, `SALES_EMAIL` y `RESEND_API_KEY` habilitan correos transaccionales no bloqueantes para pedidos y validaciones de pago.
 
 ## Comandos
 
@@ -102,10 +109,19 @@ El seed reutiliza `prisma/seed.ts` y hace bootstrap seguro, sin limpiar tablas. 
 - Limite recomendado para server uploads en Vercel: 4 MB por archivo.
 - Despues de subir la imagen, guarda el producto para persistir la URL en `ProductImage`.
 
+### Pedidos, comprobantes y correos
+
+- El checkout real genera pedidos con transferencia bancaria y precios con IVA incluido.
+- El cliente puede subir comprobantes desde `/checkout?orden=...` o `/mis-pedidos/[folio]`.
+- Los comprobantes ya no se guardan en disco local: se suben a Vercel Blob y la URL queda en `TransferPayment.receiptUrl`.
+- Formatos permitidos para comprobantes: PDF, JPG, JPEG, PNG y WEBP.
+- Limite de comprobantes: 5 MB por archivo.
+- Si Blob no esta disponible, el pedido no se rompe: la pantalla muestra un error amigable al intentar subir el comprobante.
+- Si `RESEND_API_KEY` no esta configurado, los pedidos y validaciones siguen funcionando; solo se registra una advertencia en audit log.
+
 ## Limitaciones y notas operativas
 
 - `npm run db:migrate` usa `prisma migrate dev` y esta pensado para crear migraciones en desarrollo.
 - Para despliegues reales, genera migraciones en desarrollo o staging y aplica en produccion con `npx prisma migrate deploy`.
 - No uses SQLite para este modo.
-- Al 5 de agosto de 2026 no hay una carpeta `prisma/migrations` comprometida en este repositorio; crea la migracion inicial en tu entorno antes de desplegar con `migrate deploy`.
-- La subida de comprobantes de transferencia sigue usando almacenamiento local del servidor. Si vas a operar pedidos reales en Vercel, conviene migrarla tambien a Blob en un siguiente paso.
+- Mantén `NEXT_PUBLIC_SITE_URL` apuntando al dominio real para que los flujos de pedido y acceso administrativo queden consistentes.

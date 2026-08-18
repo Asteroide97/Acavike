@@ -12,6 +12,7 @@ import {
   parseLegacyProductImages,
   parseProductImagesJson,
 } from "@/lib/product-images";
+import { notifyOrderGenerated, notifyPaymentApproved } from "@/lib/notifications";
 import { getBankSettings, makeOrderNumber, makeQuoteNumber } from "@/lib/site";
 import { parseCheckbox, parseLines, slugify, toNumber, toStringValue } from "@/lib/utils";
 
@@ -331,6 +332,10 @@ export async function updateOrderStatusAction(formData: FormData) {
   ensureWritableAction(`/admin/pedidos/${orderId}`);
   const user = await requireUser(ORDER_ROLES);
   const status = toStringValue(formData.get("status"));
+  const existingOrder = await prisma.order.findUnique({
+    where: { id: orderId },
+    select: { id: true, status: true },
+  });
 
   const allowedForWarehouse = ["TO_PICK", "WAITING_STOCK", "SHIPPED", "DELIVERED"];
   if (user.role === "WAREHOUSE" && !allowedForWarehouse.includes(status)) {
@@ -353,6 +358,12 @@ export async function updateOrderStatusAction(formData: FormData) {
   });
   revalidatePath("/admin/pedidos");
   revalidatePath(`/admin/pedidos/${order.id}`);
+  if (status === "PAYMENT_APPROVED" && existingOrder?.status !== "PAYMENT_APPROVED") {
+    await notifyPaymentApproved({
+      orderId: order.id,
+      userId: user.id,
+    });
+  }
   redirect(`/admin/pedidos/${order.id}?saved=1`);
 }
 
@@ -399,6 +410,12 @@ export async function reviewTransferPaymentAction(formData: FormData) {
   });
   revalidatePath("/admin/pagos");
   revalidatePath("/admin/pedidos");
+  if (status === "APPROVED" && payment.status !== "APPROVED") {
+    await notifyPaymentApproved({
+      orderId: payment.orderId,
+      userId: user.id,
+    });
+  }
   redirect("/admin/pagos?saved=1");
 }
 
@@ -416,8 +433,8 @@ export async function saveQuoteAction(formData: FormData) {
   }
 
   const subtotal = items.reduce((sum, item) => sum + item.total, 0);
-  const tax = Number((subtotal * 0.16).toFixed(2));
-  const total = Number((subtotal + tax).toFixed(2));
+  const tax = Number((subtotal * 0.16 / 1.16).toFixed(2));
+  const total = Number(subtotal.toFixed(2));
   const validUntil = toStringValue(formData.get("validUntil"));
 
   const data = {
@@ -512,9 +529,10 @@ export async function convertQuoteToOrderAction(formData: FormData) {
       throw new Error("No hay productos disponibles para convertir la cotización.");
     }
 
+    const orderNumber = makeOrderNumber();
     const createdOrder = await tx.order.create({
       data: {
-        orderNumber: makeOrderNumber(),
+        orderNumber,
         customerId: sourceQuote.customerId,
         status: "PENDING_TRANSFER",
         subtotal: sourceQuote.subtotal,
@@ -538,7 +556,7 @@ export async function convertQuoteToOrderAction(formData: FormData) {
             bankName: bankSettings.bankName,
             beneficiary: bankSettings.beneficiary,
             clabe: bankSettings.clabe,
-            reference: sourceQuote.quoteNumber,
+            reference: orderNumber,
             status: "PENDING",
           },
         },
@@ -562,6 +580,10 @@ export async function convertQuoteToOrderAction(formData: FormData) {
   });
   revalidatePath("/admin/cotizaciones");
   revalidatePath("/admin/pedidos");
+  await notifyOrderGenerated({
+    orderId: order.id,
+    userId: user.id,
+  });
   redirect(`/admin/pedidos/${order.id}?converted=1`);
 }
 

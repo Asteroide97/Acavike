@@ -98,7 +98,7 @@ export default async function CartPage() {
                 <span>{formatCurrency(totals.subtotal)}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span>IVA estimado</span>
+                <span>IVA incluido</span>
                 <span>{formatCurrency(totals.tax)}</span>
               </div>
               <div className="flex items-center justify-between border-t border-slate-200 pt-3 text-base font-semibold">
@@ -106,6 +106,7 @@ export default async function CartPage() {
                 <span>{formatCurrency(totals.total)}</span>
               </div>
             </div>
+            <p className="text-xs text-muted-foreground">Los precios del carrito ya incluyen IVA.</p>
 
             {cart.items.length ? (
               <Link href="/checkout" className={cn(buttonVariants({ fullWidth: true }))}>
