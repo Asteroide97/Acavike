@@ -9,7 +9,6 @@ import type {
   OrderItem,
   PriceTier,
   Product,
-  ProductImage,
   Quote,
   QuoteItem,
   SiteSection,
@@ -20,6 +19,7 @@ import type {
 import { Prisma } from "@prisma/client";
 import { BANK_SETTING_KEYS } from "@/lib/constants";
 import { demoProductSeeds, type DemoProductSeed } from "@/lib/demo-product-seeds";
+import type { ProductImageRecord } from "@/lib/product-images";
 
 const baseDate = new Date("2026-07-07T08:00:00.000Z");
 const dayMs = 24 * 60 * 60 * 1000;
@@ -45,7 +45,7 @@ function toDemoSlug(value: string) {
 export type DemoViewer = User & { customer?: Customer | null };
 export type DemoProductRecord = Product & {
   category: Category;
-  images: ProductImage[];
+  images: ProductImageRecord[];
   priceTiers: PriceTier[];
 };
 export type DemoCartItemRecord = {
@@ -248,7 +248,7 @@ export const demoProducts: DemoProductRecord[] = demoProductsBase.map((product, 
     updatedAt: product.updatedAt,
   };
 
-  const images: ProductImage[] = [
+  const images: ProductImageRecord[] = [
     {
       id: `image_${index + 1}_1`,
       productId: product.id,

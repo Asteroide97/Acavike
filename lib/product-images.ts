@@ -19,6 +19,7 @@ export const productImageSelect = {
 
 export type ProductImageRecord = {
   id?: string;
+  productId?: string;
   url: string;
   alt: string | null;
   sortOrder: number;
