@@ -6,6 +6,7 @@ import { addToCartAction } from "@/lib/actions/cart";
 import { CatalogBreadcrumbs } from "@/components/public/catalog-breadcrumbs";
 import { ProductCard } from "@/components/public/product-card";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/ui/table";
+import { getPrimaryProductImage } from "@/lib/product-images";
 import { buildQuoteRequirements } from "@/lib/public-catalog";
 import { getProductDetailDataRepository } from "@/lib/repositories/catalog";
 import { getPublicContactDetails, getSiteSettingsMap } from "@/lib/site";
@@ -47,6 +48,7 @@ export default async function ProductDetailPage({
     name: product.name,
     quantity: 1,
   });
+  const primaryImage = getPrimaryProductImage(product.images, product.name);
   const quoteHref = `/cotizacion-rapida?sku=${encodeURIComponent(product.sku)}&producto=${encodeURIComponent(product.name)}&cantidad=1`;
   const specRows = [
     { label: "SKU", value: product.sku },
@@ -75,10 +77,11 @@ export default async function ProductDetailPage({
               <div className="relative aspect-[4/3]">
                 <div className="absolute inset-5 rounded-[18px] bg-white shadow-[0_12px_32px_rgba(11,30,75,0.07)]" />
                 <Image
-                  src={product.images[0]?.url || "/placeholder-product.svg"}
-                  alt={product.images[0]?.alt || product.name}
+                  src={primaryImage.url}
+                  alt={primaryImage.alt}
                   fill
                   className="object-contain p-7"
+                  unoptimized={primaryImage.unoptimized}
                 />
               </div>
             </div>

@@ -7,6 +7,11 @@ import { logAuditEntry } from "@/lib/audit";
 import { DATABASE_CONFIG_ERROR, DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
 import { ADMIN_ROLES, ORDER_ROLES, QUOTE_ROLES } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
+import {
+  MAX_PRODUCT_IMAGES,
+  parseLegacyProductImages,
+  parseProductImagesJson,
+} from "@/lib/product-images";
 import { getBankSettings, makeOrderNumber, makeQuoteNumber } from "@/lib/site";
 import { parseCheckbox, parseLines, slugify, toNumber, toStringValue } from "@/lib/utils";
 
@@ -27,30 +32,75 @@ function ensureWritableAction(path: string, mode: "saved" | "deleted" | "convert
   }
 }
 
-function parseImageLines(value: string) {
-  const parsedImages = parseLines(value)
-    .map((line) => {
-      const [url, alt] = line.split("|").map((part) => part.trim());
-      return {
-        url,
-        alt: alt || null,
-      };
-    })
-    .filter((image) => Boolean(image.url));
+function parseSubmittedProductImages(formData: FormData) {
+  const imagesJson = toStringValue(formData.get("imagesJson"));
+  if (imagesJson) {
+    return parseProductImagesJson(imagesJson);
+  }
 
-  const imagesWithoutPlaceholder =
-    parsedImages.length > 1
-      ? parsedImages.filter((image) => image.url !== "/placeholder-product.svg")
-      : parsedImages;
+  return parseLegacyProductImages(toStringValue(formData.get("imagesText")));
+}
 
-  const safeImages = imagesWithoutPlaceholder.length
-    ? imagesWithoutPlaceholder
-    : [{ url: "/placeholder-product.svg", alt: "Imagen principal" }];
+async function syncProductImages(productId: string, submittedImages: ReturnType<typeof parseSubmittedProductImages>) {
+  const images = submittedImages.slice(0, MAX_PRODUCT_IMAGES);
+  const existingImages = await prisma.productImage.findMany({
+    where: { productId },
+    select: { id: true },
+  });
+  const existingIds = new Set(existingImages.map((image) => image.id));
+  const submittedIds = new Set(images.flatMap((image) => (image.id && existingIds.has(image.id) ? [image.id] : [])));
+  const imageOperations = [];
 
-  return safeImages.map((image, index) => ({
-    ...image,
-    sortOrder: index,
-  }));
+  if (existingImages.length) {
+    const deleteIds = existingImages
+      .filter((image) => !submittedIds.has(image.id))
+      .map((image) => image.id);
+
+    if (deleteIds.length) {
+      imageOperations.push(
+        prisma.productImage.deleteMany({
+          where: {
+            id: {
+              in: deleteIds,
+            },
+          },
+        }),
+      );
+    }
+  }
+
+  for (const image of images) {
+    const imageData = {
+      url: image.url,
+      alt: image.alt || null,
+      sortOrder: image.sortOrder,
+    };
+
+    if (image.id && existingIds.has(image.id)) {
+      imageOperations.push(
+        prisma.productImage.update({
+          where: { id: image.id },
+          data: imageData,
+        }),
+      );
+      continue;
+    }
+
+    imageOperations.push(
+      prisma.productImage.create({
+        data: {
+          productId,
+          ...imageData,
+        },
+      }),
+    );
+  }
+
+  if (imageOperations.length) {
+    await prisma.$transaction(imageOperations);
+  }
+
+  // TODO: borrar blobs huérfanos de Vercel Blob cuando se implemente una estrategia segura de limpieza.
 }
 
 function parseTierLines(value: string) {
@@ -199,7 +249,7 @@ export async function saveProductAction(formData: FormData) {
   }
 
   const slug = toStringValue(formData.get("slug")) || slugify(name);
-  const images = parseImageLines(toStringValue(formData.get("imagesText")) || "/placeholder-product.svg");
+  const images = parseSubmittedProductImages(formData);
   const tiers = parseTierLines(toStringValue(formData.get("tiersText")));
 
   const productData = {
@@ -224,10 +274,6 @@ export async function saveProductAction(formData: FormData) {
         where: { id: productId },
         data: {
           ...productData,
-          images: {
-            deleteMany: {},
-            create: images,
-          },
           priceTiers: {
             deleteMany: {},
             create: tiers,
@@ -237,14 +283,13 @@ export async function saveProductAction(formData: FormData) {
     : await prisma.product.create({
         data: {
           ...productData,
-          images: {
-            create: images,
-          },
           priceTiers: {
             create: tiers,
           },
         },
       });
+
+  await syncProductImages(product.id, images);
 
   await logAuditEntry({
     userId: user.id,

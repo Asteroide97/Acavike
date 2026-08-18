@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
 import { demoCategories, demoProducts, demoProductsBySlug, demoSiteSections } from "@/lib/demo-data";
+import { productImageSelect } from "@/lib/product-images";
 import { getSiteSettingsMapRepository } from "@/lib/repositories/settings";
 
 type SortOption = "featured" | "price_asc" | "price_desc" | "newest";
@@ -97,6 +98,7 @@ export async function getHomepageDataRepository() {
       where: { isActive: true, isFeatured: true },
       include: {
         images: {
+          select: productImageSelect,
           orderBy: { sortOrder: "asc" },
           take: 1,
         },
@@ -161,6 +163,7 @@ export async function getCatalogPageDataRepository(input: {
     },
     include: {
       images: {
+        select: productImageSelect,
         orderBy: { sortOrder: "asc" },
         take: 1,
       },
@@ -201,6 +204,7 @@ export async function getCategoryCatalogDataRepository(slug: string) {
     },
     include: {
       images: {
+        select: productImageSelect,
         orderBy: { sortOrder: "asc" },
         take: 1,
       },
@@ -235,6 +239,7 @@ export async function getProductDetailDataRepository(slug: string) {
     include: {
       category: true,
       images: {
+        select: productImageSelect,
         orderBy: { sortOrder: "asc" },
       },
       priceTiers: {
@@ -255,6 +260,7 @@ export async function getProductDetailDataRepository(slug: string) {
     },
     include: {
       images: {
+        select: productImageSelect,
         orderBy: { sortOrder: "asc" },
         take: 1,
       },

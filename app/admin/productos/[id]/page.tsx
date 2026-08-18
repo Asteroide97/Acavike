@@ -12,6 +12,7 @@ import { deleteProductAction, saveProductAction } from "@/lib/actions/admin";
 import { requireUser } from "@/lib/auth";
 import { DATABASE_ENABLED } from "@/lib/config";
 import { ADMIN_ROLES } from "@/lib/constants";
+import { productImageSelect } from "@/lib/product-images";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -42,6 +43,7 @@ export default async function ProductEditorPage({
           where: { id },
           include: {
             images: {
+              select: productImageSelect,
               orderBy: { sortOrder: "asc" },
             },
             priceTiers: {
@@ -55,8 +57,6 @@ export default async function ProductEditorPage({
     notFound();
   }
 
-  const imagesText =
-    product?.images.map((image) => `${image.url}|${image.alt || ""}`).join("\n") || "/placeholder-product.svg|Imagen principal";
   const tiersText = product?.priceTiers.map((tier) => `${tier.minQuantity}|${tier.price.toString()}`).join("\n") || "";
 
   return (
@@ -124,11 +124,12 @@ export default async function ProductEditorPage({
               </AdminField>
               <AdminField
                 label="Imágenes"
-                hint="Una línea por imagen: URL|Alt"
+                hint="Sube, reordena y elimina imágenes. La primera se usa como principal."
                 className="md:col-span-2"
               >
-                {DATABASE_ENABLED ? <ProductImageUpload textareaId="imagesText" /> : null}
-                <Textarea id="imagesText" name="imagesText" defaultValue={imagesText} className="min-h-[140px]" />
+                {DATABASE_ENABLED ? (
+                  <ProductImageUpload initialImages={product?.images || []} productId={product?.id || null} />
+                ) : null}
               </AdminField>
               <AdminField
                 label="Precios por volumen"

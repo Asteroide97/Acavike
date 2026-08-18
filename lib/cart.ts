@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { CART_COOKIE, DEMO_CART_COOKIE } from "@/lib/constants";
 import { DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
 import { demoCart, demoProductsById, type DemoProductRecord } from "@/lib/demo-data";
+import { productImageSelect } from "@/lib/product-images";
 import { prisma } from "@/lib/prisma";
 
 type DemoCartCookieItem = {
@@ -256,7 +257,9 @@ export async function getOrCreateCart(userId?: string) {
           include: {
             product: {
               include: {
-                images: true,
+                images: {
+                  select: productImageSelect,
+                },
                 category: true,
                 priceTiers: {
                   orderBy: { minQuantity: "asc" },
@@ -283,7 +286,9 @@ export async function getOrCreateCart(userId?: string) {
             include: {
               product: {
                 include: {
-                  images: true,
+                  images: {
+                    select: productImageSelect,
+                  },
                   category: true,
                   priceTiers: {
                     orderBy: { minQuantity: "asc" },
@@ -321,7 +326,9 @@ export async function getOrCreateCartForMutation(userId?: string) {
           include: {
             product: {
               include: {
-                images: true,
+                images: {
+                  select: productImageSelect,
+                },
                 category: true,
                 priceTiers: {
                   orderBy: { minQuantity: "asc" },
@@ -345,7 +352,9 @@ export async function getOrCreateCartForMutation(userId?: string) {
           include: {
             product: {
               include: {
-                images: true,
+                images: {
+                  select: productImageSelect,
+                },
                 category: true,
                 priceTiers: {
                   orderBy: { minQuantity: "asc" },
@@ -367,7 +376,9 @@ export async function getOrCreateCartForMutation(userId?: string) {
           include: {
             product: {
               include: {
-                images: true,
+                images: {
+                  select: productImageSelect,
+                },
                 category: true,
                 priceTiers: {
                   orderBy: { minQuantity: "asc" },

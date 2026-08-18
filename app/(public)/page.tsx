@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
-import type { Category, PriceTier, Product, ProductImage } from "@prisma/client";
+import type { Category, PriceTier, Product } from "@prisma/client";
 import { ArrowRight } from "lucide-react";
+import { getPrimaryProductImage, type ProductImageRecord } from "@/lib/product-images";
 import { getHomepageData } from "@/lib/site";
 import { formatCurrency } from "@/lib/utils";
 
@@ -43,7 +44,7 @@ const COMMERCIAL_STRENGTHS = [
 type HomeCategory = Category;
 type HomeProduct = Product & {
   category?: Category | null;
-  images?: ProductImage[] | null;
+  images?: ProductImageRecord[] | null;
   priceTiers?: PriceTier[] | null;
 };
 
@@ -117,8 +118,7 @@ function HomeBannerCard({ category }: { category: HomeCategory }) {
 
 function HomeProductTile({ product }: { product: HomeProduct }) {
   const productHref = product.slug ? `/producto/${product.slug}` : "/catalogo";
-  const imageUrl = product.images?.[0]?.url || "/demo-products/product-box.svg";
-  const imageAlt = product.images?.[0]?.alt || product.name || "Producto demo";
+  const primaryImage = getPrimaryProductImage(product.images, product.name || "Producto demo");
   const price = Number.isFinite(Number(product.price ?? 0)) ? Number(product.price ?? 0) : 0;
   const productName = product.name?.trim() || "Producto demo";
 
@@ -127,7 +127,13 @@ function HomeProductTile({ product }: { product: HomeProduct }) {
       <Link href={productHref} className="block">
         <div className="relative aspect-[4/3] border-b border-[#D1D5DB] bg-[#F8FAFC]">
           <div className="absolute inset-0 bg-[linear-gradient(180deg,#ffffff_0%,#F8FAFC_100%)]" />
-          <Image src={imageUrl} alt={imageAlt} fill className="object-contain p-4" />
+          <Image
+            src={primaryImage.url}
+            alt={primaryImage.alt}
+            fill
+            className="object-contain p-4"
+            unoptimized={primaryImage.unoptimized}
+          />
         </div>
         <div className="space-y-3 p-3">
           <h3 className="min-h-[2.3rem] overflow-hidden text-[13px] font-semibold leading-[1.35] text-slate-900 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">

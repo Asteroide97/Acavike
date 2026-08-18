@@ -3,10 +3,9 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
 import { ADMIN_ROLES } from "@/lib/constants";
+import { MAX_PRODUCT_IMAGE_SIZE_BYTES, PRODUCT_IMAGE_ALLOWED_MIME_TYPES } from "@/lib/product-images";
 import { slugify } from "@/lib/utils";
 
-const allowedMimeTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
-const maxUploadSizeBytes = 4 * 1024 * 1024;
 export const runtime = "nodejs";
 
 function sanitizeFileName(fileName: string) {
@@ -37,7 +36,7 @@ export async function POST(request: Request) {
 
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
     return NextResponse.json(
-      { error: "Falta BLOB_READ_WRITE_TOKEN para habilitar la subida de imagenes." },
+      { error: "BLOB_READ_WRITE_TOKEN no configurado" },
       { status: 503 },
     );
   }
@@ -45,28 +44,30 @@ export async function POST(request: Request) {
   const formData = await request.formData();
   const file = formData.get("file");
   const alt = String(formData.get("alt") ?? "").trim();
+  const rawProductId = String(formData.get("productId") ?? "").trim();
+  const productPathSegment = slugify(rawProductId) || "temp";
 
   if (!(file instanceof File) || file.size === 0) {
     return NextResponse.json({ error: "Selecciona un archivo valido." }, { status: 400 });
   }
 
-  if (!allowedMimeTypes.has(file.type)) {
+  if (!PRODUCT_IMAGE_ALLOWED_MIME_TYPES.has(file.type)) {
     return NextResponse.json(
-      { error: "Formato no permitido. Usa JPG, PNG o WEBP." },
+      { error: "Formato no permitido. Usa JPG, JPEG, PNG, WEBP o SVG." },
       { status: 400 },
     );
   }
 
-  if (file.size > maxUploadSizeBytes) {
+  if (file.size > MAX_PRODUCT_IMAGE_SIZE_BYTES) {
     return NextResponse.json(
-      { error: "La imagen excede el limite de 4 MB recomendado para uploads server-side en Vercel." },
+      { error: "La imagen excede el limite de 5 MB por archivo." },
       { status: 400 },
     );
   }
 
   try {
     const fileName = sanitizeFileName(file.name);
-    const pathname = `products/${new Date().toISOString().slice(0, 10)}/${fileName}`;
+    const pathname = `product-images/${productPathSegment}/${Date.now()}-${fileName}`;
     const blob = await put(pathname, file, {
       access: "public",
       addRandomSuffix: true,
@@ -78,8 +79,8 @@ export async function POST(request: Request) {
       url: blob.url,
       pathname: blob.pathname,
       contentType: blob.contentType,
+      size: file.size,
       alt: alt || file.name,
-      line: `${blob.url}|${alt || file.name}`,
     });
   } catch {
     return NextResponse.json(

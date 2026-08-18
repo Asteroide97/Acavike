@@ -1,12 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { Category, PriceTier, Product, ProductImage } from "@prisma/client";
+import type { Category, PriceTier, Product } from "@prisma/client";
 import { addToCartAction } from "@/lib/actions/cart";
+import { getPrimaryProductImage, type ProductImageRecord } from "@/lib/product-images";
 import { formatCurrency } from "@/lib/utils";
 
 type ProductCardItem = Product & {
   category?: Category | null;
-  images?: ProductImage[] | null;
+  images?: ProductImageRecord[] | null;
   priceTiers?: PriceTier[] | null;
 };
 
@@ -18,8 +19,7 @@ export function ProductCard({ product }: { product: ProductCardItem }) {
   const shortDescription =
     product.shortDescription?.trim() ||
     "Suministro demo disponible para operación, reposición o compra por volumen.";
-  const imageUrl = product.images?.[0]?.url || "/demo-products/product-box.svg";
-  const imageAlt = product.images?.[0]?.alt || name;
+  const primaryImage = getPrimaryProductImage(product.images, name);
   const unit = product.unit?.trim() || "pieza";
   const delivery = product.leadTimeText?.trim() || "Entrega sujeta a disponibilidad";
   const price = Number.isFinite(Number(product.price ?? 0)) ? Number(product.price ?? 0) : 0;
@@ -31,10 +31,11 @@ export function ProductCard({ product }: { product: ProductCardItem }) {
         <div className="relative aspect-[4/3] md:aspect-[6/5]">
           <div className="absolute inset-3 rounded-[10px] bg-white shadow-[0_6px_18px_rgba(11,30,75,0.06)]" />
           <Image
-            src={imageUrl}
-            alt={imageAlt}
+            src={primaryImage.url}
+            alt={primaryImage.alt}
             fill
             className="object-contain p-4"
+            unoptimized={primaryImage.unoptimized}
           />
         </div>
       </Link>

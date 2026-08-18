@@ -255,6 +255,7 @@ export const demoProducts: DemoProductRecord[] = demoProductsBase.map((product, 
       url: getDemoProductImageUrl(product.imageKey),
       alt: product.imageAlt,
       sortOrder: 0,
+      createdAt: product.createdAt,
     },
   ];
 
