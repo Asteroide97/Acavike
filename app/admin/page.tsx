@@ -10,6 +10,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { DEMO_MODE } from "@/lib/config";
 import { requireUser } from "@/lib/auth";
 import { BACKOFFICE_ROLES } from "@/lib/constants";
+import { getOperationalOrderStatus } from "@/lib/order-status";
 import { getAdminDashboardRepository } from "@/lib/repositories/admin-dashboard";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 
@@ -138,7 +139,7 @@ export default async function AdminHomePage({
                     </div>
                     <div className="flex flex-wrap items-center gap-3">
                       <span className="font-semibold">{formatCurrency(order.total)}</span>
-                      <StatusBadge kind="order" status={order.status} />
+                      <StatusBadge kind="order" status={getOperationalOrderStatus(order.status)} />
                     </div>
                   </div>
                 </div>

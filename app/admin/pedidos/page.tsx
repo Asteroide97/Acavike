@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } fro
 import { buttonVariants } from "@/components/ui/button";
 import { ORDER_ROLES } from "@/lib/constants";
 import { requireUser } from "@/lib/auth";
+import { getOperationalOrderStatus } from "@/lib/order-status";
 import { listAdminOrdersRepository } from "@/lib/repositories/orders";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 
@@ -28,7 +29,7 @@ export default async function OrdersAdminPage({
       <AdminPageHeader
         eyebrow="Pedidos"
         title="Seguimiento de pedidos"
-        description="Consulta detalle, cliente, monto total, estatus del pedido y revision de pago."
+        description="Consulta detalle, cliente, monto total, operación del pedido y revisión de pago."
       />
 
       <AdminFlash searchParams={resolvedSearchParams} />
@@ -40,6 +41,7 @@ export default async function OrdersAdminPage({
               <TableHeaderCell>Pedido</TableHeaderCell>
               <TableHeaderCell>Cliente</TableHeaderCell>
               <TableHeaderCell>Total</TableHeaderCell>
+              <TableHeaderCell>Operación</TableHeaderCell>
               <TableHeaderCell>Pago</TableHeaderCell>
               <TableHeaderCell>Fecha</TableHeaderCell>
               <TableHeaderCell></TableHeaderCell>
@@ -49,10 +51,7 @@ export default async function OrdersAdminPage({
             {orders.map((order) => (
               <TableRow key={order.id}>
                 <TableCell>
-                  <div className="space-y-2">
-                    <p className="font-semibold">{order.orderNumber}</p>
-                    <StatusBadge kind="order" status={order.status} />
-                  </div>
+                  <p className="font-semibold">{order.orderNumber}</p>
                 </TableCell>
                 <TableCell>
                   <div>
@@ -61,6 +60,9 @@ export default async function OrdersAdminPage({
                   </div>
                 </TableCell>
                 <TableCell>{formatCurrency(order.total)}</TableCell>
+                <TableCell>
+                  <StatusBadge kind="order" status={getOperationalOrderStatus(order.status)} />
+                </TableCell>
                 <TableCell>
                   {order.payment ? <StatusBadge kind="payment" status={order.payment.status} /> : "Sin registro"}
                 </TableCell>

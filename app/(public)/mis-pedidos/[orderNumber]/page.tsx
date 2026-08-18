@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { getOperationalOrderStatus } from "@/lib/order-status";
 import { getOrderDetails } from "@/lib/site";
 import { getTransferReceiptErrorMessage } from "@/lib/transfer-receipts";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -39,6 +40,7 @@ export default async function OrderDetailPage({
 
   const receiptUploaded = getSingleValue((await searchParams).receipt);
   const receiptError = getSingleValue((await searchParams).receiptError);
+  const operationalStatus = getOperationalOrderStatus(order.status);
 
   return (
     <div className="section-shell py-10">
@@ -50,7 +52,18 @@ export default async function OrderDetailPage({
               <h1 className="mt-2 text-4xl font-semibold">{order.orderNumber}</h1>
               <p className="mt-3 text-sm text-muted-foreground">{formatDate(order.createdAt)}</p>
             </div>
-            <StatusBadge kind="order" status={order.status} />
+            <div className="flex flex-wrap gap-3">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Pedido</p>
+                <StatusBadge kind="order" status={operationalStatus} />
+              </div>
+              {order.payment ? (
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Pago</p>
+                  <StatusBadge kind="payment" status={order.payment.status} />
+                </div>
+              ) : null}
+            </div>
           </div>
 
           {receiptUploaded ? (
@@ -115,6 +128,16 @@ export default async function OrderDetailPage({
             <h2 className="text-xl font-semibold">Resumen</h2>
             <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between">
+                <span>Estado del pedido</span>
+                <StatusBadge kind="order" status={operationalStatus} />
+              </div>
+              {order.payment ? (
+                <div className="flex items-center justify-between">
+                  <span>Estado del pago</span>
+                  <StatusBadge kind="payment" status={order.payment.status} />
+                </div>
+              ) : null}
+              <div className="flex items-center justify-between">
                 <span>Subtotal</span>
                 <span>{formatCurrency(order.subtotal)}</span>
               </div>
@@ -127,7 +150,6 @@ export default async function OrderDetailPage({
                 <span>{formatCurrency(order.total)}</span>
               </div>
             </div>
-            {order.payment ? <StatusBadge kind="payment" status={order.payment.status} /> : null}
           </CardContent>
         </Card>
       </div>

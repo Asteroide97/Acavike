@@ -19,8 +19,10 @@ type CheckoutValues = z.infer<typeof checkoutSchema>;
 
 export function CheckoutForm({
   defaultValues,
+  isAuthenticated = false,
 }: {
   defaultValues?: Partial<CheckoutValues>;
+  isAuthenticated?: boolean;
 }) {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
@@ -96,20 +98,30 @@ export function CheckoutForm({
         <Label htmlFor="checkout-notes">Notas del pedido</Label>
         <Textarea id="checkout-notes" {...form.register("notes")} />
       </div>
-      <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-        <div className="flex items-center gap-3">
-          <Checkbox id="checkout-create-account" checked={createAccount} onChange={(event) => form.setValue("createAccount", event.target.checked)} />
-          <Label htmlFor="checkout-create-account" className="mb-0">
-            Crear cuenta para consultar mis pedidos después del checkout
-          </Label>
+      {isAuthenticated ? (
+        <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+          El pedido quedará asociado a tu cuenta.
         </div>
-        {createAccount ? (
-          <div className="mt-4 max-w-sm">
-            <Label htmlFor="checkout-password">Contraseña</Label>
-            <Input id="checkout-password" type="password" {...form.register("password")} />
+      ) : (
+        <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <div className="flex items-center gap-3">
+            <Checkbox
+              id="checkout-create-account"
+              checked={createAccount}
+              onChange={(event) => form.setValue("createAccount", event.target.checked)}
+            />
+            <Label htmlFor="checkout-create-account" className="mb-0">
+              Crear cuenta para consultar mis pedidos después del checkout
+            </Label>
           </div>
-        ) : null}
-      </div>
+          {createAccount ? (
+            <div className="mt-4 max-w-sm">
+              <Label htmlFor="checkout-password">Contraseña</Label>
+              <Input id="checkout-password" type="password" {...form.register("password")} />
+            </div>
+          ) : null}
+        </div>
+      )}
       <div className="md:col-span-2">
         <Button type="submit" disabled={isPending}>
           {isPending ? "Generando pedido..." : "Confirmar pedido por transferencia"}

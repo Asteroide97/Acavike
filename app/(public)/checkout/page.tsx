@@ -186,6 +186,7 @@ export default async function CheckoutPage({
 
           <div className="mt-8">
             <CheckoutForm
+              isAuthenticated={Boolean(user)}
               defaultValues={{
                 name: user?.customer?.name || user?.name || "",
                 companyName: user?.customer?.companyName || "",

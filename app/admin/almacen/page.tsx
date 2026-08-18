@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/ui/table";
 import { ORDER_ROLES } from "@/lib/constants";
 import { requireUser } from "@/lib/auth";
+import { getOperationalOrderStatus } from "@/lib/order-status";
 import { listAdminProductsRepository } from "@/lib/repositories/catalog";
 import { listAdminOrdersRepository } from "@/lib/repositories/orders";
 import { formatDate } from "@/lib/utils";
@@ -85,7 +86,7 @@ export default async function WarehousePage() {
                     </TableCell>
                     <TableCell>{order.customer.companyName}</TableCell>
                     <TableCell>
-                      <StatusBadge kind="order" status={order.status} />
+                      <StatusBadge kind="order" status={getOperationalOrderStatus(order.status)} />
                     </TableCell>
                     <TableCell>{formatDate(order.createdAt)}</TableCell>
                   </TableRow>

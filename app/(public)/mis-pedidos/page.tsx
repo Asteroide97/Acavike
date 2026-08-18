@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
+import { getOperationalOrderStatus } from "@/lib/order-status";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -56,7 +57,18 @@ export default async function OrdersPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <StatusBadge kind="order" status={order.status} />
+                    <div className="flex flex-col gap-2 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Pedido</span>
+                        <StatusBadge kind="order" status={getOperationalOrderStatus(order.status)} />
+                      </div>
+                      {order.payment ? (
+                        <div className="flex items-center justify-end gap-2">
+                          <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Pago</span>
+                          <StatusBadge kind="payment" status={order.payment.status} />
+                        </div>
+                      ) : null}
+                    </div>
                     <Link href={`/mis-pedidos/${order.orderNumber}`} className="text-sm font-semibold text-primary">
                       Ver detalle
                     </Link>

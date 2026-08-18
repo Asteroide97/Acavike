@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { reviewTransferPaymentAction } from "@/lib/actions/admin";
 import { requireUser } from "@/lib/auth";
 import { ADMIN_ROLES, TRANSFER_STATUS_LABELS } from "@/lib/constants";
+import { getOperationalOrderStatus } from "@/lib/order-status";
 import { listAdminPaymentsRepository } from "@/lib/repositories/orders";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
@@ -47,7 +48,7 @@ export default async function PaymentsPage({
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <StatusBadge kind="payment" status={payment.status} />
-                  <StatusBadge kind="order" status={payment.order.status} />
+                  <StatusBadge kind="order" status={getOperationalOrderStatus(payment.order.status)} />
                 </div>
               </div>
 

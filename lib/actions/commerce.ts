@@ -298,15 +298,62 @@ export async function submitCheckoutAction(input: unknown): Promise<CheckoutActi
     return { success: false, error: "Tu carrito está vacío." };
   }
 
-  const email = parsed.data.email.toLowerCase();
+  const formEmail = parsed.data.email.toLowerCase();
+  const accountEmail = currentUser?.email?.toLowerCase() || null;
   const bankSettings = await getBankSettings();
 
   try {
     const order = await prisma.$transaction(async (tx) => {
       let customerId = currentUser?.customer?.id;
+      const customerData = {
+        name: parsed.data.name,
+        companyName: parsed.data.companyName,
+        rfc: parsed.data.rfc || null,
+        email: accountEmail || formEmail,
+        phone: parsed.data.phone,
+        address: parsed.data.address,
+      };
+
+      if (currentUser) {
+        if (currentUser.customer?.id) {
+          const updatedCustomer = await tx.customer.update({
+            where: { id: currentUser.customer.id },
+            data: {
+              ...customerData,
+              userId: currentUser.id,
+            },
+          });
+          customerId = updatedCustomer.id;
+        } else {
+          const existingCustomer = await tx.customer.findUnique({
+            where: { email: customerData.email },
+          });
+
+          if (existingCustomer?.userId && existingCustomer.userId !== currentUser.id) {
+            throw new Error("Tu cuenta ya está vinculada a otro registro de cliente. Contacta a soporte para continuar.");
+          }
+
+          const linkedCustomer = existingCustomer
+            ? await tx.customer.update({
+                where: { id: existingCustomer.id },
+                data: {
+                  ...customerData,
+                  userId: currentUser.id,
+                },
+              })
+            : await tx.customer.create({
+                data: {
+                  userId: currentUser.id,
+                  ...customerData,
+                },
+              });
+
+          customerId = linkedCustomer.id;
+        }
+      }
 
       if (!customerId && parsed.data.createAccount) {
-        const existingUser = await tx.user.findUnique({ where: { email } });
+        const existingUser = await tx.user.findUnique({ where: { email: formEmail } });
         if (existingUser) {
           throw new Error("Ya existe una cuenta con este correo. Inicia sesión para continuar.");
         }
@@ -315,7 +362,7 @@ export async function submitCheckoutAction(input: unknown): Promise<CheckoutActi
         const createdUser = await tx.user.create({
           data: {
             name: parsed.data.name,
-            email,
+            email: formEmail,
             passwordHash,
             role: "CUSTOMER",
             customer: {
@@ -323,7 +370,7 @@ export async function submitCheckoutAction(input: unknown): Promise<CheckoutActi
                 name: parsed.data.name,
                 companyName: parsed.data.companyName,
                 rfc: parsed.data.rfc || null,
-                email,
+                email: formEmail,
                 phone: parsed.data.phone,
                 address: parsed.data.address,
               },
@@ -336,24 +383,9 @@ export async function submitCheckoutAction(input: unknown): Promise<CheckoutActi
         await createSession({ id: createdUser.id, role: createdUser.role });
       }
 
-      if (!customerId && currentUser?.customer) {
-        const updatedCustomer = await tx.customer.update({
-          where: { id: currentUser.customer.id },
-          data: {
-            name: parsed.data.name,
-            companyName: parsed.data.companyName,
-            rfc: parsed.data.rfc || null,
-            email,
-            phone: parsed.data.phone,
-            address: parsed.data.address,
-          },
-        });
-        customerId = updatedCustomer.id;
-      }
-
-      if (!customerId) {
+      if (!customerId && !currentUser) {
         const customer = await tx.customer.upsert({
-          where: { email },
+          where: { email: formEmail },
           update: {
             name: parsed.data.name,
             companyName: parsed.data.companyName,
@@ -365,12 +397,16 @@ export async function submitCheckoutAction(input: unknown): Promise<CheckoutActi
             name: parsed.data.name,
             companyName: parsed.data.companyName,
             rfc: parsed.data.rfc || null,
-            email,
+            email: formEmail,
             phone: parsed.data.phone,
             address: parsed.data.address,
           },
         });
         customerId = customer.id;
+      }
+
+      if (!customerId) {
+        throw new Error("No fue posible asociar el pedido a una cuenta cliente.");
       }
 
       const { tax, total } = calculateTaxes(totals.subtotal, totals.discount);
@@ -429,6 +465,8 @@ export async function submitCheckoutAction(input: unknown): Promise<CheckoutActi
     revalidatePath("/checkout");
     revalidatePath("/admin/pedidos");
     revalidatePath("/admin");
+    revalidatePath("/mis-pedidos");
+    revalidatePath("/mi-cuenta");
     await notifyOrderGenerated({
       orderId: order.id,
       userId: currentUser?.id,

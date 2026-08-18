@@ -71,11 +71,14 @@ export function QuickQuoteForm({
         <Input id="quote-phone" className={fieldClassName} {...form.register("phone")} />
       </div>
       <div className="md:col-span-2">
-        <Label htmlFor="quote-requirements" className={labelClassName}>Requerimientos</Label>
+        <Label htmlFor="quote-requirements" className={labelClassName}>Productos requeridos</Label>
+        <p className="mt-2 text-[13px] leading-6 text-slate-600">
+          Puedes escribir SKU, nombre del producto o una descripción libre. Usa una línea por producto.
+        </p>
         <Textarea
           id="quote-requirements"
-          className={fieldClassName}
-          placeholder="Ejemplo: Guante anticorte | 24&#10;Caja corrugada doble pared | 50"
+          className={`${fieldClassName} mt-2`}
+          placeholder={"EMP-002 | Caja corrugada doble pared | 10\nGuante anticorte | 24 piezas\nDesengrasante industrial | 6 galones"}
           {...form.register("requirements")}
         />
       </div>

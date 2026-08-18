@@ -41,21 +41,22 @@ export default async function QuickQuotePage({
 
         <div className="space-y-4">
           <div className="public-panel p-6">
-            <h2 className="text-[24px] font-semibold text-slate-900">Cómo acelerar la respuesta</h2>
-            <div className="mt-4 space-y-4 text-[13px] leading-6 text-slate-700">
-              <p>Incluye cantidad estimada por partida, frecuencia de compra y si necesitas entrega local o embarque.</p>
-              <p>Si ya tienes SKUs internos o códigos de proveedor, agrégalos en una línea por producto.</p>
-              <p>El folio generado entra como borrador al panel de cotizaciones para revisión de ventas.</p>
-            </div>
+            <h2 className="text-[24px] font-semibold text-slate-900">Para cotizar más rápido</h2>
+            <ul className="mt-4 space-y-3 text-[13px] leading-6 text-slate-700">
+              <li>Indica cantidad por producto.</li>
+              <li>Agrega SKU si lo tienes.</li>
+              <li>Menciona si requieres entrega local o embarque.</li>
+              <li>Puedes agregar notas especiales.</li>
+            </ul>
           </div>
 
           <div className="rounded-[6px] bg-[#0B1E4B] p-6 text-slate-200">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-blue-200">Formato sugerido</p>
-            <pre className="mt-4 whitespace-pre-wrap font-mono text-sm text-slate-100">
-Guante anticorte | 24
-Caja corrugada doble pared | 50
-Desengrasante industrial | 6
-            </pre>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-blue-200">Ejemplo de captura</p>
+            <div className="mt-4 space-y-3 rounded-[6px] bg-white/10 p-4 text-sm leading-6 text-slate-100">
+              <p>EMP-002 | Caja corrugada doble pared | 10</p>
+              <p>Guante anticorte | 24 piezas</p>
+              <p>Desengrasante industrial | 6 galones</p>
+            </div>
           </div>
 
           <div className="rounded-[6px] bg-[#F4B000] p-6 text-[#0B1E4B]">

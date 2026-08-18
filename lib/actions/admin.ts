@@ -1,11 +1,17 @@
 "use server";
 
+import type { OrderStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { logAuditEntry } from "@/lib/audit";
 import { DATABASE_CONFIG_ERROR, DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
 import { ADMIN_ROLES, ORDER_ROLES, QUOTE_ROLES } from "@/lib/constants";
+import {
+  WAREHOUSE_OPERATIONAL_STATUSES,
+  getOrderStatusAfterPaymentReview,
+  isOperationalOrderStatus,
+} from "@/lib/order-status";
 import { prisma } from "@/lib/prisma";
 import {
   MAX_PRODUCT_IMAGES,
@@ -337,8 +343,21 @@ export async function updateOrderStatusAction(formData: FormData) {
     select: { id: true, status: true },
   });
 
-  const allowedForWarehouse = ["TO_PICK", "WAITING_STOCK", "SHIPPED", "DELIVERED"];
-  if (user.role === "WAREHOUSE" && !allowedForWarehouse.includes(status)) {
+  if (!existingOrder) {
+    redirect("/admin/pedidos");
+  }
+
+  const submittedStatus = isOperationalOrderStatus(status) ? status : null;
+
+  if (!submittedStatus) {
+    redirectWithMessage(`/admin/pedidos/${orderId}`, {
+      error: "Selecciona un estado operativo válido.",
+    });
+  }
+
+  const nextOperationalStatus = submittedStatus as OrderStatus;
+
+  if (user.role === "WAREHOUSE" && !WAREHOUSE_OPERATIONAL_STATUSES.includes(nextOperationalStatus)) {
     redirectWithMessage(`/admin/pedidos/${orderId}`, {
       error: "Tu rol solo puede actualizar estados operativos.",
     });
@@ -346,7 +365,7 @@ export async function updateOrderStatusAction(formData: FormData) {
 
   const order = await prisma.order.update({
     where: { id: orderId },
-    data: { status: status as never },
+    data: { status: nextOperationalStatus },
   });
 
   await logAuditEntry({
@@ -354,25 +373,26 @@ export async function updateOrderStatusAction(formData: FormData) {
     action: "ORDER_STATUS_UPDATED",
     entity: "order",
     entityId: order.id,
-    metadata: { status },
+    metadata: { status: nextOperationalStatus },
   });
   revalidatePath("/admin/pedidos");
   revalidatePath(`/admin/pedidos/${order.id}`);
-  if (status === "PAYMENT_APPROVED" && existingOrder?.status !== "PAYMENT_APPROVED") {
-    await notifyPaymentApproved({
-      orderId: order.id,
-      userId: user.id,
-    });
+  revalidatePath("/admin/almacen");
+  revalidatePath("/mis-pedidos");
+  if (existingOrder.status !== nextOperationalStatus) {
+    revalidatePath(`/mis-pedidos/${order.orderNumber}`);
   }
   redirect(`/admin/pedidos/${order.id}?saved=1`);
 }
 
 export async function reviewTransferPaymentAction(formData: FormData) {
-  ensureWritableAction("/admin/pagos");
+  const redirectTo = toStringValue(formData.get("redirectTo")) || "/admin/pagos";
+  ensureWritableAction(redirectTo);
   const user = await requireUser(ADMIN_ROLES);
   const paymentId = toStringValue(formData.get("paymentId"));
   const status = toStringValue(formData.get("status"));
   const adminNotes = toStringValue(formData.get("adminNotes"));
+  const allowedStatuses = ["PENDING", "IN_REVIEW", "APPROVED", "REJECTED"];
 
   const payment = await prisma.transferPayment.findUnique({
     where: { id: paymentId },
@@ -383,7 +403,13 @@ export async function reviewTransferPaymentAction(formData: FormData) {
     redirect("/admin/pagos");
   }
 
-  const orderStatus = status === "APPROVED" ? "PAYMENT_APPROVED" : "PAYMENT_REJECTED";
+  if (!allowedStatuses.includes(status)) {
+    redirectWithMessage(redirectTo, {
+      error: "Selecciona un estado de pago válido.",
+    });
+  }
+
+  const nextOrderStatus = getOrderStatusAfterPaymentReview(payment.order.status, status);
 
   await prisma.$transaction([
     prisma.transferPayment.update({
@@ -397,7 +423,7 @@ export async function reviewTransferPaymentAction(formData: FormData) {
     }),
     prisma.order.update({
       where: { id: payment.orderId },
-      data: { status: orderStatus as never },
+      data: { status: nextOrderStatus },
     }),
   ]);
 
@@ -410,13 +436,17 @@ export async function reviewTransferPaymentAction(formData: FormData) {
   });
   revalidatePath("/admin/pagos");
   revalidatePath("/admin/pedidos");
+  revalidatePath(`/admin/pedidos/${payment.orderId}`);
+  revalidatePath("/admin/almacen");
+  revalidatePath("/mis-pedidos");
+  revalidatePath(`/mis-pedidos/${payment.order.orderNumber}`);
   if (status === "APPROVED" && payment.status !== "APPROVED") {
     await notifyPaymentApproved({
       orderId: payment.orderId,
       userId: user.id,
     });
   }
-  redirect("/admin/pagos?saved=1");
+  redirectWithMessage(redirectTo, { saved: "1" });
 }
 
 export async function saveQuoteAction(formData: FormData) {
