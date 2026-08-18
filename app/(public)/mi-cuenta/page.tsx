@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { unstable_noStore as noStore } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { logoutAction } from "@/lib/actions/auth";
 import { prisma } from "@/lib/prisma";
@@ -11,6 +12,7 @@ import { cn, formatDate } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 export default async function AccountPage() {
+  noStore();
   const user = await getCurrentUser();
 
   if (!user) {
@@ -47,22 +49,26 @@ export default async function AccountPage() {
     );
   }
 
-  const ordersCount = user.customer
-    ? await prisma.order.count({
-        where: { customerId: user.customer.id },
-      })
-    : 0;
+  const displayName = typeof user.name === "string" && user.name.trim() ? user.name.trim() : "tu cuenta";
+  const ordersCount =
+    user.customer?.id && typeof user.customer.id === "string"
+      ? await prisma.order
+          .count({
+            where: { customerId: user.customer.id },
+          })
+          .catch(() => 0)
+      : 0;
 
   return (
     <div className="section-shell py-10">
       <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
         <div className="surface p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Mi cuenta</p>
-          <h1 className="mt-2 text-4xl font-semibold">Hola, {user.name}</h1>
+          <h1 className="mt-2 text-4xl font-semibold">Hola, {displayName}</h1>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
               <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Correo</p>
-              <p className="mt-2 font-semibold">{user.email}</p>
+              <p className="mt-2 font-semibold">{user.email || "No disponible"}</p>
             </div>
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
               <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Rol</p>

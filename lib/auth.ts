@@ -13,6 +13,8 @@ type SessionPayload = {
   exp: number;
 };
 
+const VALID_USER_ROLES = ["SUPERADMIN", "ADMIN", "WAREHOUSE", "SALES", "CUSTOMER"] as const satisfies UserRole[];
+
 function getSessionSecret() {
   return AUTH_SECRET;
 }
@@ -24,28 +26,56 @@ function encode(payload: SessionPayload) {
 }
 
 function decode(token: string) {
-  const [body, signature] = token.split(".");
-  if (!body || !signature) {
+  try {
+    const [body, signature] = token.split(".");
+    if (!body || !signature) {
+      return null;
+    }
+
+    const expected = createHmac("sha256", getSessionSecret()).update(body).digest("base64url");
+
+    if (expected.length !== signature.length) {
+      return null;
+    }
+
+    if (!timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
+      return null;
+    }
+
+    const payload = JSON.parse(Buffer.from(body, "base64url").toString("utf8")) as Partial<SessionPayload>;
+    const hasValidUserId = typeof payload.userId === "string" && payload.userId.trim().length > 0;
+    const hasValidRole =
+      typeof payload.role === "string" && VALID_USER_ROLES.includes(payload.role as (typeof VALID_USER_ROLES)[number]);
+    const hasValidExpiration = typeof payload.exp === "number" && Number.isFinite(payload.exp);
+
+    if (!hasValidUserId || !hasValidRole || !hasValidExpiration) {
+      return null;
+    }
+
+    const expiration = payload.exp as number;
+    const userId = payload.userId as string;
+    const role = payload.role as UserRole;
+
+    if (expiration < Date.now()) {
+      return null;
+    }
+
+    return {
+      userId,
+      role,
+      exp: expiration,
+    };
+  } catch {
     return null;
   }
+}
 
-  const expected = createHmac("sha256", getSessionSecret()).update(body).digest("base64url");
-
-  if (expected.length !== signature.length) {
+async function getCookieStoreSafe() {
+  try {
+    return await cookies();
+  } catch {
     return null;
   }
-
-  if (!timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
-    return null;
-  }
-
-  const payload = JSON.parse(Buffer.from(body, "base64url").toString("utf8")) as SessionPayload;
-
-  if (payload.exp < Date.now()) {
-    return null;
-  }
-
-  return payload;
 }
 
 export async function createSession(user: { id: string; role: UserRole }) {
@@ -71,8 +101,8 @@ export async function destroySession() {
 }
 
 export async function getSession() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(SESSION_COOKIE)?.value;
+  const cookieStore = await getCookieStoreSafe();
+  const token = cookieStore?.get(SESSION_COOKIE)?.value;
   if (!token) {
     return null;
   }
@@ -81,23 +111,29 @@ export async function getSession() {
 }
 
 export async function getCurrentUser() {
-  const session = await getSession();
-  if (!session) {
+  try {
+    const session = await getSession();
+    if (!session?.userId) {
+      return null;
+    }
+
+    if (DEMO_MODE) {
+      return findDemoViewerById(session.userId) ?? null;
+    }
+
+    if (!DATABASE_ENABLED) {
+      return null;
+    }
+
+    return await prisma.user
+      .findUnique({
+        where: { id: session.userId },
+        include: { customer: true },
+      })
+      .catch(() => null);
+  } catch {
     return null;
   }
-
-  if (DEMO_MODE) {
-    return findDemoViewerById(session.userId);
-  }
-
-  if (!DATABASE_ENABLED) {
-    return null;
-  }
-
-  return prisma.user.findUnique({
-    where: { id: session.userId },
-    include: { customer: true },
-  });
 }
 
 export async function requireUser(roles?: UserRole[]) {
