@@ -20,13 +20,13 @@ export default async function AdminLayout({
   const user = await requireUser(BACKOFFICE_ROLES);
 
   return (
-    <div className="min-h-screen bg-slate-100/80 p-4 lg:p-6">
+    <div className="admin-app min-h-screen bg-background p-4 lg:p-6">
       <div className="mx-auto grid max-w-[1600px] gap-6 lg:grid-cols-[290px_1fr]">
         <div className="lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)]">
           <AdminSidebar role={user.role} />
         </div>
 
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           <div className="admin-surface flex flex-col gap-4 p-5 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Backoffice</p>

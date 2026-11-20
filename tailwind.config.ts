@@ -10,22 +10,22 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
+        border: "var(--brand-border)",
+        input: "var(--brand-border)",
         ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        background: "var(--brand-background)",
+        foreground: "var(--brand-text)",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
+          DEFAULT: "rgb(var(--brand-blue-rgb) / <alpha-value>)",
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
+          DEFAULT: "rgb(var(--brand-navy-rgb) / <alpha-value>)",
           foreground: "hsl(var(--secondary-foreground))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          foreground: "var(--brand-muted)",
         },
         accent: {
           DEFAULT: "hsl(var(--accent))",
@@ -53,7 +53,7 @@ const config: Config = {
           "linear-gradient(to right, rgba(15, 23, 42, 0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(15, 23, 42, 0.07) 1px, transparent 1px)",
       },
       fontFamily: {
-        heading: ["var(--font-heading)"],
+        heading: ["var(--font-body)"],
         body: ["var(--font-body)"],
         mono: ["var(--font-mono)"],
       },

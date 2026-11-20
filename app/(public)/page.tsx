@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
-import { ArrowRight, ClipboardCheck, Mail, MapPin, Package, Phone, Warehouse } from "lucide-react";
-import { getHomepageData, getPublicContactDetails, getSiteSettingsMap } from "@/lib/site";
+import { ArrowRight, ClipboardCheck, Package, Warehouse } from "lucide-react";
+import { getHomepageData } from "@/lib/site";
 import styles from "./home.module.css";
 
 export const dynamic = "force-dynamic";
@@ -22,11 +22,7 @@ const steps = [
 
 export default async function HomePage() {
   noStore();
-  const [data, settings] = await Promise.all([
-    getHomepageData().catch(() => null),
-    getSiteSettingsMap().catch(() => ({})),
-  ]);
-  const contact = getPublicContactDetails(settings);
+  const data = await getHomepageData().catch(() => null);
   const availableSlugs = new Set((data?.categories ?? []).map((category) => category.slug));
 
   return (
@@ -84,12 +80,11 @@ export default async function HomePage() {
 
       <section className={styles.contactBand} aria-label="Contacto comercial">
         <div className={styles.contactInner}>
-          <Link href="/contacto" className={styles.contactTitle}>¿Listo para que nunca te falte material? Contáctanos</Link>
-          <span className={styles.contactItem}><MapPin aria-hidden="true" />{contact.companyAddress}</span>
-          <div className={styles.contactDetails}>
-            <a href={`mailto:${contact.supportEmail}`} className={styles.contactItem}><Mail aria-hidden="true" />{contact.supportEmail}</a>
-            <a href={`tel:${contact.supportPhone.replace(/[^+\d]/g, "")}`} className={styles.contactItem}><Phone aria-hidden="true" />{contact.supportPhone}</a>
+          <div>
+            <p className={styles.contactTitle}>¿Listo para que nunca te falte material?</p>
+            <p className={styles.contactSubtitle}>Cotiza tus consumibles con nuestro equipo.</p>
           </div>
+          <Link href="/contacto" className={styles.contactCta}>Contactar ventas <ArrowRight size={17} aria-hidden="true" /></Link>
         </div>
       </section>
     </div>

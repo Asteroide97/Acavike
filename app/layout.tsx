@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
+import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import { BRAND_LOGO_URL } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-
-const heading = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-heading",
-  weight: ["400", "500", "700"],
-});
 
 const body = IBM_Plex_Sans({
   subsets: ["latin"],
@@ -49,7 +43,6 @@ export default function RootLayout({
     <html lang="es">
       <body
         className={cn(
-          heading.variable,
           body.variable,
           mono.variable,
           "min-h-screen font-body text-foreground",

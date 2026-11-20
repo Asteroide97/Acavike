@@ -1,14 +1,8 @@
-import Image from "next/image";
 import type { Category } from "@prisma/client";
-import { BRAND_LOGO_URL } from "@/lib/constants";
+import { BrandLogo } from "@/components/ui/brand-logo";
 
 export function SiteFooter({
-  email,
-  phone,
-  address,
-  supportHours,
-  whatsappHref,
-  categories = [],
+  email, phone, address, supportHours, whatsappHref, categories = [],
 }: {
   email: string;
   phone: string;
@@ -18,46 +12,27 @@ export function SiteFooter({
   categories?: Category[];
 }) {
   void categories;
-
   return (
-    <footer className="mt-10 bg-[#081632] text-slate-200">
-      <div className="section-shell py-8 md:py-10">
-        <div className="rounded-[6px] border border-white/10 bg-white/[0.03] p-6 md:p-8 lg:p-10">
-          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-            <div className="relative flex h-[96px] w-[176px] items-center justify-center overflow-hidden rounded-[8px] border border-white/10 bg-white px-2 py-1.5 shadow-[0_12px_30px_rgba(0,0,0,0.18)] sm:w-[188px] md:h-[112px] md:w-[220px] md:px-3 md:py-2">
-              <Image
-                src={BRAND_LOGO_URL}
-                alt="Acavike Supplies"
-                width={1024}
-                height={1024}
-                className="pointer-events-none absolute left-1/2 top-[-30px] h-[176px] w-[176px] max-w-none -translate-x-1/2 object-contain sm:top-[-32px] sm:h-[188px] sm:w-[188px] md:top-[-40px] md:h-[220px] md:w-[220px]"
-              />
-            </div>
-            <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-              Catálogo industrial B2B
+    <footer className="bg-[var(--brand-navy)] text-white">
+      <div className="section-shell py-5 md:py-7">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-5">
+            <BrandLogo className="w-[130px] shrink-0 rounded-md bg-white p-1 md:w-[160px]" />
+            <p className="max-w-[230px] text-[15px] leading-6 text-slate-200">
+              Suministros industriales para empresas.
             </p>
           </div>
-
-          <p className="mt-6 max-w-3xl text-[15px] leading-7 text-slate-300 md:text-[16px]">
-            Suministros industriales para empresas con compra directa, cotización comercial y atención
-            operativa por canales simples.
-          </p>
-
-          <div className="mt-8 grid gap-3 text-[14px] text-slate-200 md:grid-cols-2 md:gap-x-10 md:text-[15px]">
-            <p>{phone}</p>
-            <p>{email}</p>
-            <p>{address}</p>
-            <p>{supportHours}</p>
+          <div className="flex flex-col items-start gap-2 text-[14px] md:items-end">
+            <a href={`tel:${phone.replace(/[^+\d]/g, "")}`} className="font-semibold hover:underline">{phone}</a>
+            <a href={`mailto:${email}`} className="break-all text-slate-200 hover:underline">{email}</a>
+            <a href={whatsappHref} target="_blank" rel="noreferrer" className="mt-1 inline-flex min-h-[40px] items-center rounded-md bg-[#15803D] px-4 text-[14px] font-semibold text-white hover:bg-[#166534]">
+              WhatsApp Comercial
+            </a>
           </div>
-
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-8 inline-flex min-h-[44px] items-center rounded-[6px] bg-[#16A34A] px-5 text-[14px] font-semibold text-white hover:bg-[#15803D]"
-          >
-            WhatsApp Comercial
-          </a>
+        </div>
+        <div className="mt-4 flex flex-col gap-2 border-t border-white/20 pt-3 text-[13px] text-slate-200 sm:flex-row sm:justify-between md:mt-5 md:pt-4">
+          <p>{address}</p>
+          <p>{supportHours}</p>
         </div>
       </div>
     </footer>

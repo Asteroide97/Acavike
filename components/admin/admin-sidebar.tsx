@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { BrandLogo } from "@/components/ui/brand-logo";
 import Link from "next/link";
 import {
   BadgePercent,
@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { UserRole } from "@prisma/client";
-import { BRAND_LOGO_URL } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 const items: Array<{
@@ -49,23 +48,13 @@ export function AdminSidebar({ role }: { role: UserRole }) {
   const filteredItems = items.filter((item) => item.roles.includes(role));
 
   return (
-    <aside className="flex h-full flex-col rounded-[2rem] bg-slate-950 p-6 text-slate-200">
-      <Link href="/admin" className="flex items-center gap-4">
-        <div className="relative flex h-[70px] w-full max-w-[164px] shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white px-2 py-1.5">
-          <Image
-            src={BRAND_LOGO_URL}
-            alt="Acavike Supplies"
-            width={1024}
-            height={1024}
-            className="pointer-events-none absolute left-1/2 top-[-31px] h-[168px] w-[168px] max-w-none -translate-x-1/2 object-contain"
-          />
-        </div>
-        <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Control Panel</p>
-        </div>
+    <aside className="flex h-full min-h-0 min-w-0 flex-col rounded-[2rem] bg-[var(--brand-navy)] p-6 text-slate-200">
+      <Link href="/admin" className="flex shrink-0 flex-col items-start gap-3">
+        <BrandLogo className="w-[164px] rounded-lg bg-white p-1" />
+        <p className="text-xs uppercase tracking-[0.18em] text-slate-300">Control Panel</p>
       </Link>
 
-      <nav className="mt-8 grid gap-2">
+      <nav className="mt-6 grid min-h-0 gap-2 lg:flex-1 lg:overflow-y-auto">
         {filteredItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -83,7 +72,7 @@ export function AdminSidebar({ role }: { role: UserRole }) {
         })}
       </nav>
 
-      <div className="mt-auto rounded-3xl bg-white/5 p-4 text-sm text-slate-400">
+      <div className="mt-4 shrink-0 rounded-3xl bg-white/5 p-4 text-sm text-slate-400">
         Las ediciones de catálogo, precios, contenido y usuarios se limitan a admin y superadmin.
       </div>
     </aside>

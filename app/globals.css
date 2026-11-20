@@ -4,23 +4,35 @@
 
 @layer base {
   :root {
-    --background: 220 20% 96%;
-    --foreground: 222 47% 11%;
+    --brand-blue: #0755c8;
+    --brand-blue-rgb: 7 85 200;
+    --brand-navy-rgb: 11 30 64;
+    --font-heading: var(--font-body);
+    --brand-navy: #0b1e40;
+    --brand-hover: #0646a6;
+    --brand-soft: #eaf2ff;
+    --brand-background: #f5f7fa;
+    --brand-white: #ffffff;
+    --brand-text: #10213d;
+    --brand-muted: #52637a;
+    --brand-border: #dce3ec;
+    --background: 216 33% 97%;
+    --foreground: 217 58% 15%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
-    --primary: 225 74% 17%;
+    --primary: 216 93% 41%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 221 62% 30%;
+    --secondary: 218 71% 15%;
     --secondary-foreground: 0 0% 100%;
     --muted: 220 14% 94%;
-    --muted-foreground: 220 12% 36%;
-    --accent: 43 100% 48%;
-    --accent-foreground: 225 74% 17%;
+    --muted-foreground: 215 20% 40%;
+    --accent: 217 100% 96%;
+    --accent-foreground: 218 71% 15%;
     --destructive: 0 70% 42%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 16% 84%;
-    --input: 220 16% 84%;
-    --ring: 225 74% 17%;
+    --border: 214 30% 89%;
+    --input: 214 30% 89%;
+    --ring: 216 93% 41%;
   }
 
   * {
@@ -33,7 +45,9 @@
 
   body {
     @apply min-h-screen bg-background font-body text-foreground antialiased;
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(243, 244, 246, 1) 26%);
+    background: var(--brand-background);
+    color: var(--brand-text);
+    font-size: 16px;
   }
 
   h1,
@@ -43,6 +57,8 @@
   h5,
   h6 {
     @apply font-heading tracking-tight text-slate-950;
+    font-family: var(--font-body), sans-serif;
+    color: var(--brand-text);
   }
 
   a {
@@ -52,7 +68,7 @@
 
 @layer components {
   .surface {
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--brand-border);
     border-radius: 6px;
     background: #ffffff;
     box-shadow: 0 1px 2px rgba(17, 24, 39, 0.05);
@@ -84,20 +100,20 @@
   }
 
   .public-kicker {
-    color: #1d3b7a;
-    font-size: 11px;
+    color: var(--brand-blue);
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;
   }
 
   .public-link {
-    color: #1d3b7a;
+    color: var(--brand-blue);
     font-weight: 700;
   }
 
   .public-link:hover {
-    color: #0b1e4b;
+    color: var(--brand-hover);
     text-decoration: underline;
   }
 
@@ -130,13 +146,13 @@
   }
 
   .public-btn {
-    border: 1px solid #0b1e4b;
-    background: #0b1e4b;
+    border: 1px solid var(--brand-blue);
+    background: var(--brand-blue);
     color: #ffffff;
   }
 
   .public-btn:hover {
-    background: #081632;
+    background: var(--brand-hover);
   }
 
   .public-btn-outline {
@@ -151,13 +167,13 @@
   }
 
   .public-btn-accent {
-    border: 1px solid #e0a100;
-    background: #f4b000;
-    color: #0b1e4b;
+    border: 1px solid var(--brand-blue);
+    background: var(--brand-blue);
+    color: var(--brand-white);
   }
 
   .public-btn-accent:hover {
-    background: #e7a700;
+    background: var(--brand-hover);
   }
 
   .public-input,
@@ -169,7 +185,7 @@
     background: #ffffff;
     padding: 0.65rem 0.85rem;
     color: #111827;
-    font-size: 13px;
+    font-size: 14px;
     outline: none;
   }
 
@@ -178,4 +194,31 @@
     border-color: #1d3b7a;
     box-shadow: 0 0 0 3px rgba(29, 59, 122, 0.1);
   }
+}
+
+/* Bridge existing presentation utilities to the shared palette without changing state colors. */
+:is(.public-app, .admin-app) :is([class~="text-[#0B1E4B]"], [class~="text-[#1D3B7A]"]) { color: var(--brand-blue); }
+:is(.public-app, .admin-app) :is([class~="bg-[#0B1E4B]"], [class~="bg-[#1D3B7A]"]) { background-color: var(--brand-blue); }
+:is(.public-app, .admin-app) :is([class~="bg-[#F3F4F6]"], [class~="bg-[#F9FAFB]"]) { background-color: var(--brand-background); }
+.public-app[class~="bg-[#F3F4F6]"] { background-color: var(--brand-background); }
+:is(.public-app, .admin-app) :is([class~="border-[#D1D5DB]"], [class~="border-slate-200"], [class~="border-slate-300"]) { border-color: var(--brand-border); }
+:is(.public-app, .admin-app) :is([class~="text-slate-900"], [class~="text-slate-950"]) { color: var(--brand-text); }
+:is(.public-app, .admin-app) :is([class~="text-slate-500"], [class~="text-slate-600"], [class~="text-slate-700"]) { color: var(--brand-muted); }
+:is(.public-app, .admin-app) :is([class~="text-[10px]"], [class~="text-[11px]"]) { font-size: 12px; }
+:is(.public-app, .admin-app) :is(button, input, select, textarea) { font-size: 14px; }
+:is(.public-app, .admin-app) :is(td, th) { font-size: 14px; }
+:is(.public-app, .admin-app) :is(.public-panel, .surface) { border-color: var(--brand-border); }
+.public-app :is(.public-btn-outline, .public-chip) { color: var(--brand-text); border-color: var(--brand-border); }
+.public-app .public-btn-outline:hover { background: var(--brand-soft); color: var(--brand-blue); }
+.public-app header > div:first-child { background-color: var(--brand-navy); }
+.public-app header :is(a, button) { font-size: 13px; }
+.public-app header :is([class~="hover:bg-[#081632]"], [class~="hover:bg-[#F3F4F6]"]):hover { background-color: var(--brand-hover); color: white; }
+.public-app header [class~="text-blue-200"] { color: #dbeafe; }
+.admin-app aside [class~="text-slate-400"] { color: #cbd5e1; }
+.public-app [class~="bg-[#0B1E4B]"] :is(h1, h2, h3) { color: white; }
+.public-app :is([class~="bg-[#EFF3FA]"], [class~="bg-[#FFF7DB]"], [class~="bg-[#F4B000]"]) { background-color: var(--brand-soft); }
+.public-app [class~="border-[#1D3B7A]"] { border-color: var(--brand-blue); }
+.public-app [class~="border-[#E7D28B]"] { border-color: var(--brand-border); }
+@media (max-width: 639px) {
+  .public-app header :is(a, button) { font-size: 12px; }
 }

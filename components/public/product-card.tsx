@@ -26,7 +26,7 @@ export function ProductCard({ product }: { product: ProductCardItem }) {
   const productId = product.id || "";
 
   return (
-    <article className="public-panel h-full overflow-hidden">
+    <article className="public-panel flex h-full flex-col overflow-hidden">
       <Link href={productHref} className="block border-b border-[#D1D5DB] bg-[#F9FAFB]">
         <div className="relative aspect-[4/3] md:aspect-[6/5]">
           <div className="absolute inset-3 rounded-[10px] bg-white shadow-[0_6px_18px_rgba(11,30,75,0.06)]" />
@@ -40,7 +40,7 @@ export function ProductCard({ product }: { product: ProductCardItem }) {
         </div>
       </Link>
 
-      <div className="flex h-full flex-col gap-2.5 p-3">
+      <div className="flex flex-1 flex-col gap-2.5 p-3">
         <div className="flex items-start justify-between gap-2">
           <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">{categoryName}</p>
           <span className="shrink-0 rounded-full bg-[#F3F4F6] px-2 py-0.5 text-[10px] font-semibold text-slate-600">
@@ -52,11 +52,11 @@ export function ProductCard({ product }: { product: ProductCardItem }) {
           {name}
         </Link>
 
-        <p className="min-h-[2.2rem] overflow-hidden text-[11px] leading-[1.45] text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+        <p className="min-h-[2.2rem] overflow-hidden text-[13px] leading-[1.45] text-slate-600 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
           {shortDescription}
         </p>
 
-        <div className="grid gap-1 rounded-[6px] bg-[#F9FAFB] px-2.5 py-2 text-[11px] leading-4 text-slate-700">
+        <div className="grid gap-1 rounded-[6px] bg-[#F9FAFB] px-2.5 py-2 text-[13px] leading-5 text-slate-700">
           <p>SKU: {product.sku || "DEMO-SKU"}</p>
           <p>Unidad: {unit}</p>
           <p>Entrega: {delivery}</p>

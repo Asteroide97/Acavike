@@ -1,8 +1,7 @@
-import Image from "next/image";
+import { BrandLogo } from "@/components/ui/brand-logo";
 import Link from "next/link";
 import { Clock3, Mail, Search, ShoppingCart, UserRound, Phone } from "lucide-react";
 import type { User } from "@prisma/client";
-import { BRAND_LOGO_URL } from "@/lib/constants";
 import { PUBLIC_NAV_TABS } from "@/lib/public-catalog";
 import { formatCurrency } from "@/lib/utils";
 
@@ -69,23 +68,14 @@ export function SiteHeader({
       </div>
 
       <div className="section-shell py-3 sm:py-4">
-        <div className="grid gap-2.5 lg:grid-cols-[220px_minmax(0,1fr)_auto] lg:items-center">
+        <div className="grid gap-3 xl:grid-cols-[190px_minmax(0,1fr)_auto] xl:items-center">
           <Link href="/" className="flex w-full min-w-0 items-center">
-            <span className="relative flex h-[54px] w-[150px] items-center justify-center overflow-hidden rounded-[6px] border border-[#D1D5DB] bg-white px-1 py-0.5 shadow-[0_1px_2px_rgba(17,24,39,0.05)] sm:h-[58px] sm:w-[162px] sm:px-1.5 lg:h-[64px] lg:w-[190px] lg:px-2">
-              <Image
-                src={BRAND_LOGO_URL}
-                alt="Acavike Supplies"
-                width={1024}
-                height={1024}
-                priority
-                className="pointer-events-none absolute left-1/2 top-[-22px] h-[150px] w-[150px] max-w-none -translate-x-1/2 object-contain sm:top-[-23px] sm:h-[158px] sm:w-[158px] lg:top-[-25px] lg:h-[170px] lg:w-[170px]"
-              />
-            </span>
+            <BrandLogo priority className="h-[76px] w-[145px] sm:h-[84px] sm:w-[170px]" />
           </Link>
 
           <form
             action="/catalogo"
-            className="order-3 min-w-0 grid gap-2 rounded-[6px] border border-[#D1D5DB] bg-[#F9FAFB] p-2 md:grid-cols-[minmax(0,1fr)_auto] lg:order-none"
+            className="order-3 min-w-0 grid gap-2 rounded-[6px] border border-[#D1D5DB] bg-[#F9FAFB] p-2 md:grid-cols-[minmax(0,1fr)_auto] xl:order-none"
           >
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
