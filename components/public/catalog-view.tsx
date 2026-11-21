@@ -3,6 +3,7 @@ import { Search, ArrowRight } from "lucide-react";
 import { CatalogFilterPanel } from "@/components/public/catalog-filter-panel";
 import { CatalogBreadcrumbs } from "@/components/public/catalog-breadcrumbs";
 import { ProductCard } from "@/components/public/product-card";
+import { CategoryImage } from "@/components/public/category-image";
 import { catalogHref, categoryPath, orderedCategoryTree, type CatalogFilters } from "@/lib/catalog-filters";
 import type { getCatalogPageDataRepository } from "@/lib/repositories/catalog";
 
@@ -32,7 +33,7 @@ export function CatalogView({ data, filters, unavailable = false }: { data: Cata
                   <Link href={catalogHref(filters, "")} aria-current={!active ? "page" : undefined} className={`rounded px-2 py-2 ${!active ? "bg-blue-50 font-bold text-[#1D3B7A]" : "text-slate-700 hover:bg-slate-50"}`}>Todos los productos</Link>
                   {categories.map(category => {
                     const depth = Math.min(categoryPath(categories, category.id).length - 1, 4);
-                    return <Link key={category.id} href={catalogHref(filters, category.slug)} aria-current={active?.id === category.id ? "page" : undefined} style={{ paddingLeft: `${8 + depth * 12}px` }} className={`break-words rounded py-2 pr-2 ${active?.id === category.id ? "bg-blue-50 font-bold text-[#1D3B7A]" : "text-slate-700 hover:bg-slate-50"}`}>{depth ? "– " : ""}{category.name}</Link>;
+                    return <Link key={category.id} href={catalogHref(filters, category.slug)} aria-current={active?.id === category.id ? "page" : undefined} style={{ paddingLeft: `${8 + depth * 12}px` }} className={`flex items-center gap-2 rounded py-2 pr-2 ${active?.id === category.id ? "bg-blue-50 font-bold text-[#1D3B7A]" : "text-slate-700 hover:bg-slate-50"}`}><CategoryImage imageUrl={category.imageUrl} name={category.name} className="h-8 w-8" sizes="32px" /><span className="min-w-0 break-words">{category.name}</span></Link>;
                   })}
                 </nav>
               </div>
@@ -56,7 +57,7 @@ export function CatalogView({ data, filters, unavailable = false }: { data: Cata
           <div className="rounded-md border border-[#D1D5DB] bg-white p-4 md:p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0"><p className="text-[11px] font-bold uppercase tracking-[.16em] text-[#1D3B7A]">Suministros para tu empresa</p><h1 className="mt-1 break-words text-2xl font-bold text-[#0B1E4B] md:text-3xl">{active?.name || "Catálogo industrial"}</h1><p className="mt-2 text-sm text-slate-600">{products.length} {products.length === 1 ? "producto" : "productos"}{filters.query ? ` para “${filters.query}”` : ""}</p></div>
-              <Link href="/cotizacion-rapida" className="public-btn-outline text-xs">Cotización express</Link>
+              <div className="flex items-center gap-3">{active ? <CategoryImage imageUrl={active.imageUrl} name={active.name} className="h-20 w-28 sm:h-24 sm:w-32" sizes="128px" /> : null}<Link href="/cotizacion-rapida" className="public-btn-outline text-xs">Cotización express</Link></div>
             </div>
             <form action={path} className="mt-5 grid min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] xl:grid-cols-[minmax(0,1fr)_195px_auto]">
               {filters.minPrice !== undefined ? <input type="hidden" name="min" value={filters.minPrice} /> : null}
@@ -66,7 +67,7 @@ export function CatalogView({ data, filters, unavailable = false }: { data: Cata
               <select aria-label="Ordenar productos" name="orden" defaultValue={filters.sort} className="public-select w-full min-w-0"><option value="featured">Destacados</option><option value="name_asc">Nombre: A a Z</option><option value="name_desc">Nombre: Z a A</option><option value="price_asc">Precio: menor a mayor</option><option value="price_desc">Precio: mayor a menor</option><option value="newest">Más recientes</option></select>
               <button className="public-btn" type="submit">Buscar</button>
             </form>
-            {children.length ? <nav aria-label="Subcategorías" className="mt-4 flex flex-wrap gap-2 border-t border-[#D1D5DB] pt-4">{children.map(child => <Link href={catalogHref(filters, child.slug)} key={child.id} className="rounded border border-[#D1D5DB] px-3 py-2 text-xs font-semibold text-[#1D3B7A] hover:border-[#1D3B7A]">{child.name}</Link>)}</nav> : null}
+            {children.length ? <nav aria-label="Subcategorías" className="mt-4 grid grid-cols-2 gap-3 border-t border-[#D1D5DB] pt-4 sm:grid-cols-3 lg:grid-cols-4">{children.map(child => <Link href={catalogHref(filters, child.slug)} key={child.id} className="min-w-0 rounded border border-[#D1D5DB] p-2 text-xs font-semibold text-[#1D3B7A] hover:border-[#1D3B7A]"><CategoryImage imageUrl={child.imageUrl} name={child.name} className="aspect-[4/3] w-full" sizes="(max-width: 640px) 40vw, 180px" /><span className="mt-2 block break-words">{child.name}</span></Link>)}</nav> : null}
           </div>
           {unavailable ? <p role="status" className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm">No fue posible consultar el catálogo. Intenta de nuevo o solicita una cotización.</p> : null}
           {products.length ? <div className="grid min-w-0 grid-cols-1 gap-3 min-[380px]:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">{products.map(product => <ProductCard key={product.id} product={product} catalog />)}</div> : <div className="rounded-md border border-[#D1D5DB] bg-white px-5 py-14 text-center"><h2 className="text-xl font-bold text-[#0B1E4B]">No hay productos para esta selección</h2><p className="mx-auto mt-2 max-w-md text-sm text-slate-600">Prueba otra búsqueda o envíanos tu lista de materiales para cotizar.</p><div className="mt-5 flex flex-wrap justify-center gap-2"><Link href="/catalogo" className="public-btn-outline">Ver catálogo</Link><Link href="/cotizacion-rapida" className="public-btn">Solicitar cotización</Link></div></div>}

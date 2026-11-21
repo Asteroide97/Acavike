@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/auth";
 import { logAuditEntry } from "@/lib/audit";
 import { descendantCategoryIds } from "@/lib/catalog-filters";
 import { createCatalogSku } from "@/lib/catalog-sku";
+import { parseCategoryImageField } from "@/lib/category-images";
 import { DATABASE_CONFIG_ERROR, DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
 import { ADMIN_ROLES, ORDER_ROLES, QUOTE_ROLES } from "@/lib/constants";
 import {
@@ -175,6 +176,14 @@ export async function saveCategoryAction(formData: FormData) {
 
   const slug = toStringValue(formData.get("slug")) || slugify(name);
   const parentId = toStringValue(formData.get("parentId"));
+  let imageUrl: string | null = null;
+  try { imageUrl = parseCategoryImageField(formData.get("imageUrl")); }
+  catch {
+    const previous = categoryId ? await prisma.category.findUnique({ where: { id: categoryId }, select: { imageUrl: true } }) : null;
+    const submitted = formData.get("imageUrl");
+    if (previous?.imageUrl && typeof submitted === "string" && submitted.trim() === previous.imageUrl) imageUrl = previous.imageUrl;
+    else redirectWithMessage(categoryId ? `/admin/categorias/${categoryId}` : "/admin/categorias/nuevo", { error: "La imagen no es válida. Selecciona otra fotografía o quita la imagen." });
+  }
 
   if (categoryId && parentId === categoryId) {
     redirectWithMessage(`/admin/categorias/${categoryId}`, {
@@ -193,7 +202,7 @@ export async function saveCategoryAction(formData: FormData) {
     name,
     slug,
     description: toStringValue(formData.get("description")) || null,
-    imageUrl: toStringValue(formData.get("imageUrl")) || null,
+    imageUrl,
     parentId: parentId || null,
     sortOrder: toNumber(formData.get("sortOrder")),
     isActive: parseCheckbox(formData.get("isActive")),
@@ -214,6 +223,8 @@ export async function saveCategoryAction(formData: FormData) {
   });
 
   revalidatePath("/catalogo");
+  revalidatePath("/");
+  revalidatePath(`/catalogo/${category.slug}`);
   revalidatePath("/admin/categorias");
   redirect("/admin/categorias?saved=1");
 }

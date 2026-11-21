@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { AdminField } from "@/components/admin/admin-field";
 import { AdminFlash } from "@/components/admin/admin-flash";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { CategoryImageUpload } from "@/components/admin/category-image-upload";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,8 @@ import { requireUser } from "@/lib/auth";
 import { ADMIN_ROLES } from "@/lib/constants";
 import { categoryPath, descendantCategoryIds } from "@/lib/catalog-filters";
 import { prisma } from "@/lib/prisma";
+import { DEMO_MODE } from "@/lib/config";
+import { demoCategories } from "@/lib/demo-data";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +33,9 @@ export default async function CategoryEditorPage({
   const resolvedSearchParams = await searchParams;
   const isNew = id === "nuevo";
 
-  const [categories, category] = await Promise.all([
+  const [categories, category] = DEMO_MODE
+    ? [demoCategories, isNew ? null : demoCategories.find(item => item.id === id) || null]
+    : await Promise.all([
     prisma.category.findMany({
       orderBy: { name: "asc" },
     }),
@@ -79,7 +84,7 @@ export default async function CategoryEditorPage({
                 <Input name="sortOrder" type="number" defaultValue={category?.sortOrder ?? 0} />
               </AdminField>
               <AdminField label="Imagen" className="md:col-span-2">
-                <Input name="imageUrl" defaultValue={category?.imageUrl || ""} />
+                <CategoryImageUpload initialImageUrl={category?.imageUrl} categoryId={category?.id} disabled={DEMO_MODE} />
               </AdminField>
               <AdminField label="Descripción" className="md:col-span-2">
                 <Textarea name="description" defaultValue={category?.description || ""} />
@@ -92,7 +97,7 @@ export default async function CategoryEditorPage({
               </div>
 
               <div className="md:col-span-2">
-                <button className="inline-flex h-11 items-center justify-center rounded-2xl bg-primary px-5 text-sm font-semibold text-white">
+                <button disabled={DEMO_MODE} className="inline-flex h-11 items-center justify-center rounded-2xl bg-primary px-5 text-sm font-semibold text-white disabled:opacity-50">
                   Guardar categoría
                 </button>
               </div>

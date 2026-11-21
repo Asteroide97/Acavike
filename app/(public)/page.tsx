@@ -2,16 +2,17 @@ import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
 import { ArrowRight, ClipboardCheck, Package, Warehouse } from "lucide-react";
 import { getHomepageData } from "@/lib/site";
+import { CategoryImage } from "@/components/public/category-image";
 import styles from "./home.module.css";
 
 export const dynamic = "force-dynamic";
 
 const categories = [
-  { slug: "empaque", label: "Empaque" },
-  { slug: "abrasivos", label: "Abrasivos" },
-  { slug: "equipo-de-seguridad", label: "Equipo de Seguridad" },
-  { slug: "herramienta", label: "Herramienta Neumática" },
-  { slug: "tornilleria", label: "Tornillería" },
+  { slug: "empaque", label: "Empaque", aliases: [] },
+  { slug: "abrasivos", label: "Abrasivos", aliases: [] },
+  { slug: "equipo-de-seguridad", label: "Equipo de Seguridad", aliases: ["seguridad-industrial"] },
+  { slug: "herramienta", label: "Herramienta Neumática", aliases: ["herramientas-herramientas-neumaticas", "herramientas"] },
+  { slug: "tornilleria", label: "Tornillería", aliases: [] },
 ];
 
 const steps = [
@@ -23,7 +24,7 @@ const steps = [
 export default async function HomePage() {
   noStore();
   const data = await getHomepageData().catch(() => null);
-  const availableSlugs = new Set((data?.categories ?? []).map((category) => category.slug));
+  const available = data?.categories ?? [];
 
   return (
     <div className={styles.home}>
@@ -41,16 +42,19 @@ export default async function HomePage() {
 
       <section className={styles.categories} aria-label="Categorías de suministros">
         <div className={styles.categoryGrid}>
-          {categories.map((category, index) => (
+          {categories.map((category) => {
+            const selected = available.find(item => item.slug === category.slug)
+              || category.aliases.flatMap(slug => available.filter(item => item.slug === slug))[0];
+            return (
             <Link
               key={category.slug}
-              href={availableSlugs.has(category.slug) ? `/catalogo/${category.slug}` : "/catalogo"}
+              href={selected ? `/catalogo/${selected.slug}` : "/catalogo"}
               className={styles.category}
             >
-              <span className={styles.categoryPhoto} style={{ backgroundImage: `url("/home/category-${index}.webp")` }} role="img" aria-label={category.label} />
+              <CategoryImage imageUrl={selected?.imageUrl} name={category.label} className={styles.categoryPhoto} sizes="(max-width: 760px) 45vw, 220px" />
               <span className={styles.categoryLabel}>{category.label}</span>
             </Link>
-          ))}
+          ); })}
         </div>
         <div className={styles.categoryLinks}>
           <Link href="/catalogo">Compra por categoría</Link>
