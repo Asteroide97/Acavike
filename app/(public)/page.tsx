@@ -2,7 +2,7 @@ import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
 import { ArrowRight, ClipboardCheck, Package, Warehouse } from "lucide-react";
 import { getHomepageData } from "@/lib/site";
-import { CategoryImage } from "@/components/public/category-image";
+import { CategoryTile } from "@/components/public/category-card";
 import styles from "./home.module.css";
 
 export const dynamic = "force-dynamic";
@@ -46,14 +46,12 @@ export default async function HomePage() {
             const selected = available.find(item => item.slug === category.slug)
               || category.aliases.flatMap(slug => available.filter(item => item.slug === slug))[0];
             return (
-            <Link
+            <CategoryTile
               key={category.slug}
               href={selected ? `/catalogo/${selected.slug}` : "/catalogo"}
-              className={styles.category}
-            >
-              <CategoryImage imageUrl={selected?.imageUrl} name={category.label} className={styles.categoryPhoto} sizes="(max-width: 760px) 45vw, 220px" />
-              <span className={styles.categoryLabel}>{category.label}</span>
-            </Link>
+              imageUrl={selected?.imageUrl}
+              name={category.label}
+            />
           ); })}
         </div>
         <div className={styles.categoryLinks}>

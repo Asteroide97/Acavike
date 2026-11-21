@@ -42,25 +42,25 @@ export function SiteHeader({
 
   return (
     <header className="border-b border-[#D1D5DB] bg-white">
-      <div className="bg-[#0B1E4B] text-white">
+      <div className="bg-primary text-white">
         <div className="section-shell flex flex-col gap-1.5 py-2 text-[11px] sm:text-[12px] md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
             <span className="inline-flex items-center gap-2">
               <Phone className="h-3.5 w-3.5" />
               {supportPhone}
             </span>
-            <span className="inline-flex items-center gap-2 text-blue-100">
+            <span className="inline-flex items-center gap-2 text-white">
               <Clock3 className="h-3.5 w-3.5" />
               {supportHours}
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-blue-100">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-white">
             <span className="hidden min-[360px]:inline-flex items-center gap-2">
               <Mail className="h-3.5 w-3.5" />
               {supportEmail}
             </span>
-            <span className="hidden lg:inline text-blue-200">
+            <span className="hidden lg:inline text-white">
               Catálogo B2B con compra por transferencia y atención comercial directa.
             </span>
           </div>
@@ -113,7 +113,7 @@ export function SiteHeader({
             </Link>
             <Link
               href={authHref}
-              className="inline-flex h-9 w-full min-w-0 items-center justify-center gap-1.5 rounded-[6px] bg-[#0B1E4B] px-2.5 text-[11px] font-semibold text-white hover:bg-[#081632] sm:h-10 sm:w-auto sm:gap-2 sm:px-3 sm:text-[13px]"
+              className="inline-flex h-9 w-full min-w-0 items-center justify-center gap-1.5 rounded-[6px] bg-primary px-2.5 text-[11px] font-semibold text-white hover:bg-[var(--brand-hover)] sm:h-10 sm:w-auto sm:gap-2 sm:px-3 sm:text-[13px]"
             >
               <UserRound className="h-4 w-4" />
               {authLabel}

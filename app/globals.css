@@ -6,28 +6,26 @@
   :root {
     --brand-blue: #0755c8;
     --brand-blue-rgb: 7 85 200;
-    --brand-navy-rgb: 11 30 64;
     --font-heading: var(--font-body);
-    --brand-navy: #0b1e40;
     --brand-hover: #0646a6;
     --brand-soft: #eaf2ff;
     --brand-background: #f5f7fa;
     --brand-white: #ffffff;
-    --brand-text: #10213d;
+    --brand-text: #111827;
     --brand-muted: #52637a;
     --brand-border: #dce3ec;
     --background: 216 33% 97%;
-    --foreground: 217 58% 15%;
+    --foreground: 221 39% 11%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
     --primary: 216 93% 41%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 218 71% 15%;
+    --secondary: 216 93% 41%;
     --secondary-foreground: 0 0% 100%;
     --muted: 220 14% 94%;
     --muted-foreground: 215 20% 40%;
     --accent: 217 100% 96%;
-    --accent-foreground: 218 71% 15%;
+    --accent-foreground: 216 93% 41%;
     --destructive: 0 70% 42%;
     --destructive-foreground: 0 0% 100%;
     --border: 214 30% 89%;
@@ -63,6 +61,11 @@
 
   a {
     @apply transition-colors;
+  }
+
+  :is(a, button, input, select, textarea, summary):focus-visible {
+    outline: 2px solid var(--brand-blue);
+    outline-offset: 3px;
   }
 }
 
@@ -158,12 +161,12 @@
   .public-btn-outline {
     border: 1px solid #d1d5db;
     background: #ffffff;
-    color: #0b1e4b;
+    color: var(--brand-text);
   }
 
   .public-btn-outline:hover {
-    border-color: #1d3b7a;
-    color: #1d3b7a;
+    border-color: var(--brand-blue);
+    color: var(--brand-blue);
   }
 
   .public-btn-accent {
@@ -191,9 +194,51 @@
 
   .public-input:focus,
   .public-select:focus {
-    border-color: #1d3b7a;
-    box-shadow: 0 0 0 3px rgba(29, 59, 122, 0.1);
+    border-color: var(--brand-blue);
+    box-shadow: 0 0 0 3px rgb(var(--brand-blue-rgb) / 0.15);
   }
+
+  .category-tile {
+    display: flex;
+    min-width: 0;
+    height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--brand-border);
+    border-radius: 10px;
+    background: var(--brand-white);
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+  }
+
+  .category-tile:hover {
+    border-color: var(--brand-blue);
+    box-shadow: 0 3px 10px rgb(var(--brand-blue-rgb) / 0.12);
+  }
+
+  .category-tile .category-tile-image {
+    width: 100%;
+    aspect-ratio: 1.6;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .category-tile-label {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 9px 8px;
+    background: var(--brand-blue);
+    color: var(--brand-white);
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  .category-tile:hover .category-tile-label { background: var(--brand-hover); }
 }
 
 /* Bridge existing presentation utilities to the shared palette without changing state colors. */
@@ -210,11 +255,18 @@
 :is(.public-app, .admin-app) :is(.public-panel, .surface) { border-color: var(--brand-border); }
 .public-app :is(.public-btn-outline, .public-chip) { color: var(--brand-text); border-color: var(--brand-border); }
 .public-app .public-btn-outline:hover { background: var(--brand-soft); color: var(--brand-blue); }
-.public-app header > div:first-child { background-color: var(--brand-navy); }
+.public-app header > div:first-child { background-color: var(--brand-blue); }
 .public-app header :is(a, button) { font-size: 13px; }
 .public-app header :is([class~="hover:bg-[#081632]"], [class~="hover:bg-[#F3F4F6]"]):hover { background-color: var(--brand-hover); color: white; }
 .public-app header [class~="text-blue-200"] { color: #dbeafe; }
-.admin-app aside [class~="text-slate-400"] { color: #cbd5e1; }
+.admin-app aside :is(a, p, [class~="text-slate-400"]) { color: white; }
+.admin-app aside :is(a, button):focus-visible,
+.public-app footer :is(a, button):focus-visible,
+.public-app header > div:first-child :is(a, button):focus-visible { outline-color: white; }
+:is(.public-app, .admin-app) [class~="hover:bg-[#081632]"]:hover { background-color: var(--brand-hover); }
+:is(.public-app, .admin-app) [class~="hover:text-[#0B1E4B]"]:hover { color: var(--brand-hover); }
+:is(.public-app, .admin-app) [class~="focus:border-[#1D3B7A]"]:focus { border-color: var(--brand-blue); }
+:is(.public-app, .admin-app) [class~="bg-blue-50"] { background-color: var(--brand-soft); }
 .public-app [class~="bg-[#0B1E4B]"] :is(h1, h2, h3) { color: white; }
 .public-app :is([class~="bg-[#EFF3FA]"], [class~="bg-[#FFF7DB]"], [class~="bg-[#F4B000]"]) { background-color: var(--brand-soft); }
 .public-app [class~="border-[#1D3B7A]"] { border-color: var(--brand-blue); }

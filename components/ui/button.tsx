@@ -7,8 +7,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary px-4 py-2.5 text-primary-foreground hover:bg-primary/90",
-        secondary: "bg-secondary px-4 py-2.5 text-secondary-foreground hover:bg-secondary/80",
+        default: "bg-primary px-4 py-2.5 text-primary-foreground hover:bg-[var(--brand-hover)]",
+        secondary: "bg-secondary px-4 py-2.5 text-secondary-foreground hover:bg-[var(--brand-hover)]",
         outline:
           "border border-slate-300 bg-white px-4 py-2.5 text-slate-800 hover:border-primary hover:text-primary",
         ghost: "px-3 py-2 text-slate-700 hover:bg-slate-100",

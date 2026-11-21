@@ -20,7 +20,7 @@ const config: Config = {
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "rgb(var(--brand-navy-rgb) / <alpha-value>)",
+          DEFAULT: "rgb(var(--brand-blue-rgb) / <alpha-value>)",
           foreground: "hsl(var(--secondary-foreground))",
         },
         muted: {
@@ -28,7 +28,7 @@ const config: Config = {
           foreground: "var(--brand-muted)",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
+          DEFAULT: "var(--brand-soft)",
           foreground: "hsl(var(--accent-foreground))",
         },
         destructive: {

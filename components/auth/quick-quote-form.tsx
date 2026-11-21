@@ -33,7 +33,7 @@ export function QuickQuoteForm({
     },
   });
 
-  const fieldClassName = "rounded-[6px] border-[#D1D5DB] focus:border-[#1D3B7A] focus:ring-[#1D3B7A]/10";
+  const fieldClassName = "rounded-[6px] border-border focus:border-primary focus:ring-primary/10";
   const labelClassName = "text-[12px] font-semibold uppercase tracking-[0.14em] text-slate-600";
 
   const onSubmit = form.handleSubmit((values) => {
@@ -87,7 +87,7 @@ export function QuickQuoteForm({
         <Textarea id="quote-notes" className={fieldClassName} {...form.register("notes")} />
       </div>
       <div className="md:col-span-2">
-        <Button type="submit" className="rounded-[6px] bg-[#0B1E4B] hover:bg-[#081632]" disabled={isPending}>
+        <Button type="submit" className="rounded-[6px] bg-primary hover:bg-[var(--brand-hover)]" disabled={isPending}>
           {isPending ? "Enviando..." : "Solicitar cotización"}
         </Button>
       </div>

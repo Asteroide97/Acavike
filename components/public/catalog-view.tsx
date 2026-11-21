@@ -4,6 +4,7 @@ import { CatalogFilterPanel } from "@/components/public/catalog-filter-panel";
 import { CatalogBreadcrumbs } from "@/components/public/catalog-breadcrumbs";
 import { ProductCard } from "@/components/public/product-card";
 import { CategoryImage } from "@/components/public/category-image";
+import { CategoryTile } from "@/components/public/category-card";
 import { catalogHref, categoryPath, orderedCategoryTree, type CatalogFilters } from "@/lib/catalog-filters";
 import type { getCatalogPageDataRepository } from "@/lib/repositories/catalog";
 
@@ -67,7 +68,7 @@ export function CatalogView({ data, filters, unavailable = false }: { data: Cata
               <select aria-label="Ordenar productos" name="orden" defaultValue={filters.sort} className="public-select w-full min-w-0"><option value="featured">Destacados</option><option value="name_asc">Nombre: A a Z</option><option value="name_desc">Nombre: Z a A</option><option value="price_asc">Precio: menor a mayor</option><option value="price_desc">Precio: mayor a menor</option><option value="newest">Más recientes</option></select>
               <button className="public-btn" type="submit">Buscar</button>
             </form>
-            {children.length ? <nav aria-label="Subcategorías" className="mt-4 grid grid-cols-2 gap-3 border-t border-[#D1D5DB] pt-4 sm:grid-cols-3 lg:grid-cols-4">{children.map(child => <Link href={catalogHref(filters, child.slug)} key={child.id} className="min-w-0 rounded border border-[#D1D5DB] p-2 text-xs font-semibold text-[#1D3B7A] hover:border-[#1D3B7A]"><CategoryImage imageUrl={child.imageUrl} name={child.name} className="aspect-[4/3] w-full" sizes="(max-width: 640px) 40vw, 180px" /><span className="mt-2 block break-words">{child.name}</span></Link>)}</nav> : null}
+            {children.length ? <nav aria-label="Subcategorías" className="mt-4 grid grid-cols-2 gap-3 border-t border-[#D1D5DB] pt-4 sm:grid-cols-3 lg:grid-cols-4">{children.map(child => <CategoryTile href={catalogHref(filters, child.slug)} key={child.id} imageUrl={child.imageUrl} name={child.name} sizes="(max-width: 640px) 40vw, 180px" />)}</nav> : null}
           </div>
           {unavailable ? <p role="status" className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm">No fue posible consultar el catálogo. Intenta de nuevo o solicita una cotización.</p> : null}
           {products.length ? <div className="grid min-w-0 grid-cols-1 gap-3 min-[380px]:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">{products.map(product => <ProductCard key={product.id} product={product} catalog />)}</div> : <div className="rounded-md border border-[#D1D5DB] bg-white px-5 py-14 text-center"><h2 className="text-xl font-bold text-[#0B1E4B]">No hay productos para esta selección</h2><p className="mx-auto mt-2 max-w-md text-sm text-slate-600">Prueba otra búsqueda o envíanos tu lista de materiales para cotizar.</p><div className="mt-5 flex flex-wrap justify-center gap-2"><Link href="/catalogo" className="public-btn-outline">Ver catálogo</Link><Link href="/cotizacion-rapida" className="public-btn">Solicitar cotización</Link></div></div>}
