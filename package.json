@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate --schema prisma/schema.prisma && next build",
+    "build:sqlite": "prisma generate --schema prisma/schema.sqlite.prisma && next build",
     "start": "next start",
     "lint": "eslint .",
     "db:generate": "prisma generate",

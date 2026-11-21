@@ -25,6 +25,8 @@ La migración **no aplicada** `20261121030000_product_import_reference` agrega �
 
 **No desplegar el nuevo cliente Prisma antes de aprobar y aplicar la migración.** Las lecturas del cliente regenerado esperan las columnas nuevas. Migraciones y pruebas de integración con PostgreSQL deben hacerse primero en una base local/de pruebas autorizada; no usar producción para QA.
 
+El build estándar ejecuta `prisma generate` antes de Next.js para no reutilizar tipos antiguos de la caché de Vercel. No aplica migraciones ni seeds. SQLite conserva su build separado: `npm run build:sqlite`.
+
 ## Escritura futura, solo tras aprobación
 
 No ejecutar todavía. El importador exige todos estos controles:

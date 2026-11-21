@@ -50,6 +50,8 @@ Abrir Prisma Studio con SQLite:
 npx prisma studio --schema prisma/schema.sqlite.prisma
 ```
 
+Para compilar una instalación local o VPS con SQLite, usa `npm run build:sqlite` y después `npm run start`. El build estándar regenera el cliente PostgreSQL para evitar que Vercel reutilice un cliente Prisma antiguo de su caché. Ninguno de los dos comandos de build ejecuta migraciones ni seeds.
+
 ## Seed
 
 El seed reutiliza `prisma/seed.ts`.
