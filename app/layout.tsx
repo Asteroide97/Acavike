@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
-import { BRAND_LOGO_URL } from "@/lib/constants";
+import { BRAND_LOGO_ALT, BRAND_LOGO_HEIGHT, BRAND_LOGO_URL, BRAND_LOGO_WIDTH } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 const body = IBM_Plex_Sans({
@@ -26,9 +26,9 @@ export const metadata: Metadata = {
     images: [
       {
         url: BRAND_LOGO_URL,
-        width: 1024,
-        height: 1024,
-        alt: "Acavike Supplies",
+        width: BRAND_LOGO_WIDTH,
+        height: BRAND_LOGO_HEIGHT,
+        alt: BRAND_LOGO_ALT,
       },
     ],
   },

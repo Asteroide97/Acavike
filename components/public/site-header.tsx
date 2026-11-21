@@ -70,7 +70,7 @@ export function SiteHeader({
       <div className="section-shell py-3 sm:py-4">
         <div className="grid gap-3 xl:grid-cols-[190px_minmax(0,1fr)_auto] xl:items-center">
           <Link href="/" className="flex w-full min-w-0 items-center">
-            <BrandLogo priority className="h-[76px] w-[145px] sm:h-[84px] sm:w-[170px]" />
+            <BrandLogo className="w-[160px] sm:w-[190px]" />
           </Link>
 
           <form

@@ -50,7 +50,7 @@ export function AdminSidebar({ role }: { role: UserRole }) {
   return (
     <aside className="flex h-full min-h-0 min-w-0 flex-col rounded-[2rem] bg-primary p-6 text-white">
       <Link href="/admin" className="flex shrink-0 flex-col items-start gap-3">
-        <BrandLogo className="w-[164px] rounded-lg bg-white p-1" />
+        <BrandLogo tone="white" className="w-[170px]" />
         <p className="text-xs uppercase tracking-[0.18em] text-slate-300">Control Panel</p>
       </Link>
 
