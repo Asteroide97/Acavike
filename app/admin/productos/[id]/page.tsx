@@ -12,6 +12,7 @@ import { deleteProductAction, saveProductAction } from "@/lib/actions/admin";
 import { requireUser } from "@/lib/auth";
 import { DATABASE_ENABLED } from "@/lib/config";
 import { ADMIN_ROLES } from "@/lib/constants";
+import { categoryPath } from "@/lib/catalog-filters";
 import { productImageSelect } from "@/lib/product-images";
 import { prisma } from "@/lib/prisma";
 
@@ -58,6 +59,7 @@ export default async function ProductEditorPage({
   }
 
   const tiersText = product?.priceTiers.map((tier) => `${tier.minQuantity}|${tier.price.toString()}`).join("\n") || "";
+  const reference = product?.importReference && typeof product.importReference === "object" && !Array.isArray(product.importReference) ? product.importReference : null;
 
   return (
     <div className="space-y-6">
@@ -68,6 +70,11 @@ export default async function ProductEditorPage({
       />
 
       <AdminFlash searchParams={resolvedSearchParams} />
+      {reference ? <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+        <p className="font-semibold">Referencia de importación Alegra {product?.alegraId}</p>
+        <p>Precio público sin IVA. Precio con descuento de origen: {String(reference.referenceDiscountPrice ?? "No informado")} MXN (solo referencia; no aplicado).</p>
+        {reference.inventoryVerified === false ? <p>Existencias de origen no verificadas. El cero inicial es un valor técnico, no un conteo real. Verifica el inventario antes de activar el producto.</p> : null}
+      </div> : null}
 
       <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <Card className="admin-surface">
@@ -78,8 +85,11 @@ export default async function ProductEditorPage({
               <AdminField label="Nombre">
                 <Input name="name" defaultValue={product?.name || ""} />
               </AdminField>
-              <AdminField label="SKU">
+              <AdminField label="SKU" hint={isNew ? "Si lo dejas vacío, se genera un SKU ACV único al guardar." : undefined}>
                 <Input name="sku" defaultValue={product?.sku || ""} />
+              </AdminField>
+              <AdminField label="Identificador Alegra" hint="Referencia externa de importación; no sustituye al SKU.">
+                <Input value={product?.alegraId || "Sin referencia externa"} readOnly />
               </AdminField>
               <AdminField label="Slug">
                 <Input name="slug" defaultValue={product?.slug || ""} />
@@ -89,7 +99,7 @@ export default async function ProductEditorPage({
                   <option value="">Selecciona una categoría</option>
                   {categories.map((category) => (
                     <option key={category.id} value={category.id}>
-                      {category.name}
+                      {categoryPath(categories, category.id).map(part => part.name).join(" / ")}
                     </option>
                   ))}
                 </Select>
@@ -145,6 +155,10 @@ export default async function ProductEditorPage({
                   Producto activo
                 </label>
               </div>
+              {reference ? <div className="flex items-start gap-3 md:col-span-2">
+                <Checkbox id="importInventoryVerified" name="importInventoryVerified" defaultChecked={reference.inventoryVerified === true} />
+                <label htmlFor="importInventoryVerified" className="text-sm">Confirmo que las existencias capturadas son reales y están verificadas. Obligatorio para activar un producto importado.</label>
+              </div> : null}
               <div className="flex items-center gap-3">
                 <Checkbox id="isFeatured" name="isFeatured" defaultChecked={product?.isFeatured || false} />
                 <label htmlFor="isFeatured" className="text-sm font-medium text-slate-800">

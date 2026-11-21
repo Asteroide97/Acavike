@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { deleteCategoryAction, saveCategoryAction } from "@/lib/actions/admin";
 import { requireUser } from "@/lib/auth";
 import { ADMIN_ROLES } from "@/lib/constants";
+import { categoryPath, descendantCategoryIds } from "@/lib/catalog-filters";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -66,10 +67,10 @@ export default async function CategoryEditorPage({
                 <Select name="parentId" defaultValue={category?.parentId || ""}>
                   <option value="">Sin padre</option>
                   {categories
-                    .filter((item) => item.id !== category?.id)
+                    .filter((item) => !category || !descendantCategoryIds(categories, category.id).includes(item.id))
                     .map((item) => (
                       <option key={item.id} value={item.id}>
-                        {item.name}
+                        {categoryPath(categories, item.id).map(part => part.name).join(" / ")}
                       </option>
                     ))}
                 </Select>

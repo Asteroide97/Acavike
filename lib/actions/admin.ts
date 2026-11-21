@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { logAuditEntry } from "@/lib/audit";
+import { descendantCategoryIds } from "@/lib/catalog-filters";
+import { createCatalogSku } from "@/lib/catalog-sku";
 import { DATABASE_CONFIG_ERROR, DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
 import { ADMIN_ROLES, ORDER_ROLES, QUOTE_ROLES } from "@/lib/constants";
 import {
@@ -180,6 +182,13 @@ export async function saveCategoryAction(formData: FormData) {
     });
   }
 
+  if (categoryId && parentId) {
+    const categories = await prisma.category.findMany();
+    if (descendantCategoryIds(categories, categoryId).includes(parentId)) {
+      redirectWithMessage(`/admin/categorias/${categoryId}`, { error: "Una categoría no puede depender de una de sus subcategorías." });
+    }
+  }
+
   const data = {
     name,
     slug,
@@ -246,7 +255,7 @@ export async function saveProductAction(formData: FormData) {
   const user = await requireUser(ADMIN_ROLES);
   const productId = toStringValue(formData.get("productId"));
   const name = toStringValue(formData.get("name"));
-  const sku = toStringValue(formData.get("sku"));
+  const sku = toStringValue(formData.get("sku")) || (!productId ? createCatalogSku() : "");
   const categoryId = toStringValue(formData.get("categoryId"));
 
   if (!name || !sku || !categoryId) {
@@ -258,8 +267,17 @@ export async function saveProductAction(formData: FormData) {
   const slug = toStringValue(formData.get("slug")) || slugify(name);
   const images = parseSubmittedProductImages(formData);
   const tiers = parseTierLines(toStringValue(formData.get("tiersText")));
+  const existingReference = productId
+    ? (await prisma.product.findUnique({ where: { id: productId }, select: { importReference: true } }))?.importReference
+    : null;
+  const reference = existingReference && typeof existingReference === "object" && !Array.isArray(existingReference) ? existingReference : null;
+  const inventoryVerified = parseCheckbox(formData.get("importInventoryVerified"));
+  if (reference && parseCheckbox(formData.get("isActive")) && !inventoryVerified) {
+    redirectWithMessage(`/admin/productos/${productId}`, { error: "Verifica y confirma las existencias reales antes de activar un producto importado." });
+  }
 
   const productData = {
+    ...(reference ? { importReference: { ...reference, inventoryVerified } } : {}),
     name,
     slug,
     sku,

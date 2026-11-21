@@ -3,15 +3,16 @@ import { DATABASE_ENABLED, DEMO_MODE } from "@/lib/config";
 import { demoCategories, demoProducts, demoProductsBySlug, demoSiteSections } from "@/lib/demo-data";
 import { productImageSelect } from "@/lib/product-images";
 import { getSiteSettingsMapRepository } from "@/lib/repositories/settings";
+import { descendantCategoryIds, visibleCategories, type CatalogFilters, type CatalogSort } from "@/lib/catalog-filters";
 
-type SortOption = "featured" | "price_asc" | "price_desc" | "newest";
+type SortOption = CatalogSort;
 
 function filterAndSortDemoProducts(query: string, categorySlug: string, sort: SortOption) {
   const normalizedQuery = query.trim().toLowerCase();
 
   const filtered = demoProducts.filter((product) => {
     const matchesQuery = normalizedQuery
-      ? [product.name, product.sku, product.brand || "", product.category.name]
+      ? [product.name, product.sku, product.brand || "", product.description || "", product.shortDescription || "", product.alegraId || "", product.category.name]
           .join(" ")
           .toLowerCase()
           .includes(normalizedQuery)
@@ -22,6 +23,7 @@ function filterAndSortDemoProducts(query: string, categorySlug: string, sort: So
   });
 
   return filtered.sort((left, right) => {
+    if (sort === "name_asc" || sort === "name_desc") return left.name.localeCompare(right.name, "es") * (sort === "name_desc" ? -1 : 1);
     if (sort === "price_asc") {
       return Number(left.price) - Number(right.price);
     }
@@ -115,15 +117,19 @@ export async function getHomepageDataRepository() {
   return { sections, categories, featuredProducts };
 }
 
-export async function getCatalogPageDataRepository(input: {
-  query: string;
-  categorySlug: string;
-  sort: SortOption;
-}) {
+export async function getCatalogPageDataRepository(input: CatalogFilters) {
   if (DEMO_MODE) {
+    const categories = visibleCategories(demoCategories);
+    const selected = categories.find(category => category.slug === input.categorySlug);
+    const ids = selected ? descendantCategoryIds(categories, selected.id) : [];
     return {
-      categories: demoCategories.filter((category) => category.isActive),
-      products: filterAndSortDemoProducts(input.query, input.categorySlug, input.sort),
+      categories,
+      products: filterAndSortDemoProducts(input.query, "", input.sort).filter(product =>
+        categories.some(category => category.id === product.categoryId) &&
+        (!input.categorySlug || ids.includes(product.categoryId)) &&
+        (!input.inStock || product.stock > 0) &&
+        (input.minPrice === undefined || Number(product.price) >= input.minPrice) &&
+        (input.maxPrice === undefined || Number(product.price) <= input.maxPrice)),
     };
   }
 
@@ -134,16 +140,22 @@ export async function getCatalogPageDataRepository(input: {
     };
   }
 
-  const categories = await prisma.category.findMany({
-    where: { isActive: true },
+  const allCategories = await prisma.category.findMany({
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
   });
+  const categories = visibleCategories(allCategories);
+  const selected = categories.find(category => category.slug === input.categorySlug);
+  const ids = input.categorySlug ? selected ? descendantCategoryIds(categories, selected.id) : [] : categories.map(category => category.id);
 
   const orderBy =
     input.sort === "price_asc"
       ? { price: "asc" as const }
       : input.sort === "price_desc"
         ? { price: "desc" as const }
+        : input.sort === "name_asc"
+          ? { name: "asc" as const }
+          : input.sort === "name_desc"
+            ? { name: "desc" as const }
         : input.sort === "newest"
           ? { createdAt: "desc" as const }
           : { isFeatured: "desc" as const };
@@ -155,11 +167,16 @@ export async function getCatalogPageDataRepository(input: {
         ? [
             { name: { contains: input.query, mode: "insensitive" } },
             { sku: { contains: input.query, mode: "insensitive" } },
+            { description: { contains: input.query, mode: "insensitive" } },
+            { shortDescription: { contains: input.query, mode: "insensitive" } },
+            { alegraId: { contains: input.query, mode: "insensitive" } },
             { brand: { contains: input.query, mode: "insensitive" } },
             { category: { name: { contains: input.query, mode: "insensitive" } } },
           ]
         : undefined,
-      category: input.categorySlug ? { slug: input.categorySlug } : undefined,
+      categoryId: { in: ids },
+      stock: input.inStock ? { gt: 0 } : undefined,
+      price: { gte: input.minPrice, lte: input.maxPrice },
     },
     include: {
       images: {
@@ -172,7 +189,7 @@ export async function getCatalogPageDataRepository(input: {
         orderBy: { minQuantity: "asc" },
       },
     },
-    orderBy,
+    orderBy: [orderBy, { id: "asc" }],
   });
 
   return { categories, products };

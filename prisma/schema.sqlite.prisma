@@ -112,6 +112,8 @@ model Product {
   name              String
   slug              String         @unique
   sku               String         @unique
+  alegraId          String?        @unique
+  importReference   Json?
   brand             String?
   shortDescription  String?
   description       String?

@@ -193,6 +193,8 @@ const demoProductsBase: Array<
   }
 > = demoProductSeeds.map((product: DemoProductSeed, index) => ({
   id: `prod_${index + 1}`,
+  alegraId: null,
+  importReference: null,
   name: product.name?.trim() || `Producto demo ${index + 1}`,
   slug: toDemoSlug(product.name?.trim() || `producto-demo-${index + 1}`),
   sku: product.sku?.trim() || `DEMO-${String(index + 1).padStart(3, "0")}`,
@@ -229,6 +231,8 @@ const demoProductsBase: Array<
 export const demoProducts: DemoProductRecord[] = demoProductsBase.map((product, index) => {
   const category = categoryBySlug.get(product.categorySlug) ?? demoCategories[0];
   const productRecord: Product = {
+    alegraId: null,
+    importReference: null,
     id: product.id,
     name: product.name,
     slug: product.slug,
