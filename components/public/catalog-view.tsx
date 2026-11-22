@@ -5,6 +5,7 @@ import { CatalogBreadcrumbs } from "@/components/public/catalog-breadcrumbs";
 import { ProductCard } from "@/components/public/product-card";
 import { CategoryImage } from "@/components/public/category-image";
 import { CategoryTile } from "@/components/public/category-card";
+import { CategoryHeader } from "@/components/public/category-header";
 import { catalogHref, catalogPage, categoryPath, orderedCategoryTree, type CatalogFilters } from "@/lib/catalog-filters";
 import type { getCatalogPageDataRepository } from "@/lib/repositories/catalog";
 
@@ -57,15 +58,12 @@ export function CatalogView({ data, filters, unavailable = false }: { data: Cata
         </aside>
         <section className="min-w-0 space-y-4">
           <div className="rounded-md border border-[#D1D5DB] bg-white p-4 md:p-5">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="min-w-0"><p className="text-[11px] font-bold uppercase tracking-[.16em] text-[#1D3B7A]">Suministros para tu empresa</p><h1 className="mt-1 break-words text-2xl font-bold text-[#0B1E4B] md:text-3xl">{active?.name || "Catálogo industrial"}</h1><p className="mt-2 text-sm text-slate-600">{products.length} {products.length === 1 ? "producto" : "productos"}{filters.query ? ` para “${filters.query}”` : ""}</p></div>
-              <div className="flex items-center gap-3">{active ? <CategoryImage imageUrl={active.imageUrl} name={active.name} className="h-20 w-28 sm:h-24 sm:w-32" sizes="128px" /> : null}<Link href="/cotizacion-rapida" className="public-btn-outline text-xs">Cotización express</Link></div>
-            </div>
-            <form action={path} className="mt-5 grid min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] xl:grid-cols-[minmax(0,1fr)_195px_auto]">
+            <CategoryHeader name={active?.name || "Catálogo industrial"} description={active?.description} imageUrl={active?.imageUrl} productCount={products.length} query={filters.query} />
+            <form action={path} className="grid min-w-0 gap-2 border-t border-border pt-4 sm:grid-cols-[minmax(0,1fr)_180px_auto]">
               {filters.minPrice !== undefined ? <input type="hidden" name="min" value={filters.minPrice} /> : null}
               {filters.maxPrice !== undefined ? <input type="hidden" name="max" value={filters.maxPrice} /> : null}
               {filters.inStock ? <input type="hidden" name="disponibilidad" value="disponible" /> : null}
-              <label className="relative min-w-0 sm:col-span-2 xl:col-span-1"><span className="sr-only">Buscar productos</span><Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" /><input name="q" defaultValue={filters.query} placeholder="Nombre, descripción, código o SKU" className="public-input w-full min-w-0 pl-9" /></label>
+              <label className="relative min-w-0"><span className="sr-only">Buscar productos</span><Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" /><input name="q" defaultValue={filters.query} placeholder="Nombre, descripción, código o SKU" className="public-input w-full min-w-0 pl-9" /></label>
               <select aria-label="Ordenar productos" name="orden" defaultValue={filters.sort} className="public-select w-full min-w-0"><option value="custom">Orden personalizado</option><option value="featured">Destacados</option><option value="name_asc">Nombre: A a Z</option><option value="name_desc">Nombre: Z a A</option><option value="price_asc">Precio: menor a mayor</option><option value="price_desc">Precio: mayor a menor</option><option value="newest">Más recientes</option></select>
               <button className="public-btn" type="submit">Buscar</button>
             </form>

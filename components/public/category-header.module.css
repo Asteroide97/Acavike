@@ -1,0 +1,26 @@
+.hero {
+  display: grid;
+  min-width: 0;
+  align-items: center;
+  gap: 20px;
+  padding: 4px 0 20px;
+}
+
+.copy { min-width: 0; }
+.kicker { color: var(--brand-blue); font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.title { margin-top: 6px; font-size: clamp(26px, 2.6vw, 34px); line-height: 1.15; font-weight: 700; overflow-wrap: anywhere; }
+.description { max-width: 58ch; margin-top: 12px; color: var(--brand-muted); font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
+.count { margin-top: 12px; color: var(--brand-muted); font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.quote { margin-top: 18px; max-width: 100%; }
+.visual { position: relative; width: 100%; min-width: 0; height: 170px; max-height: 240px; }
+.image { object-fit: contain; object-position: center; }
+
+@media (min-width: 640px) {
+  .withImage { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; }
+  .visual { height: 200px; }
+}
+
+@media (min-width: 1024px) {
+  .withImage { gap: 32px; }
+  .visual { height: 240px; }
+}
