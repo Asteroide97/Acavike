@@ -1,5 +1,5 @@
 export type CatalogCategory = { id: string; parentId: string | null; slug: string; name: string; isActive: boolean };
-export const CATALOG_SORTS = ["featured", "name_asc", "name_desc", "price_asc", "price_desc", "newest"] as const;
+export const CATALOG_SORTS = ["custom", "featured", "name_asc", "name_desc", "price_asc", "price_desc", "newest"] as const;
 export type CatalogSort = (typeof CATALOG_SORTS)[number];
 export type CatalogFilters = {
   query: string;
@@ -8,6 +8,7 @@ export type CatalogFilters = {
   inStock?: boolean;
   minPrice?: number;
   maxPrice?: number;
+  page?: number;
 };
 
 export function parseCatalogFilters(values: Record<string, string | string[] | undefined>): CatalogFilters {
@@ -20,8 +21,9 @@ export function parseCatalogFilters(values: Record<string, string | string[] | u
   const sort = one("orden");
   return {
     query: one("q").trim().slice(0, 200), categorySlug: one("categoria"),
-    sort: CATALOG_SORTS.includes(sort as CatalogSort) ? sort as CatalogSort : "featured",
+    sort: CATALOG_SORTS.includes(sort as CatalogSort) ? sort as CatalogSort : "custom",
     inStock: one("disponibilidad") === "disponible", minPrice: price("min"), maxPrice: price("max"),
+    page: /^\d+$/.test(one("pagina")) && Number.isSafeInteger(Number(one("pagina"))) ? Math.max(1, Number(one("pagina"))) : 1,
   };
 }
 
@@ -81,12 +83,19 @@ export function orderedCategoryTree<T extends CatalogCategory>(categories: T[]):
   return result;
 }
 
-export function catalogHref(filters: CatalogFilters, slug = filters.categorySlug) {
+export function catalogHref(filters: CatalogFilters, slug = filters.categorySlug, page = 1) {
   const params = new URLSearchParams();
   if (filters.query) params.set("q", filters.query);
-  if (filters.sort !== "featured") params.set("orden", filters.sort);
+  if (filters.sort !== "custom") params.set("orden", filters.sort);
+  if (page > 1) params.set("pagina", String(page));
   if (filters.inStock) params.set("disponibilidad", "disponible");
   if (filters.minPrice !== undefined) params.set("min", String(filters.minPrice));
   if (filters.maxPrice !== undefined) params.set("max", String(filters.maxPrice));
   return `${slug ? `/catalogo/${encodeURIComponent(slug)}` : "/catalogo"}${params.size ? `?${params}` : ""}`;
+}
+
+export function catalogPage<T>(products: T[], requested = 1, pageSize = 24) {
+  const pageCount = Math.max(1, Math.ceil(products.length / pageSize));
+  const page = Math.max(1, Math.min(Number.isSafeInteger(requested) ? requested : 1, pageCount));
+  return { page, pageCount, products: products.slice((page - 1) * pageSize, page * pageSize) };
 }

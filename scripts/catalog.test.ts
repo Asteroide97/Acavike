@@ -24,7 +24,7 @@ test("categorías inactivas, huérfanas y ciclos no aparecen", () => {
 test("parámetros inválidos no producen NaN ni orden arbitrario", () => {
   const filters = parseCatalogFilters({ min: "bad", max: "-1", orden: "sql", q: ["  cinta ", "ignored"] });
   assert.equal(filters.minPrice, undefined); assert.equal(filters.maxPrice, undefined);
-  assert.equal(filters.sort, "featured"); assert.equal(filters.query, "cinta");
+  assert.equal(filters.sort, "custom"); assert.equal(filters.query, "cinta");
   assert.equal(parseCatalogFilters({ min: "0" }).minPrice, 0);
 });
 test("cambiar categoría conserva búsqueda, orden, precio y disponibilidad", () => {

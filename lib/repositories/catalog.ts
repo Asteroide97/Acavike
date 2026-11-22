@@ -4,6 +4,8 @@ import { demoCategories, demoProducts, demoProductsBySlug, demoSiteSections } fr
 import { productImageSelect } from "@/lib/product-images";
 import { getSiteSettingsMapRepository } from "@/lib/repositories/settings";
 import { descendantCategoryIds, visibleCategories, type CatalogFilters, type CatalogSort } from "@/lib/catalog-filters";
+import { sortCustomProducts } from "@/lib/product-order";
+import { getCustomOrderEntriesRepository } from "@/lib/repositories/product-order";
 
 type SortOption = CatalogSort;
 
@@ -22,6 +24,7 @@ function filterAndSortDemoProducts(query: string, categorySlug: string, sort: So
     return product.isActive && matchesQuery && matchesCategory;
   });
 
+  if (sort === "custom") return sortCustomProducts(filtered, []);
   return filtered.sort((left, right) => {
     if (sort === "name_asc" || sort === "name_desc") return left.name.localeCompare(right.name, "es") * (sort === "name_desc" ? -1 : 1);
     if (sort === "price_asc") {
@@ -158,7 +161,7 @@ export async function getCatalogPageDataRepository(input: CatalogFilters) {
             ? { name: "desc" as const }
         : input.sort === "newest"
           ? { createdAt: "desc" as const }
-          : { isFeatured: "desc" as const };
+          : input.sort === "custom" ? { createdAt: "asc" as const } : { isFeatured: "desc" as const };
 
   const products = await prisma.product.findMany({
     where: {
@@ -192,13 +195,13 @@ export async function getCatalogPageDataRepository(input: CatalogFilters) {
     orderBy: [orderBy, { id: "asc" }],
   });
 
-  return { categories, products };
+  return { categories, products: input.sort === "custom" ? sortCustomProducts(products, await getCustomOrderEntriesRepository(selected?.id || null)) : products };
 }
 
 export async function getCategoryCatalogDataRepository(slug: string) {
   if (DEMO_MODE) {
     const category = demoCategories.find((item) => item.slug === slug) || null;
-    const products = demoProducts.filter((product) => product.category.slug === slug && product.isActive);
+    const products = sortCustomProducts(demoProducts.filter((product) => product.category.slug === slug && product.isActive), []);
     return { category, products };
   }
 
@@ -233,7 +236,7 @@ export async function getCategoryCatalogDataRepository(slug: string) {
     orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
   });
 
-  return { category, products };
+  return { category, products: sortCustomProducts(products, await getCustomOrderEntriesRepository(category.id)) };
 }
 
 export async function getProductDetailDataRepository(slug: string) {

@@ -103,6 +103,7 @@ model Category {
   sortOrder   Int        @default(0)
   isActive    Boolean    @default(true)
   products    Product[]
+  catalogOrderScope CatalogOrderScope?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 }
@@ -131,8 +132,29 @@ model Product {
   cartItems         CartItem[]
   orderItems        OrderItem[]
   quoteItems        QuoteItem[]
+  catalogOrders     CatalogProductOrder[]
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
+}
+
+model CatalogOrderScope {
+  id         String @id
+  categoryId String? @unique
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  version    Int @default(0)
+  items      CatalogProductOrder[]
+}
+
+model CatalogProductOrder {
+  scopeId   String
+  scope     CatalogOrderScope @relation(fields: [scopeId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  position  Int
+
+  @@id([scopeId, productId])
+  @@unique([scopeId, position])
+  @@index([productId])
 }
 
 model ProductImage {

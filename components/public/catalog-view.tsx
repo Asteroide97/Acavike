@@ -5,7 +5,7 @@ import { CatalogBreadcrumbs } from "@/components/public/catalog-breadcrumbs";
 import { ProductCard } from "@/components/public/product-card";
 import { CategoryImage } from "@/components/public/category-image";
 import { CategoryTile } from "@/components/public/category-card";
-import { catalogHref, categoryPath, orderedCategoryTree, type CatalogFilters } from "@/lib/catalog-filters";
+import { catalogHref, catalogPage, categoryPath, orderedCategoryTree, type CatalogFilters } from "@/lib/catalog-filters";
 import type { getCatalogPageDataRepository } from "@/lib/repositories/catalog";
 
 type CatalogData = Awaited<ReturnType<typeof getCatalogPageDataRepository>>;
@@ -13,6 +13,7 @@ type CatalogData = Awaited<ReturnType<typeof getCatalogPageDataRepository>>;
 export function CatalogView({ data, filters, unavailable = false }: { data: CatalogData; filters: CatalogFilters; unavailable?: boolean }) {
   const categories = orderedCategoryTree(data.categories ?? []);
   const products = data.products ?? [];
+  const pagination = catalogPage(products, filters.page);
   const active = categories.find(category => category.slug === filters.categorySlug);
   const ancestors = active ? categoryPath(categories, active.id) : [];
   const children = categories.filter(category => category.parentId === active?.id);
@@ -65,13 +66,18 @@ export function CatalogView({ data, filters, unavailable = false }: { data: Cata
               {filters.maxPrice !== undefined ? <input type="hidden" name="max" value={filters.maxPrice} /> : null}
               {filters.inStock ? <input type="hidden" name="disponibilidad" value="disponible" /> : null}
               <label className="relative min-w-0 sm:col-span-2 xl:col-span-1"><span className="sr-only">Buscar productos</span><Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" /><input name="q" defaultValue={filters.query} placeholder="Nombre, descripción, código o SKU" className="public-input w-full min-w-0 pl-9" /></label>
-              <select aria-label="Ordenar productos" name="orden" defaultValue={filters.sort} className="public-select w-full min-w-0"><option value="featured">Destacados</option><option value="name_asc">Nombre: A a Z</option><option value="name_desc">Nombre: Z a A</option><option value="price_asc">Precio: menor a mayor</option><option value="price_desc">Precio: mayor a menor</option><option value="newest">Más recientes</option></select>
+              <select aria-label="Ordenar productos" name="orden" defaultValue={filters.sort} className="public-select w-full min-w-0"><option value="custom">Orden personalizado</option><option value="featured">Destacados</option><option value="name_asc">Nombre: A a Z</option><option value="name_desc">Nombre: Z a A</option><option value="price_asc">Precio: menor a mayor</option><option value="price_desc">Precio: mayor a menor</option><option value="newest">Más recientes</option></select>
               <button className="public-btn" type="submit">Buscar</button>
             </form>
             {children.length ? <nav aria-label="Subcategorías" className="mt-4 grid grid-cols-2 gap-3 border-t border-[#D1D5DB] pt-4 sm:grid-cols-3 lg:grid-cols-4">{children.map(child => <CategoryTile href={catalogHref(filters, child.slug)} key={child.id} imageUrl={child.imageUrl} name={child.name} sizes="(max-width: 640px) 40vw, 180px" />)}</nav> : null}
           </div>
           {unavailable ? <p role="status" className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm">No fue posible consultar el catálogo. Intenta de nuevo o solicita una cotización.</p> : null}
-          {products.length ? <div className="grid min-w-0 grid-cols-1 gap-3 min-[380px]:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">{products.map(product => <ProductCard key={product.id} product={product} catalog />)}</div> : <div className="rounded-md border border-[#D1D5DB] bg-white px-5 py-14 text-center"><h2 className="text-xl font-bold text-[#0B1E4B]">No hay productos para esta selección</h2><p className="mx-auto mt-2 max-w-md text-sm text-slate-600">Prueba otra búsqueda o envíanos tu lista de materiales para cotizar.</p><div className="mt-5 flex flex-wrap justify-center gap-2"><Link href="/catalogo" className="public-btn-outline">Ver catálogo</Link><Link href="/cotizacion-rapida" className="public-btn">Solicitar cotización</Link></div></div>}
+          {products.length ? <div className="grid min-w-0 grid-cols-1 gap-3 min-[380px]:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">{pagination.products.map(product => <ProductCard key={product.id} product={product} catalog />)}</div> : <div className="rounded-md border border-[#D1D5DB] bg-white px-5 py-14 text-center"><h2 className="text-xl font-bold text-[#0B1E4B]">No hay productos para esta selección</h2><p className="mx-auto mt-2 max-w-md text-sm text-slate-600">Prueba otra búsqueda o envíanos tu lista de materiales para cotizar.</p><div className="mt-5 flex flex-wrap justify-center gap-2"><Link href="/catalogo" className="public-btn-outline">Ver catálogo</Link><Link href="/cotizacion-rapida" className="public-btn">Solicitar cotización</Link></div></div>}
+          {pagination.pageCount > 1 ? <nav aria-label="Páginas del catálogo" className="flex flex-wrap items-center justify-between gap-3 rounded-md border bg-white p-3">
+            {pagination.page > 1 ? <Link href={catalogHref(filters, filters.categorySlug, pagination.page - 1)} className="public-btn-outline">Anterior</Link> : <span />}
+            <span className="text-sm">Página {pagination.page} de {pagination.pageCount}</span>
+            {pagination.page < pagination.pageCount ? <Link href={catalogHref(filters, filters.categorySlug, pagination.page + 1)} className="public-btn-outline">Siguiente</Link> : <span />}
+          </nav> : null}
         </section>
       </div>
     </div>

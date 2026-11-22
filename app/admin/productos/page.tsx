@@ -23,7 +23,9 @@ export default async function ProductsAdminPage() {
         title="Catálogo de productos"
         description="Administra nombres, SKU, categoría, stock, precios y escalas por mayoreo."
         actions={
-          DEMO_MODE ? (
+          <div className="flex flex-wrap gap-2">
+            <Link href="/admin/productos/ordenar" className={cn(buttonVariants({ variant: "outline" }))}>Ordenar productos</Link>
+            {DEMO_MODE ? (
             <span className={cn(buttonVariants({ variant: "outline" }), "pointer-events-none opacity-60")}>
               Nuevo producto
             </span>
@@ -31,7 +33,8 @@ export default async function ProductsAdminPage() {
             <Link href="/admin/productos/nuevo" className={cn(buttonVariants())}>
               Nuevo producto
             </Link>
-          )
+            )}
+          </div>
         }
       />
 
