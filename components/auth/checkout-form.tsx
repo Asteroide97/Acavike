@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { CsfUploadPending } from "@/components/auth/csf-upload-pending";
 
 type CheckoutValues = z.infer<typeof checkoutSchema>;
 
@@ -97,6 +98,9 @@ export function CheckoutForm({
       <div className="md:col-span-2">
         <Label htmlFor="checkout-notes">Notas del pedido</Label>
         <Textarea id="checkout-notes" {...form.register("notes")} />
+      </div>
+      <div className="md:col-span-2">
+        <CsfUploadPending />
       </div>
       {isAuthenticated ? (
         <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
